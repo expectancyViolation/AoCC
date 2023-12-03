@@ -5,3 +5,7 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 set(CMAKE_C_STANDARD 11)
 
 add_executable(aocc main.c timer.c)
+#add_link_options(aocc -static)
+#add_library(libconnectc STATIC)
+
+target_link_libraries(aocc -static -lcollectc)

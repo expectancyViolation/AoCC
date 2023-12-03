@@ -48,7 +48,7 @@ int get_last(const char *buffer, bool part2) {
   return 0;
 }
 
-struct two_part_result *day01(char *buf) {
+struct two_part_result *day01(char *buf, __attribute__((unused)) long buf_len) {
   struct two_part_result *result = allocate_two_part_result();
   char **buf_pos = &buf;
   while (*buf_pos != NULL) {

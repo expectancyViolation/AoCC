@@ -31,20 +31,52 @@ long read_file_to_memory(const char *filename, char **file_content_out,
   fclose(f);
 
   if (add_newline)
-    (*file_content_out)[fsize - 1] = '\n';
+    (*file_content_out)[fsize + add_newline - 1] = '\n';
 
-  (*file_content_out)[fsize] = 0;
-  return fsize;
+  (*file_content_out)[fsize + add_newline] = 0;
+  return fsize + 1 + add_newline;
 }
 
-void align_pointers_on_separator(const char *buf, char **head, char **tail) {
-  if (*head != buf) {
-    while ((**head != '\n') && (**head != 0))
-      ++*head;
-    ++*head;
+void step_forward_to_separator(const char *bound, char **ptr) {
+  while ((**ptr != '\n') && (**ptr != 0) && (*ptr != bound)) {
+    ++*ptr;
   }
-  while (**tail != '\n' && (**tail != 0))
-    ++*tail;
 }
+
+void step_backward_to_separator(const char *bound, char **ptr) {
+  while ((**ptr != '\n') && (**ptr != 0) && (*ptr != bound)) {
+    --*ptr;
+  }
+}
+
+void align_pointer_on_separator(const char *lower_bound,
+                                const char *upper_bound, const int offset,
+                                char **ptr) {
+  // printf("aligning (%x-%x) with offset %d starting from
+  // %x\n",lower_bound,upper_bound,offset,*ptr);
+  step_forward_to_separator(upper_bound, ptr);
+  if (offset >= 0) {
+    for (int i = 0; i < offset; i++) {
+      ++*ptr;
+      step_forward_to_separator(upper_bound, ptr);
+    }
+  } else {
+    step_backward_to_separator(lower_bound, ptr);
+    for (int i = 0; i > offset; i--) {
+      --*ptr;
+      step_backward_to_separator(lower_bound, ptr);
+    }
+  }
+  // printf("aligned: %x\n",*ptr);
+}
+
+void align_pointers_on_separator(const char *lower_bound,
+                                 const char *upper_bound, int lower_extend,
+                                 int upper_extend, char **head, char **tail) {
+  align_pointer_on_separator(lower_bound, upper_bound, -lower_extend, head);
+  align_pointer_on_separator(lower_bound, upper_bound, upper_extend, tail);
+}
+
+long get_first_line_length(char *buf) { return strchr(buf, '\n') - buf + 1; }
 
 #endif // AOCC_HELPERS_H

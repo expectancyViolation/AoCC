@@ -9,37 +9,40 @@
 // TODO DANGER: buffer is split in equal size pieces,
 //      if two pieces are contained within the same line
 //      two threads will access the same segment of memory!
-#define PARALLEL_LOOP_COUNT 30
+#define PARALLEL_LOOP_COUNT 1000
 
 #include "helpers.h"
 #include <stdbool.h>
 #include <string.h>
 
 // TODO: better to pass an input buffer?
-void parallelize(void *solve(char *buffer),
+void parallelize(void *solve(char *buffer, long buf_len),
                  void consume_partial_result(void *result, void *partial),
-                 void *result, const char *input_filename) {
-  char *file_content;
-  const long filesize =
-      read_file_to_memory(input_filename, &file_content, true);
+                 void *result, const char *input_buffer, long filesize,
+                 int overlap) {
+  const char *file_end = input_buffer + filesize - 1;
   const int n_chunks = PARALLEL_LOOP_COUNT;
   const long chunk_size = filesize / n_chunks;
 #pragma omp parallel for
   for (int i = 0; i < n_chunks; ++i) {
     const long begin_pos = chunk_size * i;
     const long end_pos = min(chunk_size * (i + 1), filesize - 1);
-    char *begin_pointer = file_content + begin_pos;
-    char *end_pointer = file_content + end_pos;
-    align_pointers_on_separator(file_content, &begin_pointer, &end_pointer);
-    *end_pointer = 0;
+    const char *begin_pointer = input_buffer + begin_pos;
+    const char *end_pointer = input_buffer + end_pos;
+    const bool is_first_segment = (i == 0);
+    const int lower_extend = is_first_segment ? 1 : overlap;
+    align_pointers_on_separator(input_buffer, file_end, lower_extend, overlap,
+                                &begin_pointer, &end_pointer);
+    if (!is_first_segment)
+      ++begin_pointer;
 #ifdef PARALLELIZE_ON_COPY
     // operate on a copy to prevent "strsep" etc. to mess stuff up:
     // TODO: how does this affect performance
     const ptrdiff_t segment_size = end_pointer - begin_pointer;
-    char *copy_buffer = (char *)malloc(segment_size);
+    char *copy_buffer = (char *)malloc(segment_size + 1);
     strncpy(copy_buffer, begin_pointer, segment_size);
-    copy_buffer[segment_size - 1] = 0;
-    void *partial_res = solve(copy_buffer);
+    copy_buffer[segment_size] = 0;
+    void *partial_res = solve(copy_buffer, segment_size + 1);
     free(copy_buffer);
 #else
     void *partial_res = solve(begin_pointer);
@@ -47,8 +50,6 @@ void parallelize(void *solve(char *buffer),
 #pragma omp critical
     consume_partial_result(result, partial_res);
   }
-#pragma omp single
-  { free(file_content); }
 }
 
 #endif // AOCC_PARALLELIZE_H

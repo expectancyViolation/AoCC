@@ -79,7 +79,7 @@ void get_required_draw(char *buf, long *game_id_out,
   }
 }
 
-struct two_part_result *day02(char *buf) {
+struct two_part_result *day02(char *buf, __attribute__((unused)) long buf_len) {
   struct draw draw_limit = {12, 13, 14};
   struct draw required_draw;
 
