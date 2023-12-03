@@ -5,6 +5,15 @@
 #include "day01.h"
 #include "day02.h"
 #include "parallelize.h"
+#include "two_part_result.h"
+
+void print_day_result(char *day, struct two_part_result *result) {
+  printf("----------\n");
+  printf("%s\n", day);
+  printf("---\n");
+  print_two_part_result(result);
+  printf("----------\n\n");
+}
 
 int main() {
 

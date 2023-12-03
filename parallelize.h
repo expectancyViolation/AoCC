@@ -2,11 +2,11 @@
 // Created by matze on 03/12/2023.
 //
 
-#define PARALLELIZE_ON_COPY
-#define PARALLEL_COUNT 1
-
 #ifndef AOCC_PARALLELIZE_H
 #define AOCC_PARALLELIZE_H
+
+#define PARALLELIZE_ON_COPY
+#define PARALLEL_LOOP_COUNT 50
 
 #include "helpers.h"
 #include <stdbool.h>
@@ -18,7 +18,7 @@ void parallelize(void *solve(char *buffer),
                  void *result, const char *filename) {
   char *file_content;
   const long filesize = read_file_to_memory(filename, &file_content, true);
-  const int n_chunks = PARALLEL_COUNT;
+  const int n_chunks = PARALLEL_LOOP_COUNT;
   const long chunk_size = filesize / n_chunks;
 #pragma omp parallel for
   for (int i = 0; i < n_chunks; ++i) {

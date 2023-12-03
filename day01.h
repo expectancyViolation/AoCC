@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "helpers.h"
+#include "two_part_result.h"
 
 const char *digit_and_names[20] = {"0",    "1",   "2",     "3",     "4",
                                    "5",    "6",   "7",     "8",     "9",
@@ -31,7 +32,7 @@ int get_first(const char *buffer, bool part2) {
       }
     }
   }
-  assert(false);
+  return 0;
 }
 
 int get_last(const char *buffer, bool part2) {
@@ -42,7 +43,7 @@ int get_last(const char *buffer, bool part2) {
       }
     }
   }
-  assert(false);
+  return 0;
 }
 
 struct two_part_result *day01(char *buf) {
