@@ -19,11 +19,13 @@ struct two_part_result *allocate_two_part_result() {
   return result;
 }
 
+void free_two_part_result(struct two_part_result *result) { free(result); }
+
 void add_consume_partial_result(struct two_part_result *result,
                                 struct two_part_result *partial_result) {
   (result->part2_result) += (partial_result->part2_result);
   (result->part1_result) += (partial_result->part1_result);
-  free(partial_result);
+  free_two_part_result(partial_result);
 }
 
 void print_two_part_result(struct two_part_result *result) {

@@ -9,3 +9,11 @@ export OMP_NUM_THREADS = 24
 ```
 clang-format -i ./*.c ./*.h
 ```
+
+# debug
+
+## memory
+
+```
+valgrind --tool=memcheck  --leak-check=full --track-origins=yes ./aocc
+```

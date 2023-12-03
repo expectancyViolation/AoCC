@@ -24,6 +24,8 @@ int matches(const long long *buff_int, const int j) {
   return !((difference) & (masks[j]));
 }
 
+// unsafe: we read over the end of the buffer :/
+// but: it's fast :D
 int get_first(const char *buffer, bool part2) {
   for (int i = 0; buffer[i] != 0; i++) {
     for (int j = 0; j < (part2 ? 20 : 10); j++) {
