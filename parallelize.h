@@ -6,18 +6,22 @@
 #define AOCC_PARALLELIZE_H
 
 #define PARALLELIZE_ON_COPY
-#define PARALLEL_LOOP_COUNT 50
+// TODO DANGER: buffer is split in equal size pieces,
+//      if two pieces are contained within the same line
+//      two threads will access the same segment of memory!
+#define PARALLEL_LOOP_COUNT 30
 
 #include "helpers.h"
 #include <stdbool.h>
 #include <string.h>
 
-// TODO: better to pass a buffer?
+// TODO: better to pass an input buffer?
 void parallelize(void *solve(char *buffer),
                  void consume_partial_result(void *result, void *partial),
-                 void *result, const char *filename) {
+                 void *result, const char *input_filename) {
   char *file_content;
-  const long filesize = read_file_to_memory(filename, &file_content, true);
+  const long filesize =
+      read_file_to_memory(input_filename, &file_content, true);
   const int n_chunks = PARALLEL_LOOP_COUNT;
   const long chunk_size = filesize / n_chunks;
 #pragma omp parallel for
@@ -29,8 +33,8 @@ void parallelize(void *solve(char *buffer),
     align_pointers_on_separator(file_content, &begin_pointer, &end_pointer);
     *end_pointer = 0;
 #ifdef PARALLELIZE_ON_COPY
-    // operate on a copy to prevent "strsep" etc. to mess stuff up: TODO: how
-    // does this affect performance
+    // operate on a copy to prevent "strsep" etc. to mess stuff up:
+    // TODO: how does this affect performance
     const ptrdiff_t segment_size = end_pointer - begin_pointer;
     char *copy_buffer = (char *)malloc(segment_size);
     strncpy(copy_buffer, begin_pointer, segment_size);
