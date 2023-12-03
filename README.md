@@ -1,3 +1,2 @@
-```
-export OMP_NUM_THREADS=24
+``` export OMP_NUM_THREADS = 24
 ```
