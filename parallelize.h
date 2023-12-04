@@ -9,11 +9,12 @@
 // TODO DANGER: buffer is split in equal size pieces,
 //      if two pieces are contained within the same line
 //      two threads will access the same segment of memory!
-#define PARALLEL_LOOP_COUNT 100
+#define PARALLEL_LOOP_COUNT 24
 
 #include "helpers.h"
 #include <stdbool.h>
 #include <string.h>
+#include <omp.h>
 
 // TODO: better to pass an input buffer?
 void parallelize(void *solve(char *buffer, long buf_len),
@@ -44,6 +45,8 @@ void parallelize(void *solve(char *buffer, long buf_len),
     copy_buffer[segment_size] = 0;
     void *partial_res = solve(copy_buffer, segment_size + 1);
     free(copy_buffer);
+//    int tid = omp_get_thread_num();
+//    printf("Hello world from omp thread %d\n", tid);
 #else
     void *partial_res = solve(begin_pointer);
 #endif
