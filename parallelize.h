@@ -2,7 +2,7 @@
 #define AOCC_PARALLELIZE_H
 
 #define PARALLELIZE_ON_COPY
-#define PARALLEL_LOOP_COUNT 4
+#define PARALLEL_LOOP_COUNT 24
 
 #include "helpers.h"
 #include <omp.h>

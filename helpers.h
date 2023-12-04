@@ -79,4 +79,6 @@ void align_pointers_on_separator(const char *lower_bound,
 
 long get_first_line_length(char *buf) { return strchr(buf, '\n') - buf + 1; }
 
+long compare_long(long *l1, long *l2) { return (*l1) - (*l2); }
+
 #endif // AOCC_HELPERS_H

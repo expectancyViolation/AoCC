@@ -5,11 +5,11 @@
 #include "day01.h"
 #include "day02.h"
 #include "day03.h"
+#include "day04.h"
+#include "fenwick.h"
 #include "parallelize.h"
 #include "timer.h"
 #include "two_part_result.h"
-#include "day04.h"
-#include "fenwick.h"
 
 void parallel_solve_day01() {
   struct two_part_result *day_res = allocate_two_part_result();
@@ -41,6 +41,5 @@ int main() {
 //  benchmark(parallel_solve_day01);
 //  benchmark(parallel_solve_day02);
 //  benchmark(solve_day03);
-//test_fenwick();
-    benchmark(solve_day04);
+  benchmark(solve_day04);
 }
