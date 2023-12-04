@@ -1,12 +1,7 @@
-//
-// Created by matze on 02/12/2023.
-//
-
 #include "day01.h"
 #include "day02.h"
 #include "day03.h"
 #include "day04.h"
-#include "fenwick.h"
 #include "parallelize.h"
 #include "timer.h"
 #include "two_part_result.h"
@@ -39,8 +34,8 @@ void parallel_solve_day02() {
 }
 
 int main() {
-  // benchmark(parallel_solve_day01);
-  // benchmark(parallel_solve_day02);
-  // benchmark(solve_day03);
+  benchmark(parallel_solve_day01);
+  benchmark(parallel_solve_day02);
+  benchmark(solve_day03);
   benchmark(solve_day04);
 }

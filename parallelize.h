@@ -1,7 +1,7 @@
 #ifndef AOCC_PARALLELIZE_H
 #define AOCC_PARALLELIZE_H
 
-#define PARALLELIZE_ON_COPY
+#define PARALLELIZE_RUN_ON_COPY
 #define PARALLEL_LOOP_COUNT 24
 
 #include "helpers.h"
@@ -28,7 +28,7 @@ void parallelize(void *solve(char *buffer, long buf_len),
                                 &begin_pointer, &end_pointer);
     if (!is_first_segment)
       ++begin_pointer;
-#ifdef PARALLELIZE_ON_COPY
+#ifdef PARALLELIZE_RUN_ON_COPY
     // operate on a copy to prevent "strsep" etc. to mess stuff up:
     // TODO: how does this affect performance
     const ptrdiff_t segment_size = end_pointer - begin_pointer;

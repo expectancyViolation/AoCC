@@ -1,7 +1,3 @@
-//
-// Created by matze on 04/12/2023.
-//
-
 #ifndef AOCC_FENWICK_H
 #define AOCC_FENWICK_H
 

@@ -1,7 +1,3 @@
-//
-// Created by matze on 04/12/2023.
-//
-
 #include "fenwick.h"
 #include "helpers.h"
 #include "parallelize.h"
@@ -11,7 +7,7 @@
 #ifndef AOCC_DAY04_H
 #define AOCC_DAY04_H
 
-#define DAY04_FILE "/tmp/day04_bigboy"
+#define DAY04_FILE "/tmp/day04"
 #define DAY04_MIN_LINE_LEN 10 // assume a line is at least 10 bytes long
 #define MAX_WIN_NUMBER 100    // assume winning numbers are 2 digit
 #define num_bitmask 0b1111

@@ -1,7 +1,3 @@
-//
-// Created by matze on 03/12/2023.
-//
-
 #ifndef AOCC_TWO_PART_RESULT_H
 #define AOCC_TWO_PART_RESULT_H
 
