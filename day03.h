@@ -1,6 +1,8 @@
 #ifndef AOCC_DAY03_H
 #define AOCC_DAY03_H
 
+#define DAY03_FILE "/tmp/day03"
+
 #include "cvector.h"
 #include "parallelize.h"
 #include "two_part_result.h"
@@ -37,7 +39,6 @@ bool is_dig(char c) { return (c >= '0') && (c <= '9'); }
 int day03_parse_numbers(char **curr_number_pos, char **curr_number_end) {
   while ((!is_dig(**curr_number_pos)) && (**curr_number_pos != 0))
     ++*curr_number_pos;
-
   if (**curr_number_pos == 0)
     return 0;
   const int number = (int)strtol(*curr_number_pos, curr_number_end, 10);
@@ -162,8 +163,7 @@ struct two_part_result *day03(char *buf, long buf_len) {
 void solve_day03() {
   struct two_part_result *day_res = allocate_two_part_result();
   char *input_buffer;
-  const long filesize =
-      read_file_to_memory("/tmp/day03_bigboy", &input_buffer, true);
+  const long filesize = read_file_to_memory(DAY03_FILE, &input_buffer, true);
   char *padded_buffer;
   const long padded_buffer_len =
       day03_pad_input(input_buffer, &padded_buffer, filesize);

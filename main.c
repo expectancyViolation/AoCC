@@ -11,11 +11,13 @@
 #include "timer.h"
 #include "two_part_result.h"
 
+#define DAY01_FILE "/tmp/day01"
+#define DAY02_FILE "/tmp/day02"
+
 void parallel_solve_day01() {
   struct two_part_result *day_res = allocate_two_part_result();
   char *input_buffer;
-  const long filesize =
-      read_file_to_memory("/tmp/day01_bigboy", &input_buffer, true);
+  const long filesize = read_file_to_memory(DAY01_FILE, &input_buffer, true);
   parallelize((void *(*)(char *, long))(day01),
               (void (*)(void *, void *))(add_consume_partial_result), day_res,
               input_buffer, filesize, 0);
@@ -27,8 +29,7 @@ void parallel_solve_day01() {
 void parallel_solve_day02() {
   struct two_part_result *day_res = allocate_two_part_result();
   char *input_buffer;
-  const long filesize =
-      read_file_to_memory("/tmp/day02_bigboy", &input_buffer, true);
+  const long filesize = read_file_to_memory(DAY02_FILE, &input_buffer, true);
   parallelize((void *(*)(char *, long))(day02),
               (void (*)(void *, void *))(add_consume_partial_result), day_res,
               input_buffer, filesize, 0);
@@ -38,8 +39,8 @@ void parallel_solve_day02() {
 }
 
 int main() {
-//  benchmark(parallel_solve_day01);
-//  benchmark(parallel_solve_day02);
-//  benchmark(solve_day03);
+  // benchmark(parallel_solve_day01);
+  // benchmark(parallel_solve_day02);
+  // benchmark(solve_day03);
   benchmark(solve_day04);
 }
