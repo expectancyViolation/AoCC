@@ -8,4 +8,4 @@ add_executable(aocc main.c timer.c)
 #add_link_options(aocc -static)
 #add_library(libconnectc STATIC)
 
-target_link_libraries(aocc -static -lcollectc)
+#target_link_libraries(aocc -static -lcollectc)

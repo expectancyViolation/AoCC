@@ -6,7 +6,7 @@
 #define AOCC_DAY03_H
 
 #include "two_part_result.h"
-#include <collectc/cc_hashtable.h>
+#include "cvector.h"
 
 void day03_place_pad_line(char *buf, long line_length) {
     memset(buf, '.', line_length);
@@ -62,68 +62,46 @@ bool day03_is_adjacent_to_symbol(char *segment_begin, const char *segment_end,
     return result;
 }
 
-void increment_count_table(CC_HashTable *count_table, const char *pos) {
-    long *cnt;
-    enum cc_stat got = cc_hashtable_get(count_table, pos, (void **) &cnt);
-    if (got != CC_OK) {
-        cnt = malloc(sizeof *cnt);
-        *cnt = 0;
-    }
-    (*cnt) += 1;
-    cc_hashtable_add(count_table, pos, cnt);
-}
+struct day03_gear_match {
+    char *pos;
+    long num;
+};
 
-void multiply_prod_table(CC_HashTable *prod_table, const char *pos, long val) {
-    long *cnt;
-    enum cc_stat got = cc_hashtable_get(prod_table, pos, (void **) &cnt);
-    if (got != CC_OK) {
-        cnt = malloc(sizeof *cnt);
-        *cnt = 1;
-    }
-    (*cnt) *= val;
-    cc_hashtable_add(prod_table, pos, cnt);
+long compare_day03_gear_match(struct day03_gear_match *m1, struct day03_gear_match *m2) {
+    return (m1->pos) - (m2->pos);
 }
-
 
 void day03_mark_gears(char *segment_begin, const char *segment_end,
-                      long line_length, long value, CC_HashTable *count_table, CC_HashTable *prod_table) {
+                      long line_length, long value, struct day03_gear_match **vec) {
+    struct day03_gear_match match;
+    match.num = value;
     for (int i = -1; i < 2; i++) {
         const long offset = i * line_length;
         for (char *ptr = segment_begin - 1; ptr != segment_end + 1; ++ptr) {
             const char *curr_pos = (ptr + offset);
             if (*curr_pos == '*') {
-                increment_count_table(count_table, curr_pos);
-                multiply_prod_table(prod_table, curr_pos, value);
+                match.pos = curr_pos;
+                cvector_push_back(*vec, match);
             }
         }
     }
 }
+
 
 struct two_part_result *day03(char *buf, long buf_len) {
     struct two_part_result *result = allocate_two_part_result();
     const long line_length = get_first_line_length(buf);
 
     char *curr_number_pos = buf;
-    char *part2_segment_begin = buf + line_length;
     char *part1_segment_begin = curr_number_pos + 2 * line_length;
     char *curr_number_end;
 
     char *part1_segment_end = buf + buf_len - 2 * line_length;
-    char *part2_segment_end = buf + buf_len - 1 * line_length;
 
-
+    struct day03_gear_match *v = NULL;
+    //struct day03_gear_match m={NULL,65};
+    //cvector_push_back(v,m);
     int curr_number = -1;
-    CC_HashTable *count_table;
-    CC_HashTable *prod_table;
-
-
-
-    if (cc_hashtable_new(&count_table) != CC_OK) {
-        printf("failed to create hashtable");
-    }
-    if (cc_hashtable_new(&prod_table) != CC_OK) {
-        printf("failed to create hashtable");
-    }
     while (true) {
         curr_number = day03_parse_numbers(&curr_number_pos, &curr_number_end);
         if (curr_number == 0)
@@ -131,7 +109,7 @@ struct two_part_result *day03(char *buf, long buf_len) {
         const bool is_adjacent = day03_is_adjacent_to_symbol(
                 curr_number_pos, curr_number_end, line_length);
 
-        //day03_mark_gears(curr_number_pos, curr_number_end, line_length, curr_number, count_table, prod_table);
+        day03_mark_gears(curr_number_pos, curr_number_end, line_length, curr_number, &v);
 
         if ((part1_segment_begin <= curr_number_pos) && (curr_number_pos < part1_segment_end)) {
             if (is_adjacent) {
@@ -140,23 +118,37 @@ struct two_part_result *day03(char *buf, long buf_len) {
         }
         curr_number_pos = curr_number_end;
     }
+    qsort(v, cvector_size(v), sizeof (struct day03_gear_match), (__compar_fn_t) compare_day03_gear_match);
 
-    CC_HashTableIter hti;
-
-    cc_hashtable_iter_init(&hti, count_table);
-    TableEntry *entry;
-    long *gear_val;
-    while (cc_hashtable_iter_next(&hti, &entry) != CC_ITER_END) {
-        long *val = entry->value;
-        char *gear_pos = entry->key;
-        if ((*val) == 2) {
-            if ((part1_segment_begin <= gear_pos) && (gear_pos <= part1_segment_end)) {
-                cc_hashtable_get(prod_table, entry->key, (void **) &gear_val);
-                result->part2_result += *gear_val;
+    char *prev_pos = NULL;
+    int curr_count = 0;
+    long curr_prod = 1;
+    if (v) {
+        struct day03_gear_match *it;
+        int i = 0;
+        for (it = cvector_begin(v); it != cvector_end(v); ++it) {
+            const char *curr_pos = it->pos;
+            if (curr_pos != prev_pos) {
+                if (curr_count == 2) {
+                    if((part1_segment_begin <= prev_pos) && (prev_pos < part1_segment_end) )
+                    result->part2_result += curr_prod;
+                }
+                curr_count = 0;
+                curr_prod = 1;
             }
+            curr_count += 1;
+            curr_prod *= it->num;
+            prev_pos = curr_pos;
+        }
+        if (curr_count == 2) {
+            if((part1_segment_begin <= prev_pos) && (prev_pos < part1_segment_end) )
+            result->part2_result += curr_prod;
         }
     }
-    return result;
+
+
+    return  result;
 }
+
 
 #endif // AOCC_DAY03_H

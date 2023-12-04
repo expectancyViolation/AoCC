@@ -9,7 +9,7 @@
 // TODO DANGER: buffer is split in equal size pieces,
 //      if two pieces are contained within the same line
 //      two threads will access the same segment of memory!
-#define PARALLEL_LOOP_COUNT 1000
+#define PARALLEL_LOOP_COUNT 100
 
 #include "helpers.h"
 #include <stdbool.h>
