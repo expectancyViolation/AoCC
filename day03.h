@@ -1,12 +1,9 @@
-//
-// Created by matze on 03/12/2023.
-//
-
 #ifndef AOCC_DAY03_H
 #define AOCC_DAY03_H
 
 #include "cvector.h"
 #include "two_part_result.h"
+#include "parallelize.h"
 
 void day03_place_pad_line(char **buf_ptr, long line_length) {
   memset(*buf_ptr, '.', line_length);
@@ -21,6 +18,7 @@ long day03_pad_input(char *input_buffer, char **padded_buffer_out,
   *padded_buffer_out = malloc(padded_buffer_len);
   char *padded_buffer = *padded_buffer_out;
   char *pad_ptr = padded_buffer;
+
   day03_place_pad_line(&pad_ptr, line_length);
   day03_place_pad_line(&pad_ptr, line_length);
 
@@ -34,12 +32,11 @@ long day03_pad_input(char *input_buffer, char **padded_buffer_out,
   return padded_buffer_len;
 }
 
-bool is_dig(char c) { return (c >= '0') && (c <= '9'); }
+inline bool is_dig(char c) { return (c >= '0') && (c <= '9'); }
 
 int day03_parse_numbers(char **curr_number_pos, char **curr_number_end) {
   while ((!is_dig(**curr_number_pos)) && (**curr_number_pos != 0))
     ++*curr_number_pos;
-  //assert(**curr_number_pos != '0'); // no leading zeros (and neither 0)
 
   if (**curr_number_pos == 0)
     return 0;
@@ -47,7 +44,7 @@ int day03_parse_numbers(char **curr_number_pos, char **curr_number_end) {
   return number;
 }
 
-bool day03_is_symbol(char c) {
+inline bool day03_is_symbol(char c) {
   return ((c != '.') && (c != 0) && (c != '\n') && !is_dig(c));
 }
 
@@ -160,6 +157,23 @@ struct two_part_result *day03(char *buf, long buf_len) {
   }
 
   return result;
+}
+
+void solve_day03() {
+    struct two_part_result *day_res = allocate_two_part_result();
+    char *input_buffer;
+    const long filesize =
+            read_file_to_memory("/tmp/day03_bigboy", &input_buffer, true);
+    char *padded_buffer;
+    const long padded_buffer_len =
+            day03_pad_input(input_buffer, &padded_buffer, filesize);
+    free(input_buffer);
+    parallelize((void *(*)(char *, long))(day03),
+                (void (*)(void *, void *))(add_consume_partial_result), day_res,
+                padded_buffer, padded_buffer_len, 2);
+    print_day_result("day03", day_res);
+    free_two_part_result(day_res);
+    free(padded_buffer);
 }
 
 #endif // AOCC_DAY03_H
