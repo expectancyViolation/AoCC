@@ -32,7 +32,7 @@ long day03_pad_input(char *input_buffer, char **padded_buffer_out,
   return padded_buffer_len;
 }
 
-inline bool is_dig(char c) { return (c >= '0') && (c <= '9'); }
+bool is_dig(char c) { return (c >= '0') && (c <= '9'); }
 
 int day03_parse_numbers(char **curr_number_pos, char **curr_number_end) {
   while ((!is_dig(**curr_number_pos)) && (**curr_number_pos != 0))
@@ -44,7 +44,7 @@ int day03_parse_numbers(char **curr_number_pos, char **curr_number_end) {
   return number;
 }
 
-inline bool day03_is_symbol(char c) {
+bool day03_is_symbol(char c) {
   return ((c != '.') && (c != 0) && (c != '\n') && !is_dig(c));
 }
 

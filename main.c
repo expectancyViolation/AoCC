@@ -8,6 +8,8 @@
 #include "parallelize.h"
 #include "timer.h"
 #include "two_part_result.h"
+#include "day04.h"
+#include "fenwick.h"
 
 void parallel_solve_day01() {
   struct two_part_result *day_res = allocate_two_part_result();
@@ -36,7 +38,9 @@ void parallel_solve_day02() {
 }
 
 int main() {
-  benchmark(parallel_solve_day01);
-  benchmark(parallel_solve_day02);
-  benchmark(solve_day03);
+//  benchmark(parallel_solve_day01);
+//  benchmark(parallel_solve_day02);
+//  benchmark(solve_day03);
+//test_fenwick();
+    benchmark(solve_day04);
 }
