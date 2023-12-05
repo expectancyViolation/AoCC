@@ -12,8 +12,45 @@
 
 #define DAY05_FILE "/tmp/day05"
 
-void parse_seeds(char *line, long **vec) {
+struct range {
+    long begin;
+    long end;
+};
 
+bool range_is_empty(const struct range *r) {
+    return (r->begin) >= (r->end);
+}
+
+
+int range_compare_lex(const struct range *r1, const struct range *r2) {
+    const long diff_begin = (r1->begin) - (r2->begin);
+    const long diff_end = (r1->end) - (r2->end);
+    // prevent compare function overflow
+    return (diff_begin != 0) ? (diff_begin > 0) - (diff_begin < 0) : (diff_end > 0) - (diff_end < 0);
+}
+
+void range_intersect(const struct range *r1, const struct range *r2, struct range *result) {
+    result->begin = max(r1->begin, r2->begin);
+    result->end = min(r1->end, r2->end);
+}
+
+void range_diff(const struct range *r1, const struct range *r2, struct range *result) {
+    if (r1->begin <= r2->begin) {
+        result->begin = r1->begin;
+        result->end = min(r1->end, r2->begin);
+    } else {
+        result->begin = max(r1->begin, r2->end);
+        result->end = r1->end;
+    }
+}
+
+void shift_range(struct range *r, long offset) {
+    r->begin += offset;
+    r->end += offset;
+}
+
+__attribute__((unused)) void parse_seeds_p1(char *line, struct range **vec) {
+    struct range parsed_range;
     strsep(&line, ":");
     char *endpos;
     while (true) {
@@ -21,76 +58,125 @@ void parse_seeds(char *line, long **vec) {
         if (endpos == line)
             break;
         line = endpos;
-        printf("%ld\n", curr_num);
-        cvector_push_back(*vec, curr_num);
+        parsed_range.begin = curr_num;
+        parsed_range.end = curr_num + 1;
+        cvector_push_back(*vec, parsed_range);
     }
     printf("donso\n");
 }
 
-void print_arr(const long *arr, int arr_len) {
-    for (int i = 0; i < arr_len; i++) {
-        printf("%ld,", arr[i]);
+void parse_seeds_p2(char *line, struct range **vec) {
+    struct range parsed_range;
+    strsep(&line, ":");
+    char *endpos;
+    while (true) {
+        parsed_range.begin = strtol(line, &endpos, 10);
+        parsed_range.end = parsed_range.begin;
+        if (endpos == line)
+            break;
+        line = endpos;
+        parsed_range.end += strtol(line, &line, 10);
+        cvector_push_back(*vec, parsed_range);
+    }
+}
+
+void print_range(const struct range *r) {
+    printf("range from %ld to %ld\n", r->begin, r->end);
+}
+
+__attribute__((unused)) void print_seed_arr(const struct range *arr) {
+    for (size_t i = 0; i < cvector_size(arr); i++) {
+        print_range(&arr[i]);
     }
     printf("\n");
 }
 
-struct two_part_result *day05(char *buf, long buf_len) {
+void coalesce_seed_arr(struct range **v, struct range **out) {
+    qsort(*v, cvector_size(*v), sizeof(struct range),
+          (__compar_fn_t) range_compare_lex);
+    struct range temp_range;
+    temp_range.begin=(*v)[0].begin;
+    temp_range.end=(*v)[0].end;
+    for(size_t i=1;i< cvector_size(*v);i++){
+        const struct range* curr_range=&(*v)[i];
+        if(curr_range->begin>temp_range.end){
+            // temp_range closes
+            cvector_push_back(*out,temp_range);
+            temp_range.begin=curr_range->begin;
+            temp_range.end=curr_range->end;
+        }else{
+            // coalesce
+            temp_range.end=curr_range->end;
+        }
+    }
+    cvector_push_back(*out,temp_range);
+}
+
+struct two_part_result *day05(char *buf, __attribute__((unused)) long _buf_len) {
     struct two_part_result *day_res = allocate_two_part_result();
-    long *source = NULL;
     char *line = strsep(&buf, "\n");
-    parse_seeds(line, &source);
-    const int seed_el_count = cvector_size(source);
-    const size_t seed_size = seed_el_count * (sizeof(long));
-    long *arr1 = malloc(seed_size);
-    long *arr2 = malloc(seed_size);
-    memcpy(arr1, source, seed_size);
-    memcpy(arr2, source, seed_size);
+    struct range *source = NULL;
+    struct range *dest = NULL;
+    struct range parsed_source_range;
+    struct range temp_range;
+
+    parse_seeds_p2(line, &source);
     strsep(&buf, "\n"); // remove first newline
     while (true) {
         if (buf == NULL)
             break;
-        char *map_title = strsep(&buf, "\n"); // remove first newline
-        printf("title:%s\n", map_title);
+        strsep(&buf, "\n"); // discard map title
+        char *end_pos;
         while (true) {
-            char *endpos;
-            long target_range = strtol(buf, &endpos, 10);
-            if (endpos == buf)
+            long destination_range_begin = strtol(buf, &end_pos, 10);
+            if (end_pos == buf)
                 break;
-            buf = endpos;
-            long source_range = strtol(buf, &buf, 10);
+            buf = end_pos;
+            long source_range_begin = strtol(buf, &buf, 10);
             long range_len = strtol(buf, &buf, 10);
-            printf("from %ld to %ld (size %ld)\n", source_range, target_range, range_len);
-            for (int i = 0; i < seed_el_count; i++) {
-                const long el = arr1[i];
-                if ((source_range <= el) && (el < source_range + range_len)) {
-                    arr2[i] = el + target_range - source_range;
-                    arr1[i] = -1;
+
+            parsed_source_range.begin = source_range_begin;
+            parsed_source_range.end = source_range_begin + range_len;
+            const long offset = destination_range_begin - source_range_begin;
+            for (size_t i = 0; i < cvector_size(source); i++) {
+                struct range *curr_range = &source[i];
+                range_intersect(curr_range, &parsed_source_range, &temp_range);
+                if (!range_is_empty(&temp_range)) {
+                    shift_range(&temp_range, offset);
+                    cvector_push_back(dest, temp_range);
                 }
+                range_diff(curr_range, &parsed_source_range, &temp_range);
+                curr_range->begin = temp_range.begin;
+                curr_range->end = temp_range.end;
             }
         }
-        for (int i = 0; i < seed_el_count; i++) {
-            if (arr1[i] == -1)
-                arr1[i] = arr2[i];
+        for (size_t i = 0; i < cvector_size(source); i++) {
+            const struct range *remaining_range = &source[i];
+            if (!range_is_empty(remaining_range)) {
+                cvector_push_back(dest, *remaining_range);
+            }
         }
+        cvector_clear(source);
+        coalesce_seed_arr(&dest, &source);
+        cvector_clear(dest);
 
-        long *tmp = arr1;
-        arr1 = arr2;
-        arr2 = tmp;
-//        print_arr(arr1, seed_el_count);
         strsep(&buf, "\n"); //skip newline after last number
         strsep(&buf, "\n"); // skip empty line
     }
-    long min_el=arr1[0];
-    for (int i = 0; i < seed_el_count; i++) {
-        min_el=min(min_el,arr1[i]);
+    long min_el = source[0].begin;
+    for (size_t i = 0; i < cvector_size(source); i++) {
+        min_el = min(min_el, source[i].begin);
     }
-    day_res->part1_result=min_el;
+    day_res->part2_result = min_el;
 
+
+    cvector_free(source);
+    cvector_free(dest);
     return day_res;
 }
 
 void solve_day05() {
-    struct two_part_result *day_res = allocate_two_part_result();
+    struct two_part_result *day_res;
     char *input_buffer;
     // harder to parallelize b.c. of arbitrary range interactions!
     const long filesize = read_file_to_memory(DAY05_FILE, &input_buffer, false);
