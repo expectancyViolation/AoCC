@@ -28,6 +28,7 @@ long read_file_to_memory(const char *filename, char **file_content_out,
   bool add_newline = append_newline && (last_char != '\n');
   *file_content_out = malloc(fsize + 1 + add_newline);
   fread(*file_content_out, fsize, 1, f);
+
   fclose(f);
 
   if (add_newline)

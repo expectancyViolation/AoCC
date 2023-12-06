@@ -11,7 +11,7 @@
 
 void parallelize(void *solve(char *buffer, long buf_len),
                  void consume_partial_result(void *result, void *partial),
-                 void *result, const char *input_buffer, long filesize,
+                 void *result, char *const input_buffer, long filesize,
                  int overlap) {
   const char *file_end = input_buffer + filesize - 1;
   const int n_chunks = PARALLEL_LOOP_COUNT;
@@ -20,8 +20,8 @@ void parallelize(void *solve(char *buffer, long buf_len),
   for (int i = 0; i < n_chunks; ++i) {
     const long begin_pos = chunk_size * i;
     const long end_pos = min(chunk_size * (i + 1), filesize - 1);
-    const char *begin_pointer = input_buffer + begin_pos;
-    const char *end_pointer = input_buffer + end_pos;
+    char *begin_pointer = input_buffer + begin_pos;
+    char *end_pointer = input_buffer + end_pos;
     const bool is_first_segment = (i == 0);
     const int lower_extend = is_first_segment ? 1 : overlap;
     align_pointers_on_separator(input_buffer, file_end, lower_extend, overlap,

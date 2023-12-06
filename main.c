@@ -3,10 +3,10 @@
 #include "day03.h"
 #include "day04.h"
 #include "day05.h"
+#include "day06.h"
 #include "parallelize.h"
 #include "timer.h"
 #include "two_part_result.h"
-#include "day06.h"
 
 #define DAY01_FILE "/tmp/day01"
 #define DAY02_FILE "/tmp/day02"
@@ -35,12 +35,14 @@ void parallel_solve_day02() {
   free(input_buffer);
 }
 
-int main() {
-  //  benchmark(parallel_solve_day01);
-  //  benchmark(parallel_solve_day02);
-  //  benchmark(solve_day03);
-  //  benchmark(solve_day04);
-
+void run_all_days() {
+  benchmark(parallel_solve_day01);
+  benchmark(parallel_solve_day02);
+  benchmark(solve_day03);
+  benchmark(solve_day04);
   benchmark(solve_day05);
-  //benchmark(solve_day06);
+  benchmark(solve_day06);
+  printf("------------------\n\n");
 }
+
+int main() { benchmark(run_all_days); }

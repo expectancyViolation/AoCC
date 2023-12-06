@@ -66,9 +66,9 @@ struct day03_gear_match {
   long num;
 };
 
-long compare_day03_gear_match(struct day03_gear_match *m1,
-                              struct day03_gear_match *m2) {
-  return (m1->pos) - (m2->pos);
+int compare_day03_gear_match(struct day03_gear_match *m1,
+                             struct day03_gear_match *m2) {
+  return ((m1->pos) > (m2->pos)) - ((m1->pos) < (m2->pos));
 }
 
 void day03_mark_gears(char *segment_begin, const char *segment_end,
@@ -79,7 +79,7 @@ void day03_mark_gears(char *segment_begin, const char *segment_end,
   for (int i = -1; i < 2; i++) {
     const long offset = i * line_length;
     for (char *ptr = segment_begin - 1; ptr != segment_end + 1; ++ptr) {
-      const char *curr_pos = (ptr + offset);
+      char *const curr_pos = (ptr + offset);
       if (*curr_pos == '*') {
         match.pos = curr_pos;
         cvector_push_back(*vec, match);
@@ -103,7 +103,7 @@ struct two_part_result *day03(char *buf, long buf_len) {
   // vector of matches
   struct day03_gear_match *v = NULL;
 
-  int curr_number = -1;
+  int curr_number;
   while (true) {
     curr_number = day03_parse_numbers(&curr_number_pos, &curr_number_end);
     if (curr_number == 0)
@@ -137,7 +137,7 @@ struct two_part_result *day03(char *buf, long buf_len) {
   if (v) {
     struct day03_gear_match *it;
     for (it = cvector_begin(v); it != cvector_end(v); ++it) {
-      const char *curr_pos = it->pos;
+      char *const curr_pos = it->pos;
       if (curr_pos != prev_pos) {
         if (curr_count == 2) {
           if ((part1_segment_begin <= prev_pos) &&
