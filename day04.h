@@ -103,11 +103,11 @@ void solve_day04() {
   // harder to parallelize b.c. of arbitrary range interactions!
   const long filesize = read_file_to_memory(DAY04_FILE, &input_buffer, false);
 #ifdef DAY04_UNSAFE_PARALLEL
-      parallelize((void *(*)(char *, long))(day04),
-                    (void (*)(void *, void *))(add_consume_partial_result),
-                    day_res, input_buffer, filesize, 0);
+  parallelize((void *(*)(char *, long))(day04),
+              (void (*)(void *, void *))(add_consume_partial_result), day_res,
+              input_buffer, filesize, 0);
 #else
-    day_res = day04(input_buffer, filesize);
+  day_res = day04(input_buffer, filesize);
 #endif
 
   print_day_result("day04", day_res);
