@@ -3,7 +3,6 @@
 #include "day03.h"
 #include "day04.h"
 #include "day05.h"
-#include "day05_new.h"
 #include "parallelize.h"
 #include "timer.h"
 #include "two_part_result.h"
@@ -41,5 +40,7 @@ int main() {
   //  benchmark(parallel_solve_day02);
   //  benchmark(solve_day03);
   //  benchmark(solve_day04);
-  benchmark(solve_day06);
+
+  benchmark(solve_day05);
+  //benchmark(solve_day06);
 }
