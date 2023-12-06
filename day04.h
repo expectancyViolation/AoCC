@@ -98,7 +98,7 @@ struct two_part_result *day04(char *buf, long buf_len) {
 }
 
 void solve_day04() {
-  struct two_part_result *day_res = allocate_two_part_result();
+  struct two_part_result *day_res; // = allocate_two_part_result();
   char *input_buffer;
   // harder to parallelize b.c. of arbitrary range interactions!
   const long filesize = read_file_to_memory(DAY04_FILE, &input_buffer, false);
