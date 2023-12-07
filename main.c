@@ -43,10 +43,10 @@ void run_all_days() {
   benchmark(solve_day04);
   benchmark(solve_day05);
   benchmark(solve_day06);
+  benchmark(solve_day07);
   printf("------------------\n\n");
 }
 
 int main() {
-  // benchmark(run_all_days);
-  benchmark(solve_day07);
+  benchmark(run_all_days);
 }

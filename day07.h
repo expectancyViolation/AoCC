@@ -14,11 +14,12 @@
 
 #define DAY07_FILE "/tmp/day07"
 
-#define DAY07_PART1
+// TODO: remove this define.solve both parts simultaneously
+#define DAY07_PART2
 
 #define HAND_SIZE 5
 
-#define CMP(a, b) ((a) > (b)) - ((b) > (a))
+#define CMP(a, b) (((a) > (b)) - ((b) > (a)))
 
 struct hand {
   int largest_match;
@@ -74,7 +75,7 @@ int compare_hand(const struct hand *h1, const struct hand *h2) {
     const int curr_card_compare =
         compare_card_strength(h1->unsorted_hand + i, h2->unsorted_hand + i);
     if (curr_card_compare != 0)
-      return curr_card_compare;
+        return curr_card_compare;
   }
   return 0;
 }
