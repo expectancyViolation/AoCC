@@ -4,3 +4,4 @@ cmake-build-release-wsl
 .idea
 a.out
 /cmake-build-debug-esp/
+/cmake-build-release-mingw/

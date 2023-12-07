@@ -11,9 +11,5 @@ if (OPENMP_FOUND)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-add_executable(aocc main.c timer.c day04.h fenwick.h day05.h day06.h)
-#add_link_options(aocc -static)
-#add_library(libconnectc STATIC)
-
-#target_link_libraries(aocc -static -lcollectc)
+add_executable(aocc main.c timer.c day07.h)
 target_link_libraries(aocc m)
