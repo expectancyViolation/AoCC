@@ -4,10 +4,10 @@
 #include "day04.h"
 #include "day05.h"
 #include "day06.h"
+#include "day07.h"
 #include "parallelize.h"
 #include "timer.h"
 #include "two_part_result.h"
-#include "day07.h"
 
 #define DAY01_FILE "/tmp/day01"
 #define DAY02_FILE "/tmp/day02"
@@ -47,6 +47,6 @@ void run_all_days() {
 }
 
 int main() {
-    //benchmark(run_all_days);
-    benchmark(solve_day07);
+  // benchmark(run_all_days);
+  benchmark(solve_day07);
 }
