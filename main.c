@@ -5,6 +5,7 @@
 #include "day05.h"
 #include "day06.h"
 #include "day07.h"
+#include "day08.h"
 #include "parallelize.h"
 #include "timer.h"
 #include "two_part_result.h"
@@ -44,6 +45,7 @@ void run_all_days() {
   benchmark(solve_day05);
   benchmark(solve_day06);
   benchmark(solve_day07);
+  benchmark(solve_day08);
   printf("------------------\n\n");
 }
 

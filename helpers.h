@@ -82,4 +82,10 @@ long get_first_line_length(char *buf) { return strchr(buf, '\n') - buf + 1; }
 
 long compare_long(long *l1, long *l2) { return (*l1) - (*l2); }
 
+// from: https://stackoverflow.com/questions/19738919/gcd-function-for-c
+long long gcd(long long a, long long b){
+    if (a && b) for(;(a %= b) && (b %= a););
+    return a | b;
+}
+
 #endif // AOCC_HELPERS_H
