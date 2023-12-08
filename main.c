@@ -49,6 +49,4 @@ void run_all_days() {
   printf("------------------\n\n");
 }
 
-int main() {
-  benchmark(run_all_days);
-}
+int main() { benchmark(run_all_days); }

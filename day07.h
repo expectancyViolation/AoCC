@@ -58,7 +58,7 @@ int compare_card_strength(const char *c1, const char *c2) {
   return compare_char(&c1_strength, &c2_strength);
 }
 
-//void print_hand(const struct hand *h) {
+// void print_hand(const struct hand *h) {
 //  printf("hand:\n\t%d\n\t%d\n\t%s\n\t%ld\n", h->largest_match,
 //         h->second_largest_match, h->unsorted_hand, h->bid);
 //}
@@ -75,7 +75,7 @@ int compare_hand(const struct hand *h1, const struct hand *h2) {
     const int curr_card_compare =
         compare_card_strength(h1->unsorted_hand + i, h2->unsorted_hand + i);
     if (curr_card_compare != 0)
-        return curr_card_compare;
+      return curr_card_compare;
   }
   return 0;
 }
@@ -133,7 +133,7 @@ void parse_hand(char *line, struct hand *out) {
   }
 }
 
-struct two_part_result *day07(char *buf, long buf_len) {
+struct two_part_result *day07(char *buf, __attribute__((unused)) long buf_len) {
   struct two_part_result *day_res = allocate_two_part_result();
 
   struct hand curr_hand;
