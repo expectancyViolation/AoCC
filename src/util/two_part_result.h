@@ -29,9 +29,9 @@ void print_two_part_result(struct two_part_result *result) {
          result->part2_result);
 }
 
-void print_day_result(char *day, struct two_part_result *result) {
+void print_day_result(int day, struct two_part_result *result) {
   printf("--------------\n");
-  printf("%s\n", day);
+  printf("day%2d\n", day);
   print_two_part_result(result);
   printf("\n");
 }

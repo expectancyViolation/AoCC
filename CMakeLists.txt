@@ -1,8 +1,12 @@
+# // clang-format off
 cmake_minimum_required(VERSION 3.16)
 project(aocc C)
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 set(CMAKE_C_STANDARD 11)
+
+
+find_package(CURL REQUIRED)
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -11,5 +15,7 @@ if (OPENMP_FOUND)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-add_executable(aocc main.c timer.c day07.h)
+add_executable(aocc src/main.c src/util/timer.c src/2023/day07.h src/util/aoc.h
+        src/2023/day09.h)
 target_link_libraries(aocc m)
+target_link_libraries(aocc CURL::libcurl)

@@ -1,17 +1,17 @@
-#include "cvector.h"
-#include "fenwick.h"
-#include "helpers.h"
-#include "parallelize.h"
-#include "two_part_result.h"
+#ifndef AOCC_DAY05_H
+#define AOCC_DAY05_H
+
+#include "../../res/cvector.h"
+#include "../util/aoc.h"
+#include "../util/fenwick.h"
+#include "../util/helpers.h"
+#include "../util/parallelize.h"
+#include "../util/two_part_result.h"
+
 #include <errno.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
-#ifndef AOCC_DAY05_H
-#define AOCC_DAY05_H
-
-#define DAY05_FILE "/tmp/day05"
 
 struct range {
   long long begin;
@@ -187,7 +187,11 @@ long long solve_mappings(void parse(char *line, struct range **vec),
     }
     cvector_clear(source);
 
-    // TODO: why do we need to merge?
+    // we need to merge arrays since our current result might contain
+    // overlapping ranges,
+    //   that cannot be handled by linear scanning:
+    //   e.g. an earlier interval might extend further than the end on a further
+    //   interval
     merge_seed_arr(&dest, &source);
 
     strsep(&buf, "\n"); // skip newline after last number
@@ -207,9 +211,11 @@ long long solve_mappings(void parse(char *line, struct range **vec),
 }
 
 void solve_day05() {
+  const int year = 2023;
+  const int day = 5;
   struct two_part_result *day_res = allocate_two_part_result();
   char *input_buffer;
-  const long filesize = read_file_to_memory(DAY05_FILE, &input_buffer, false);
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
   const size_t input_size = filesize * sizeof(char);
   char *input_copy;
 
@@ -222,11 +228,17 @@ void solve_day05() {
   memcpy(input_copy, input_buffer, input_size);
   day_res->part2_result = solve_mappings(parse_seeds_p2, input_copy);
   free(input_copy);
-  free(input_buffer);
 
   // result
-  print_day_result("day05", day_res);
+  print_day_result(day, day_res);
+
+  // part 1
+  // submit_answer(year, day, day_part_part1, day_res);
+
+  // part 2
+  // submit_answer(year, day, day_part_part2, day_res);
   free_two_part_result(day_res);
+  free(input_buffer);
 }
 
 #endif // AOCC_DAY05_H

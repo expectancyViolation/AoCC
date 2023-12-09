@@ -1,13 +1,14 @@
-#include "fenwick.h"
-#include "helpers.h"
-#include "parallelize.h"
-#include "two_part_result.h"
-#include <stdbool.h>
-
 #ifndef AOCC_DAY04_H
 #define AOCC_DAY04_H
 
-#define DAY04_FILE "/tmp/day04"
+#include "../util/aoc.h"
+#include "../util/fenwick.h"
+#include "../util/helpers.h"
+#include "../util/parallelize.h"
+#include "../util/two_part_result.h"
+
+#include <stdbool.h>
+
 #define DAY04_MIN_LINE_LEN 10 // assume a line is at least 10 bytes long
 #define MAX_WIN_NUMBER 100    // assume winning numbers are 2 digit
 #define num_bitmask 0b1111
@@ -98,10 +99,12 @@ struct two_part_result *day04(char *buf, long buf_len) {
 }
 
 void solve_day04() {
+  const int year = 2023;
+  const int day = 4;
   struct two_part_result *day_res; // = allocate_two_part_result();
   char *input_buffer;
   // harder to parallelize b.c. of arbitrary range interactions!
-  const long filesize = read_file_to_memory(DAY04_FILE, &input_buffer, false);
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
 #ifdef DAY04_UNSAFE_PARALLEL
   parallelize((void *(*)(char *, long))(day04),
               (void (*)(void *, void *))(add_consume_partial_result), day_res,
@@ -109,8 +112,13 @@ void solve_day04() {
 #else
   day_res = day04(input_buffer, filesize);
 #endif
+  print_day_result(day, day_res);
 
-  print_day_result("day04", day_res);
+  // part 1
+  // submit_answer(year, day, day_part_part1, day_res);
+
+  // part 2
+  // submit_answer(year, day, day_part_part2, day_res);
   free_two_part_result(day_res);
   free(input_buffer);
 }

@@ -1,11 +1,17 @@
+
+#ifndef AOCC_DAY01_H
+#define AOCC_DAY01_H
+
+#include "../util/aoc.h"
+#include "../util/helpers.h"
+#include "../util/parallelize.h"
+#include "../util/two_part_result.h"
+
 #include <assert.h>
 #include <malloc.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "helpers.h"
-#include "two_part_result.h"
 
 const char *digit_and_names[20] = {"0",    "1",   "2",     "3",     "4",
                                    "5",    "6",   "7",     "8",     "9",
@@ -59,3 +65,24 @@ struct two_part_result *day01(char *buf, __attribute__((unused)) long buf_len) {
   }
   return result;
 }
+
+void parallel_solve_day01() {
+  const int year = 2023;
+  const int day = 1;
+  struct two_part_result *day_res = allocate_two_part_result();
+  char *input_buffer;
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
+  parallelize((void *(*)(char *, long))(day01),
+              (void (*)(void *, void *))(add_consume_partial_result), day_res,
+              input_buffer, filesize, 0);
+  print_day_result(day, day_res);
+
+  // part 1
+  // submit_answer(year, day, day_part_part1, day_res);
+
+  // part 2
+  // submit_answer(year, day, day_part_part2, day_res);
+  free_two_part_result(day_res);
+  free(input_buffer);
+}
+#endif // AOCC_DAY01_H

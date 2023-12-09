@@ -1,7 +1,3 @@
-//
-// Created by matze on 03/12/2023.
-//
-
 #include <assert.h>
 #include <stdbool.h>
 #include <time.h>
@@ -44,4 +40,4 @@ void benchmark(void (*fun)()) {
   fun();
   took = stop_perf_measurement(timer);
   printf("took: %f\n", took);
-};
+}

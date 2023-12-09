@@ -1,18 +1,14 @@
-//
-// Created by matze on 06/12/2023.
-//
-
 #ifndef AOCC_DAY07_H
 #define AOCC_DAY07_H
 
-#include "helpers.h"
-#include "two_part_result.h"
+#include "../util/aoc.h"
+#include "../util/helpers.h"
+#include "../util/two_part_result.h"
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define DAY07_FILE "/tmp/day07"
 
 // TODO: remove this define.solve both parts simultaneously
 #define DAY07_PART2
@@ -141,7 +137,7 @@ struct two_part_result *day07(char *buf, __attribute__((unused)) long buf_len) {
   char **curr_pos = &buf;
   while (true) {
     char *const line = strsep(curr_pos, "\n");
-    if (*line == 0)
+    if (line == NULL)
       break;
     parse_hand(line, &curr_hand);
     cvector_push_back(hands, curr_hand);
@@ -166,11 +162,13 @@ struct two_part_result *day07(char *buf, __attribute__((unused)) long buf_len) {
 }
 
 void solve_day07() {
+  const int year = 2023;
+  const int day = 7;
   struct two_part_result *day_res;
   char *input_buffer;
-  const long filesize = read_file_to_memory(DAY07_FILE, &input_buffer, false);
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
   day_res = day07(input_buffer, filesize);
-  print_day_result("day07", day_res);
+  print_day_result(day, day_res);
   free_two_part_result(day_res);
   free(input_buffer);
 }

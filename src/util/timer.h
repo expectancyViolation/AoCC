@@ -1,7 +1,3 @@
-//
-// Created by matze on 03/12/2023.
-//
-
 #ifndef AOCC_TIMER_H
 #define AOCC_TIMER_H
 

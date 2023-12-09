@@ -1,18 +1,16 @@
-//
-// Created by matze on 06/12/2023.
-//
-
 #ifndef AOCC_DAY08_H
 #define AOCC_DAY08_H
 
-#include "helpers.h"
-#include "two_part_result.h"
+#include "../util/aoc.h"
+#include "../util/helpers.h"
+#include "../util/two_part_result.h"
+
+#define _GNU_SOURCE
 #include <math.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define DAY08_FILE "/tmp/day08"
 
 #define KEY_LEN 3
 
@@ -80,11 +78,11 @@ struct two_part_result *day08(char *buf, __attribute__((unused)) long buf_len) {
     char b[4] = {};
     for (j = 0; curr_node != target; j++) {
       // input is easier than general case:
-      //  first goal state (at step k) loops back onto second element=>period
-      //  (of size k) is entered at second element sequence is only at goal at
-      //  step k*n
-      // this also implies that k is solution to part 1 (since we only enter one
-      // **Z state=> it has to be ZZZ)
+      //  first goal state (at step k) loops back onto second element
+      //  => period (of size k) is entered at second element
+      //  => sequence is only at goal at step k*n
+      // this also implies that k is solution to part 1:
+      // since we only enter one **Z state=> it has to be ZZZ
       pos_to_key((curr_node - nodes), b);
       if (b[2] == 'Z') {
         break;
@@ -111,11 +109,21 @@ struct two_part_result *day08(char *buf, __attribute__((unused)) long buf_len) {
 }
 
 void solve_day08() {
+  const int year = 2023;
+  const int day = 8;
   struct two_part_result *day_res;
   char *input_buffer;
-  const long filesize = read_file_to_memory(DAY08_FILE, &input_buffer, false);
+  // const long filesize = read_file_to_memory(DAY08_FILE, &input_buffer,false);
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
   day_res = day08(input_buffer, filesize);
-  print_day_result("day08", day_res);
+  print_day_result(day, day_res);
+
+  // part 1
+  // submit_answer(2023, 8, day_part_part1, day_res);
+
+  // part 2
+  // submit_answer(2023, 8, day_part_part2, day_res);
+
   free_two_part_result(day_res);
   free(input_buffer);
 }

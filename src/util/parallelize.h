@@ -5,6 +5,7 @@
 #define PARALLEL_LOOP_COUNT 24
 
 #include "helpers.h"
+
 #include <omp.h>
 #include <stdbool.h>
 #include <string.h>

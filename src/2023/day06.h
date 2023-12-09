@@ -1,18 +1,15 @@
-//
-// Created by matze on 06/12/2023.
-//
-
 #ifndef AOCC_DAY06_H
 #define AOCC_DAY06_H
 
-#include "helpers.h"
-#include "two_part_result.h"
+#include "../util/aoc.h"
+#include "../util/helpers.h"
+#include "../util/two_part_result.h"
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define DAY06_FILE "/tmp/day06"
 // to nudge floating point results in correct direction
 #define EPS 0.00000000001
 
@@ -63,11 +60,19 @@ struct two_part_result *day06(char *buf, long buf_len) {
 }
 
 void solve_day06() {
+  const int year = 2023;
+  const int day = 6;
   struct two_part_result *day_res;
   char *input_buffer;
-  const long filesize = read_file_to_memory(DAY06_FILE, &input_buffer, false);
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
   day_res = day06(input_buffer, filesize);
-  print_day_result("day06", day_res);
+  print_day_result(day, day_res);
+
+  // part 1
+  // submit_answer(year, day, day_part_part1, day_res);
+
+  // part 2
+  // submit_answer(year, day, day_part_part2, day_res);
   free_two_part_result(day_res);
   free(input_buffer);
 }

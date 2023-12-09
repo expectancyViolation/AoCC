@@ -1,4 +1,10 @@
-#include "helpers.h"
+#ifndef AOCC_DAY02_H
+#define AOCC_DAY02_H
+
+#include "../util/aoc.h"
+#include "../util/helpers.h"
+#include "../util/parallelize.h"
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -99,3 +105,25 @@ struct two_part_result *day02(char *buf, __attribute__((unused)) long buf_len) {
   }
   return result;
 }
+
+void parallel_solve_day02() {
+  const int year = 2023;
+  const int day = 2;
+  struct two_part_result *day_res = allocate_two_part_result();
+  char *input_buffer;
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
+  printf("day2 filesize:%ld",filesize);
+  parallelize((void *(*)(char *, long))(day02),
+              (void (*)(void *, void *))(add_consume_partial_result), day_res,
+              input_buffer, filesize, 0);
+  print_day_result(day, day_res);
+
+  // part 1
+  // submit_answer(year, day, day_part_part1, day_res);
+
+  // part 2
+  // submit_answer(year, day, day_part_part2, day_res);
+  free_two_part_result(day_res);
+  free(input_buffer);
+}
+#endif // AOCC_DAY02_H

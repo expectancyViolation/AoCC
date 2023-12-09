@@ -1,0 +1,45 @@
+{% set day_string = '{:0>2}'.format(day) %}
+#ifndef AOCC_DAY{{day_string}}_H
+#define AOCC_DAY{{day_string}}_H
+
+#include "../util/aoc.h"
+#include "../util/helpers.h"
+#include "../util/two_part_result.h"
+
+#define _GNU_SOURCE
+#include <math.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// #define DAY{{day_string}}_FILE
+
+struct two_part_result *day{{day_string}}(char *buf, long buf_len) {
+  struct two_part_result *day_res = allocate_two_part_result();
+  day_res->part1_result = 0;
+  day_res->part2_result = 0;
+  return day_res;
+}
+
+void solve_day{{day_string}}() {
+  const int year = {{year}};
+  const int day = {{day}};
+  struct two_part_result *day_res;
+  char *input_buffer;
+  // const long filesize = read_file_to_memory(DAY{{day_string}}_FILE, &input_buffer,false);
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
+  day_res = day{{day_string}}(input_buffer, filesize);
+  print_day_result(day, day_res);
+
+  // part 1
+  // submit_answer({{year}}, {{day}}, day_part_part1, day_res);
+
+  // part 2
+  // submit_answer({{year}}, {{day}}, day_part_part2, day_res);
+
+  free_two_part_result(day_res);
+  free(input_buffer);
+}
+
+#endif // AOCC_DAY{{day_string}}_H

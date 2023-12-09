@@ -1,11 +1,10 @@
 #ifndef AOCC_DAY03_H
 #define AOCC_DAY03_H
 
-#define DAY03_FILE "/tmp/day03"
-
-#include "cvector.h"
-#include "parallelize.h"
-#include "two_part_result.h"
+#include "../../res/cvector.h"
+#include "../util/aoc.h"
+#include "../util/parallelize.h"
+#include "../util/two_part_result.h"
 
 void day03_place_pad_line(char **buf_ptr, long line_length) {
   memset(*buf_ptr, '.', line_length);
@@ -161,19 +160,26 @@ struct two_part_result *day03(char *buf, long buf_len) {
 }
 
 void solve_day03() {
+  const int year = 2023;
+  const int day = 3;
   struct two_part_result *day_res = allocate_two_part_result();
   char *input_buffer;
-  const long filesize = read_file_to_memory(DAY03_FILE, &input_buffer, true);
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
   char *padded_buffer;
   const long padded_buffer_len =
       day03_pad_input(input_buffer, &padded_buffer, filesize);
-  free(input_buffer);
   parallelize((void *(*)(char *, long))(day03),
               (void (*)(void *, void *))(add_consume_partial_result), day_res,
               padded_buffer, padded_buffer_len, 2);
-  print_day_result("day03", day_res);
-  free_two_part_result(day_res);
   free(padded_buffer);
+  print_day_result(day, day_res);
+  // part 1
+  // submit_answer(year, day, day_part_part1, day_res);
+
+  // part 2
+  // submit_answer(year, day, day_part_part2, day_res);
+  free_two_part_result(day_res);
+  free(input_buffer);
 }
 
 #endif // AOCC_DAY03_H
