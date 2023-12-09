@@ -13,7 +13,7 @@
 #define MAX_WIN_NUMBER 100    // assume winning numbers are 2 digit
 #define num_bitmask 0b1111
 
-//#define DAY04_UNSAFE_PARALLEL
+// #define DAY04_UNSAFE_PARALLEL
 
 __attribute__((unused)) void parse_winning(char *line, char *winning_numbers) {
   while (line != NULL) {

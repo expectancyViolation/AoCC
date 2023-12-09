@@ -119,10 +119,10 @@ void solve_day08() {
   print_day_result(day, day_res);
 
   // part 1
-  // submit_answer(2023, 8, day_part_part1, day_res);
+  // submit_answer(year, day, day_part_part1, day_res);
 
   // part 2
-  // submit_answer(2023, 8, day_part_part2, day_res);
+  // submit_answer(year, day, day_part_part2, day_res);
 
   free_two_part_result(day_res);
   free(input_buffer);

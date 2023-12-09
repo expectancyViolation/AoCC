@@ -112,7 +112,7 @@ void parallel_solve_day02() {
   struct two_part_result *day_res = allocate_two_part_result();
   char *input_buffer;
   const long filesize = get_day_input_cached(year, day, &input_buffer);
-  printf("day2 filesize:%ld",filesize);
+  printf("day2 filesize:%ld", filesize);
   parallelize((void *(*)(char *, long))(day02),
               (void (*)(void *, void *))(add_consume_partial_result), day_res,
               input_buffer, filesize, 0);

@@ -27,7 +27,7 @@ void fenwick_add_range(long *tree, int tree_size, int lower, int upper,
   fenwick_add_zero_range(tree, tree_size, upper, -val);
 }
 
-void test_fenwick() {
+__attribute__((unused)) void test_fenwick() {
 #define fenwick_test_tree_size 20
   long tree[fenwick_test_tree_size] = {0};
   const int tree_size = fenwick_test_tree_size;

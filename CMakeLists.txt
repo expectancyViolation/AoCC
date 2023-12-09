@@ -15,7 +15,6 @@ if (OPENMP_FOUND)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-add_executable(aocc src/main.c src/util/timer.c src/2023/day07.h src/util/aoc.h
-        src/2023/day09.h)
+add_executable(aocc src/main.c src/util/timer.c)
 target_link_libraries(aocc m)
 target_link_libraries(aocc CURL::libcurl)

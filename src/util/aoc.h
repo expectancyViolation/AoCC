@@ -85,8 +85,9 @@ void set_session_cookie(CURL *curl, char *session) {
 
 // TODO: cache wrong answers?
 // TODO: evaluate and cache hints and prevent impossible submissions?
-__attribute__((unused)) void submit_answer(int year, int day, enum DAY_PART part,
-                   const struct two_part_result *res) {
+__attribute__((unused)) void submit_answer(int year, int day,
+                                           enum DAY_PART part,
+                                           const struct two_part_result *res) {
   char *answer;
   const long long long_answer =
       (part == day_part_part1) ? res->part1_result : res->part2_result;
@@ -166,7 +167,7 @@ long get_day_input_cached(int year, int day, char **file_content_out) {
   char *filepath = get_input_file_path(year, day);
   printf("%s\n", filepath);
   if (access(filepath, F_OK) != 0) {
-      printf("%s not found. fetching...",filepath);
+    printf("%s not found. fetching...", filepath);
     fetch_day_input(year, day, filepath);
   }
   const long long input_size =
