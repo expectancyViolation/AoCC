@@ -4,7 +4,7 @@
 
 #include "../util/aoc.h"
 #include "../util/helpers.h"
-#include "../util/two_part_result.h"
+#include "../util/ll_tuple.h"
 
 #define _GNU_SOURCE
 #include <math.h>
@@ -13,12 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct tuple {
-  long long left;
-  long long right;
-};
-
-struct tuple get_extrapolated_val(char *line) {
+struct ll_tuple get_extrapolated_val(char *line) {
   long long *numbers = NULL;
   char *endpos;
   while (true) {
@@ -30,7 +25,7 @@ struct tuple get_extrapolated_val(char *line) {
   }
   const long long n = cvector_size(numbers);
   long long coeff = 1;
-  struct tuple res = {0, 0};
+  struct ll_tuple res = {0, 0};
   for (int i = 0; i < n; i++) {
     const long long x = numbers[i];
     res.left += coeff * x;
@@ -43,16 +38,16 @@ struct tuple get_extrapolated_val(char *line) {
   return res;
 }
 
-struct two_part_result *day09(char *buf, long buf_len) {
-  struct two_part_result *day_res = allocate_two_part_result();
+struct ll_tuple day09(char *buf, __attribute__((unused)) long buf_len) {
+  struct ll_tuple day_res = {0, 0};
   char **curr_pos = &buf;
   while (true) {
     char *const line = strsep(curr_pos, "\n");
     if (line == NULL)
       break;
-    const struct tuple res = get_extrapolated_val(line);
-    day_res->part1_result += res.left;
-    day_res->part2_result += res.right;
+    const struct ll_tuple res = get_extrapolated_val(line);
+    day_res.left += res.left;
+    day_res.right += res.right;
   }
   return day_res;
 }
@@ -60,13 +55,11 @@ struct two_part_result *day09(char *buf, long buf_len) {
 void solve_day09() {
   const int year = 2023;
   const int day = 9;
-  struct two_part_result *day_res = allocate_two_part_result();
+  struct ll_tuple day_res = {};
   char *input_buffer;
   const long filesize = get_day_input_cached(year, day, &input_buffer);
 
-  parallelize((void *(*)(char *, long))(day09),
-              (void (*)(void *, void *))(add_consume_partial_result), day_res,
-              input_buffer, filesize, 0);
+  parallelize(day09, ll_tuple_add, input_buffer, filesize, 0);
   print_day_result(day, day_res);
 
   // part 1
@@ -75,7 +68,6 @@ void solve_day09() {
   // part 2
   // submit_answer(2023, 9, day_part_part2, day_res);
 
-  free_two_part_result(day_res);
   free(input_buffer);
 }
 

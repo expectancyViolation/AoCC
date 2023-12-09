@@ -85,11 +85,10 @@ void get_required_draw(char *buf, long *game_id_out,
   }
 }
 
-struct two_part_result *day02(char *buf, __attribute__((unused)) long buf_len) {
+struct ll_tuple day02(char *buf, __attribute__((unused)) long buf_len) {
+  struct ll_tuple result = {};
   struct draw draw_limit = {12, 13, 14};
   struct draw required_draw;
-
-  struct two_part_result *result = allocate_two_part_result();
 
   long game_id = -1;
   char **buf_pos = &buf;
@@ -99,23 +98,21 @@ struct two_part_result *day02(char *buf, __attribute__((unused)) long buf_len) {
     get_required_draw(line, &game_id, &required_draw);
     const bool game_ok = draw_is_leq(&required_draw, &draw_limit);
     if (game_ok) {
-      (result->part1_result) += game_id;
+      result.left += game_id;
     }
-    (result->part2_result) += draw_power(&required_draw);
+    result.right += draw_power(&required_draw);
   }
   return result;
 }
 
-void parallel_solve_day02() {
+void solve_day02() {
   const int year = 2023;
   const int day = 2;
-  struct two_part_result *day_res = allocate_two_part_result();
+
   char *input_buffer;
   const long filesize = get_day_input_cached(year, day, &input_buffer);
-  printf("day2 filesize:%ld", filesize);
-  parallelize((void *(*)(char *, long))(day02),
-              (void (*)(void *, void *))(add_consume_partial_result), day_res,
-              input_buffer, filesize, 0);
+  struct ll_tuple day_res =
+      parallelize(day02, ll_tuple_add, input_buffer, filesize, 0);
   print_day_result(day, day_res);
 
   // part 1
@@ -123,7 +120,6 @@ void parallel_solve_day02() {
 
   // part 2
   // submit_answer(year, day, day_part_part2, day_res);
-  free_two_part_result(day_res);
   free(input_buffer);
 }
 #endif // AOCC_DAY02_H

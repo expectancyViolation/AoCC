@@ -3,7 +3,7 @@
 
 #include "../util/aoc.h"
 #include "../util/helpers.h"
-#include "../util/two_part_result.h"
+#include "../util/ll_tuple.h"
 
 #define _GNU_SOURCE
 #include <math.h>
@@ -55,8 +55,8 @@ void parse_nodes(char *buf, struct node *nodes, size_t **start_positions) {
   }
 }
 
-struct two_part_result *day08(char *buf, __attribute__((unused)) long buf_len) {
-  struct two_part_result *day_res = allocate_two_part_result();
+struct ll_tuple day08(char *buf, __attribute__((unused)) long buf_len) {
+  struct ll_tuple day_res = {};
 
   struct node nodes[26 * 26 * 26]; // 26**KEY_LEN   no constexpr in C :(
   struct node *curr_node = NULL;
@@ -99,23 +99,22 @@ struct two_part_result *day08(char *buf, __attribute__((unused)) long buf_len) {
       }
     }
     if (start_positions[i] == aaa_pos) {
-      day_res->part1_result = j;
+      day_res.left = j;
     }
     // calculate lcm of periods
     res = (res * j) / gcd(res, j);
   }
-  day_res->part2_result = res;
+  day_res.right = res;
   return day_res;
 }
 
 void solve_day08() {
   const int year = 2023;
   const int day = 8;
-  struct two_part_result *day_res;
   char *input_buffer;
   // const long filesize = read_file_to_memory(DAY08_FILE, &input_buffer,false);
   const long filesize = get_day_input_cached(year, day, &input_buffer);
-  day_res = day08(input_buffer, filesize);
+  const struct ll_tuple day_res = day08(input_buffer, filesize);
   print_day_result(day, day_res);
 
   // part 1
@@ -124,7 +123,6 @@ void solve_day08() {
   // part 2
   // submit_answer(year, day, day_part_part2, day_res);
 
-  free_two_part_result(day_res);
   free(input_buffer);
 }
 

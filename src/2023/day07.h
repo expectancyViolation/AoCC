@@ -3,7 +3,7 @@
 
 #include "../util/aoc.h"
 #include "../util/helpers.h"
-#include "../util/two_part_result.h"
+#include "../util/ll_tuple.h"
 
 #include <math.h>
 #include <stdbool.h>
@@ -129,8 +129,8 @@ void parse_hand(char *line, struct hand *out) {
   }
 }
 
-struct two_part_result *day07(char *buf, __attribute__((unused)) long buf_len) {
-  struct two_part_result *day_res = allocate_two_part_result();
+struct ll_tuple day07(char *buf, __attribute__((unused)) long buf_len) {
+  struct ll_tuple day_res = {};
 
   struct hand curr_hand;
   struct hand *hands = NULL;
@@ -154,9 +154,9 @@ struct two_part_result *day07(char *buf, __attribute__((unused)) long buf_len) {
     i++;
   }
 #ifdef DAY07_PART2
-  day_res->part2_result = winnings;
+  day_res.right = winnings;
 #else
-  day_res->part1_result = winnings;
+  day_res.left = winnings;
 #endif
   return day_res;
 }
@@ -164,12 +164,10 @@ struct two_part_result *day07(char *buf, __attribute__((unused)) long buf_len) {
 void solve_day07() {
   const int year = 2023;
   const int day = 7;
-  struct two_part_result *day_res;
   char *input_buffer;
   const long filesize = get_day_input_cached(year, day, &input_buffer);
-  day_res = day07(input_buffer, filesize);
+  const struct ll_tuple day_res = day07(input_buffer, filesize);
   print_day_result(day, day_res);
-  free_two_part_result(day_res);
   free(input_buffer);
 }
 

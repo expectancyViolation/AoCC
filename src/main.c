@@ -9,12 +9,12 @@
 #include "2023/day07.h"
 #include "2023/day08.h"
 #include "2023/day09.h"
+#include "util/ll_tuple.h"
 #include "util/timer.h"
-#include "util/two_part_result.h"
 
 __attribute__((unused)) void run_all_days() {
 
-  void(*to_solve[]) = {parallel_solve_day01, parallel_solve_day02, solve_day03,
+  void(*to_solve[]) = {solve_day01, solve_day02, solve_day03,
                        solve_day04,          solve_day05,          solve_day06,
                        solve_day07,          solve_day08,          solve_day09};
   size_t num_of_solves = sizeof(to_solve) / sizeof(to_solve[0]);

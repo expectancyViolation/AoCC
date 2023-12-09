@@ -10,15 +10,17 @@
 #include <stdbool.h>
 #include <string.h>
 
-void parallelize(void *solve(char *buffer, long buf_len),
-                 void consume_partial_result(void *result, void *partial),
-                 void *result, char *const input_buffer, long filesize,
+struct ll_tuple parallelize(struct ll_tuple solve(char *buffer, long buf_len),
+                 struct ll_tuple reduce_partial_result(struct ll_tuple tup1, struct ll_tuple tup2),
+                 char *const input_buffer, long filesize,
                  int overlap) {
+  struct ll_tuple result={};
   const char *file_end = input_buffer + filesize - 1;
   const int n_chunks = PARALLEL_LOOP_COUNT;
   const long chunk_size = filesize / n_chunks;
 #pragma omp parallel for
   for (int i = 0; i < n_chunks; ++i) {
+    struct ll_tuple partial_res={};
     const long begin_pos = chunk_size * i;
     const long end_pos = min(chunk_size * (i + 1), filesize - 1);
     char *begin_pointer = input_buffer + begin_pos;
@@ -36,14 +38,15 @@ void parallelize(void *solve(char *buffer, long buf_len),
     char *copy_buffer = (char *)malloc(segment_size + 1);
     strncpy(copy_buffer, begin_pointer, segment_size);
     copy_buffer[segment_size] = 0;
-    void *partial_res = solve(copy_buffer, segment_size + 1);
+    partial_res = solve(copy_buffer, segment_size + 1);
     free(copy_buffer);
 #else
-    void *partial_res = solve(begin_pointer);
+    partial_res = solve(begin_pointer);
 #endif
 #pragma omp critical
-    consume_partial_result(result, partial_res);
+    result=reduce_partial_result(result, partial_res);
   }
+  return result;
 }
 
 #endif // AOCC_PARALLELIZE_H

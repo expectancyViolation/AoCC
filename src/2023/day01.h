@@ -4,8 +4,8 @@
 
 #include "../util/aoc.h"
 #include "../util/helpers.h"
+#include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
-#include "../util/two_part_result.h"
 
 #include <assert.h>
 #include <malloc.h>
@@ -54,27 +54,25 @@ int get_last(const char *buffer, bool part2) {
   return 0;
 }
 
-struct two_part_result *day01(char *buf, __attribute__((unused)) long buf_len) {
-  struct two_part_result *result = allocate_two_part_result();
+struct ll_tuple day01(char *buf, __attribute__((unused)) long buf_len) {
+  struct ll_tuple result={};
   char **buf_pos = &buf;
   while (*buf_pos != NULL) {
     char *line = strsep(buf_pos, "\n");
-    (result->part1_result) +=
+    result.left +=
         get_first(line, false) * 10 + get_last(line, false);
-    (result->part2_result) += get_first(line, true) * 10 + get_last(line, true);
+    result.right += get_first(line, true) * 10 + get_last(line, true);
   }
   return result;
 }
 
-void parallel_solve_day01() {
+void solve_day01() {
   const int year = 2023;
   const int day = 1;
-  struct two_part_result *day_res = allocate_two_part_result();
+
   char *input_buffer;
   const long filesize = get_day_input_cached(year, day, &input_buffer);
-  parallelize((void *(*)(char *, long))(day01),
-              (void (*)(void *, void *))(add_consume_partial_result), day_res,
-              input_buffer, filesize, 0);
+  struct ll_tuple day_res = parallelize(day01, ll_tuple_add , input_buffer, filesize,0);
   print_day_result(day, day_res);
 
   // part 1
@@ -82,7 +80,6 @@ void parallel_solve_day01() {
 
   // part 2
   // submit_answer(year, day, day_part_part2, day_res);
-  free_two_part_result(day_res);
   free(input_buffer);
 }
 #endif // AOCC_DAY01_H

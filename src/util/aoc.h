@@ -2,7 +2,7 @@
 #define AOCC_AOCC_H
 
 #include "helpers.h"
-#include "two_part_result.h"
+#include "ll_tuple.h"
 
 #define _GNU_SOURCE
 #include <curl/curl.h>
@@ -87,10 +87,10 @@ void set_session_cookie(CURL *curl, char *session) {
 // TODO: evaluate and cache hints and prevent impossible submissions?
 __attribute__((unused)) void submit_answer(int year, int day,
                                            enum DAY_PART part,
-                                           const struct two_part_result *res) {
+                                           const struct ll_tuple *res) {
   char *answer;
   const long long long_answer =
-      (part == day_part_part1) ? res->part1_result : res->part2_result;
+      (part == day_part_part1) ? res->left : res->right;
   asprintf(&answer, "%lld", long_answer);
   CURL *curl;
   CURLcode curl_res;

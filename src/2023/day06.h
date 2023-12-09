@@ -3,7 +3,7 @@
 
 #include "../util/aoc.h"
 #include "../util/helpers.h"
-#include "../util/two_part_result.h"
+#include "../util/ll_tuple.h"
 
 #include <math.h>
 #include <stdbool.h>
@@ -47,14 +47,14 @@ long long solve(char *buf) {
   return res;
 }
 
-struct two_part_result *day06(char *buf, long buf_len) {
-  struct two_part_result *day_res = malloc(sizeof *day_res);
+struct ll_tuple day06(char *buf, long buf_len) {
+  struct ll_tuple day_res ={};
   const size_t buf_size = buf_len * sizeof(*buf);
   char *buf_copy = malloc(buf_size);
   memcpy(buf_copy, buf, buf_size);
-  day_res->part1_result = solve(buf_copy);
+  day_res.left = solve(buf_copy);
   remove_spaces(buf);
-  day_res->part2_result = solve(buf);
+  day_res.right = solve(buf);
   free(buf_copy);
   return day_res;
 }
@@ -62,10 +62,9 @@ struct two_part_result *day06(char *buf, long buf_len) {
 void solve_day06() {
   const int year = 2023;
   const int day = 6;
-  struct two_part_result *day_res;
   char *input_buffer;
   const long filesize = get_day_input_cached(year, day, &input_buffer);
-  day_res = day06(input_buffer, filesize);
+  const struct ll_tuple day_res = day06(input_buffer, filesize);
   print_day_result(day, day_res);
 
   // part 1
@@ -73,7 +72,6 @@ void solve_day06() {
 
   // part 2
   // submit_answer(year, day, day_part_part2, day_res);
-  free_two_part_result(day_res);
   free(input_buffer);
 }
 

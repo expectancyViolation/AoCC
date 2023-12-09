@@ -3,8 +3,8 @@
 
 #include "../../res/cvector.h"
 #include "../util/aoc.h"
+#include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
-#include "../util/two_part_result.h"
 
 void day03_place_pad_line(char **buf_ptr, long line_length) {
   memset(*buf_ptr, '.', line_length);
@@ -87,8 +87,8 @@ void day03_mark_gears(char *segment_begin, const char *segment_end,
   }
 }
 
-struct two_part_result *day03(char *buf, long buf_len) {
-  struct two_part_result *result = allocate_two_part_result();
+struct ll_tuple day03(char *buf, long buf_len) {
+  struct ll_tuple result = {};
   const long line_length = get_first_line_length(buf);
 
   char *curr_number_pos = buf;
@@ -120,7 +120,7 @@ struct two_part_result *day03(char *buf, long buf_len) {
       if ((part1_segment_begin <= curr_number_pos) &&
           (curr_number_pos < part1_segment_end)) {
         if (is_adjacent) {
-          result->part1_result += curr_number;
+          result.left += curr_number;
         }
       }
     }
@@ -141,7 +141,7 @@ struct two_part_result *day03(char *buf, long buf_len) {
         if (curr_count == 2) {
           if ((part1_segment_begin <= prev_pos) &&
               (prev_pos < part1_segment_end))
-            result->part2_result += curr_prod;
+            result.right += curr_prod;
         }
         curr_count = 0;
         curr_prod = 1;
@@ -152,7 +152,7 @@ struct two_part_result *day03(char *buf, long buf_len) {
     }
     if (curr_count == 2) {
       if ((part1_segment_begin <= prev_pos) && (prev_pos < part1_segment_end))
-        result->part2_result += curr_prod;
+        result.right += curr_prod;
     }
   }
 
@@ -162,23 +162,22 @@ struct two_part_result *day03(char *buf, long buf_len) {
 void solve_day03() {
   const int year = 2023;
   const int day = 3;
-  struct two_part_result *day_res = allocate_two_part_result();
+
   char *input_buffer;
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
   char *padded_buffer;
+  const long filesize = get_day_input_cached(year, day, &input_buffer);
   const long padded_buffer_len =
       day03_pad_input(input_buffer, &padded_buffer, filesize);
-  parallelize((void *(*)(char *, long))(day03),
-              (void (*)(void *, void *))(add_consume_partial_result), day_res,
-              padded_buffer, padded_buffer_len, 2);
-  free(padded_buffer);
+  struct ll_tuple day_res =
+      parallelize(day03, ll_tuple_add, padded_buffer, padded_buffer_len, 0);
   print_day_result(day, day_res);
+
   // part 1
   // submit_answer(year, day, day_part_part1, day_res);
 
   // part 2
   // submit_answer(year, day, day_part_part2, day_res);
-  free_two_part_result(day_res);
+  free(padded_buffer);
   free(input_buffer);
 }
 

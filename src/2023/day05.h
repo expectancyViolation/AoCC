@@ -5,8 +5,8 @@
 #include "../util/aoc.h"
 #include "../util/fenwick.h"
 #include "../util/helpers.h"
+#include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
-#include "../util/two_part_result.h"
 
 #include <errno.h>
 #include <limits.h>
@@ -213,7 +213,7 @@ long long solve_mappings(void parse(char *line, struct range **vec),
 void solve_day05() {
   const int year = 2023;
   const int day = 5;
-  struct two_part_result *day_res = allocate_two_part_result();
+  struct ll_tuple day_res = {};
   char *input_buffer;
   const long filesize = get_day_input_cached(year, day, &input_buffer);
   const size_t input_size = filesize * sizeof(char);
@@ -222,11 +222,11 @@ void solve_day05() {
   // part 1
   input_copy = malloc(input_size);
   memcpy(input_copy, input_buffer, input_size);
-  day_res->part1_result = solve_mappings(parse_seeds_p1, input_copy);
+  day_res.left = solve_mappings(parse_seeds_p1, input_copy);
 
   // part 2
   memcpy(input_copy, input_buffer, input_size);
-  day_res->part2_result = solve_mappings(parse_seeds_p2, input_copy);
+  day_res.right = solve_mappings(parse_seeds_p2, input_copy);
   free(input_copy);
 
   // result
@@ -237,7 +237,6 @@ void solve_day05() {
 
   // part 2
   // submit_answer(year, day, day_part_part2, day_res);
-  free_two_part_result(day_res);
   free(input_buffer);
 }
 

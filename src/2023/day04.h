@@ -4,8 +4,8 @@
 #include "../util/aoc.h"
 #include "../util/fenwick.h"
 #include "../util/helpers.h"
+#include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
-#include "../util/two_part_result.h"
 
 #include <stdbool.h>
 
@@ -58,8 +58,8 @@ int count_matches_brittle(char *ticket, const char *winning_numbers) {
   return curr_matches;
 }
 
-struct two_part_result *day04(char *buf, long buf_len) {
-  struct two_part_result *result = allocate_two_part_result();
+struct ll_tuple day04(char *buf, long buf_len) {
+  struct ll_tuple result = {};
   const int tree_size =
       (int)(buf_len / DAY04_MIN_LINE_LEN); // this has to be larger than the
   // number of lines
@@ -86,12 +86,12 @@ struct two_part_result *day04(char *buf, long buf_len) {
     memset(winning_numbers, 0, MAX_WIN_NUMBER * sizeof(*winning_numbers));
 
     const int curr_res = curr_matches ? (1 << (curr_matches - 1)) : 0;
-    result->part1_result += curr_res;
+    result.left += curr_res;
 
     const long won_count = fenwick_get(range_tree, pos) + 1;
     fenwick_add_range(range_tree, tree_size, pos + 1, pos + 1 + curr_matches,
                       won_count);
-    result->part2_result += won_count;
+    result.right += won_count;
     pos += 1;
   }
   free(range_tree);
@@ -101,16 +101,15 @@ struct two_part_result *day04(char *buf, long buf_len) {
 void solve_day04() {
   const int year = 2023;
   const int day = 4;
-  struct two_part_result *day_res; // = allocate_two_part_result();
   char *input_buffer;
   // harder to parallelize b.c. of arbitrary range interactions!
   const long filesize = get_day_input_cached(year, day, &input_buffer);
 #ifdef DAY04_UNSAFE_PARALLEL
-  parallelize((void *(*)(char *, long))(day04),
-              (void (*)(void *, void *))(add_consume_partial_result), day_res,
+  const struct ll_tuple day_res = parallelize((day04),
+              ll_tuple_add,
               input_buffer, filesize, 0);
 #else
-  day_res = day04(input_buffer, filesize);
+  const struct ll_tuple day_res = day04(input_buffer, filesize);
 #endif
   print_day_result(day, day_res);
 
@@ -119,7 +118,6 @@ void solve_day04() {
 
   // part 2
   // submit_answer(year, day, day_part_part2, day_res);
-  free_two_part_result(day_res);
   free(input_buffer);
 }
 
