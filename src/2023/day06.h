@@ -1,9 +1,11 @@
 #ifndef AOCC_DAY06_H
 #define AOCC_DAY06_H
 
-#include "../util/aoc.h"
+#include "../util/aoc.c"
 #include "../util/helpers.h"
 #include "../util/ll_tuple.h"
+#include "../util/aoc_types.h"
+
 
 #include <math.h>
 #include <stdbool.h>
@@ -48,7 +50,7 @@ long long solve(char *buf) {
 }
 
 struct ll_tuple day06(char *buf, long buf_len) {
-  struct ll_tuple day_res ={};
+  struct ll_tuple day_res = {};
   const size_t buf_size = buf_len * sizeof(*buf);
   char *buf_copy = malloc(buf_size);
   memcpy(buf_copy, buf, buf_size);
@@ -59,20 +61,14 @@ struct ll_tuple day06(char *buf, long buf_len) {
   return day_res;
 }
 
-void solve_day06() {
-  const int year = 2023;
-  const int day = 6;
+struct aoc_day_res solve_day06(const char* input_file) {
   char *input_buffer;
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
-  const struct ll_tuple day_res = day06(input_buffer, filesize);
-  print_day_result(day, day_res);
-
-  // part 1
-  // submit_answer(year, day, day_part_part1, day_res);
-
-  // part 2
-  // submit_answer(year, day, day_part_part2, day_res);
+  const long filesize = read_file_to_memory(input_file, &input_buffer, true);
+  const struct ll_tuple res = day06(input_buffer, filesize);
   free(input_buffer);
+
+  struct aoc_day_res day_res={res};
+  return day_res;
 }
 
 #endif // AOCC_DAY06_H

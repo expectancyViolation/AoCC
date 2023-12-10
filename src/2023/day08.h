@@ -1,9 +1,10 @@
 #ifndef AOCC_DAY08_H
 #define AOCC_DAY08_H
 
-#include "../util/aoc.h"
+#include "../util/aoc.c"
 #include "../util/helpers.h"
 #include "../util/ll_tuple.h"
+#include "../util/aoc_types.h"
 
 #define _GNU_SOURCE
 #include <math.h>
@@ -81,7 +82,7 @@ struct ll_tuple day08(char *buf, __attribute__((unused)) long buf_len) {
       //  first goal state (at step k) loops back onto second element
       //  => period (of size k) is entered at second element
       //  => sequence is only at goal at step k*n
-      // this also implies that k is solution to part 1:
+      // this also implies that k is solution_type_num_solution to part 1:
       // since we only enter one **Z state=> it has to be ZZZ
       pos_to_key((curr_node - nodes), b);
       if (b[2] == 'Z') {
@@ -108,22 +109,14 @@ struct ll_tuple day08(char *buf, __attribute__((unused)) long buf_len) {
   return day_res;
 }
 
-void solve_day08() {
-  const int year = 2023;
-  const int day = 8;
+struct aoc_day_res solve_day08(const char* input_file) {
   char *input_buffer;
-  // const long filesize = read_file_to_memory(DAY08_FILE, &input_buffer,false);
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
-  const struct ll_tuple day_res = day08(input_buffer, filesize);
-  print_day_result(day, day_res);
+  const long filesize = read_file_to_memory(input_file, &input_buffer,false);
+  const struct ll_tuple res = day08(input_buffer, filesize);
 
-  // part 1
-  // submit_answer(year, day, day_part_part1, day_res);
-
-  // part 2
-  // submit_answer(year, day, day_part_part2, day_res);
-
+  struct aoc_day_res day_res={res};
   free(input_buffer);
+  return day_res;
 }
 
 #endif // AOCC_DAY08_H

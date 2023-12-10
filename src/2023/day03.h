@@ -2,36 +2,12 @@
 #define AOCC_DAY03_H
 
 #include "../../res/cvector.h"
-#include "../util/aoc.h"
+#include "../util/aoc.c"
+#include "../util/aoc_types.h"
+#include "../util/helpers.h"
 #include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
 
-void day03_place_pad_line(char **buf_ptr, long line_length) {
-  memset(*buf_ptr, '.', line_length);
-  *(*buf_ptr + line_length - 1) = '\n';
-  *buf_ptr += line_length;
-}
-
-long day03_pad_input(char *input_buffer, char **padded_buffer_out,
-                     long filesize) {
-  const long line_length = get_first_line_length(input_buffer);
-  const long padded_buffer_len = filesize + 4 * (line_length)-1;
-  *padded_buffer_out = malloc(padded_buffer_len);
-  char *padded_buffer = *padded_buffer_out;
-  char *pad_ptr = padded_buffer;
-
-  day03_place_pad_line(&pad_ptr, line_length);
-  day03_place_pad_line(&pad_ptr, line_length);
-
-  strncpy(pad_ptr, input_buffer, filesize - 1);
-  pad_ptr += filesize - 1;
-
-  day03_place_pad_line(&pad_ptr, line_length);
-  day03_place_pad_line(&pad_ptr, line_length);
-
-  *(padded_buffer + padded_buffer_len - 1) = 0;
-  return padded_buffer_len;
-}
 
 bool is_dig(char c) { return (c >= '0') && (c <= '9'); }
 
@@ -159,26 +135,20 @@ struct ll_tuple day03(char *buf, long buf_len) {
   return result;
 }
 
-void solve_day03() {
-  const int year = 2023;
-  const int day = 3;
-
+struct aoc_day_res solve_day03(const char *input_file) {
   char *input_buffer;
   char *padded_buffer;
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
+  const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   const long padded_buffer_len =
-      day03_pad_input(input_buffer, &padded_buffer, filesize);
-  struct ll_tuple day_res =
+      pad_input(input_buffer, &padded_buffer, filesize,'.');
+  struct ll_tuple res =
       parallelize(day03, ll_tuple_add, padded_buffer, padded_buffer_len, 0);
-  print_day_result(day, day_res);
+  struct aoc_day_res day_res={res};
 
-  // part 1
-  // submit_answer(year, day, day_part_part1, day_res);
-
-  // part 2
-  // submit_answer(year, day, day_part_part2, day_res);
   free(padded_buffer);
   free(input_buffer);
+  return day_res;
 }
+
 
 #endif // AOCC_DAY03_H

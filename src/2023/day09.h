@@ -2,9 +2,10 @@
 #ifndef AOCC_DAY09_H
 #define AOCC_DAY09_H
 
-#include "../util/aoc.h"
+#include "../util/aoc.c"
 #include "../util/helpers.h"
 #include "../util/ll_tuple.h"
+#include "../util/aoc_types.h"
 
 #define _GNU_SOURCE
 #include <math.h>
@@ -39,7 +40,7 @@ struct ll_tuple get_extrapolated_val(char *line) {
 }
 
 struct ll_tuple day09(char *buf, __attribute__((unused)) long buf_len) {
-  struct ll_tuple day_res = {0, 0};
+  struct ll_tuple day_res = {};
   char **curr_pos = &buf;
   while (true) {
     char *const line = strsep(curr_pos, "\n");
@@ -52,23 +53,14 @@ struct ll_tuple day09(char *buf, __attribute__((unused)) long buf_len) {
   return day_res;
 }
 
-void solve_day09() {
-  const int year = 2023;
-  const int day = 9;
-  struct ll_tuple day_res = {};
+struct aoc_day_res solve_day09(const char* input_file) {
   char *input_buffer;
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
+  const long filesize = read_file_to_memory(input_file, &input_buffer, false);
+  struct ll_tuple res=parallelize(day09, ll_tuple_add, input_buffer, filesize, 0);
 
-  parallelize(day09, ll_tuple_add, input_buffer, filesize, 0);
-  print_day_result(day, day_res);
-
-  // part 1
-  // submit_answer(2023, 9, day_part_part1, day_res);
-
-  // part 2
-  // submit_answer(2023, 9, day_part_part2, day_res);
-
+  struct aoc_day_res day_res={res};
   free(input_buffer);
+  return day_res;
 }
 
 #endif // AOCC_DAY09_H

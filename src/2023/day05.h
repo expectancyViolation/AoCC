@@ -2,11 +2,12 @@
 #define AOCC_DAY05_H
 
 #include "../../res/cvector.h"
-#include "../util/aoc.h"
+#include "../util/aoc.c"
 #include "../util/fenwick.h"
 #include "../util/helpers.h"
 #include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
+#include "../util/aoc_types.h"
 
 #include <errno.h>
 #include <limits.h>
@@ -210,34 +211,26 @@ long long solve_mappings(void parse(char *line, struct range **vec),
   return min_el;
 }
 
-void solve_day05() {
-  const int year = 2023;
-  const int day = 5;
-  struct ll_tuple day_res = {};
+struct aoc_day_res solve_day05(const char *input_file)  {
+  struct ll_tuple res= {};
   char *input_buffer;
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
+  const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   const size_t input_size = filesize * sizeof(char);
   char *input_copy;
 
   // part 1
   input_copy = malloc(input_size);
   memcpy(input_copy, input_buffer, input_size);
-  day_res.left = solve_mappings(parse_seeds_p1, input_copy);
+  res.left = solve_mappings(parse_seeds_p1, input_copy);
 
   // part 2
   memcpy(input_copy, input_buffer, input_size);
-  day_res.right = solve_mappings(parse_seeds_p2, input_copy);
+  res.right = solve_mappings(parse_seeds_p2, input_copy);
   free(input_copy);
-
-  // result
-  print_day_result(day, day_res);
-
-  // part 1
-  // submit_answer(year, day, day_part_part1, day_res);
-
-  // part 2
-  // submit_answer(year, day, day_part_part2, day_res);
   free(input_buffer);
+
+  struct aoc_day_res day_res={res};
+  return day_res;
 }
 
 #endif // AOCC_DAY05_H

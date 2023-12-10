@@ -2,10 +2,11 @@
 #ifndef AOCC_DAY01_H
 #define AOCC_DAY01_H
 
-#include "../util/aoc.h"
+#include "../util/aoc.c"
 #include "../util/helpers.h"
 #include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
+#include "../util/aoc_types.h"
 
 #include <assert.h>
 #include <malloc.h>
@@ -55,31 +56,23 @@ int get_last(const char *buffer, bool part2) {
 }
 
 struct ll_tuple day01(char *buf, __attribute__((unused)) long buf_len) {
-  struct ll_tuple result={};
+  struct ll_tuple result = {};
   char **buf_pos = &buf;
   while (*buf_pos != NULL) {
     char *line = strsep(buf_pos, "\n");
-    result.left +=
-        get_first(line, false) * 10 + get_last(line, false);
+    result.left += get_first(line, false) * 10 + get_last(line, false);
     result.right += get_first(line, true) * 10 + get_last(line, true);
   }
   return result;
 }
 
-void solve_day01() {
-  const int year = 2023;
-  const int day = 1;
-
+struct aoc_day_res solve_day01(const char *input_file) {
   char *input_buffer;
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
-  struct ll_tuple day_res = parallelize(day01, ll_tuple_add , input_buffer, filesize,0);
-  print_day_result(day, day_res);
-
-  // part 1
-  // submit_answer(year, day, day_part_part1, day_res);
-
-  // part 2
-  // submit_answer(year, day, day_part_part2, day_res);
+  const long filesize = read_file_to_memory(input_file, &input_buffer, true);
+  struct ll_tuple res =
+      parallelize(day01, ll_tuple_add, input_buffer, filesize, 0);
+  struct aoc_day_res day_res = {res};
   free(input_buffer);
+  return day_res;
 }
 #endif // AOCC_DAY01_H

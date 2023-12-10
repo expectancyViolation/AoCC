@@ -1,9 +1,10 @@
 #ifndef AOCC_DAY07_H
 #define AOCC_DAY07_H
 
-#include "../util/aoc.h"
+#include "../util/aoc.c"
 #include "../util/helpers.h"
 #include "../util/ll_tuple.h"
+#include "../util/aoc_types.h"
 
 #include <math.h>
 #include <stdbool.h>
@@ -161,14 +162,14 @@ struct ll_tuple day07(char *buf, __attribute__((unused)) long buf_len) {
   return day_res;
 }
 
-void solve_day07() {
-  const int year = 2023;
-  const int day = 7;
+struct aoc_day_res solve_day07(const char* input_file) {
   char *input_buffer;
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
-  const struct ll_tuple day_res = day07(input_buffer, filesize);
-  print_day_result(day, day_res);
+  const long filesize = read_file_to_memory(input_file, &input_buffer, true);
+  const struct ll_tuple res = day07(input_buffer, filesize);
   free(input_buffer);
+
+  struct aoc_day_res day_res={res};
+  return day_res;
 }
 
 #endif // AOCC_DAY07_H

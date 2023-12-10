@@ -1,9 +1,10 @@
 #ifndef AOCC_DAY02_H
 #define AOCC_DAY02_H
 
-#include "../util/aoc.h"
+#include "../util/aoc.c"
 #include "../util/helpers.h"
 #include "../util/parallelize.h"
+#include "../util/aoc_types.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -105,21 +106,14 @@ struct ll_tuple day02(char *buf, __attribute__((unused)) long buf_len) {
   return result;
 }
 
-void solve_day02() {
-  const int year = 2023;
-  const int day = 2;
-
+struct aoc_day_res solve_day02(const char *input_file) {
   char *input_buffer;
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
-  struct ll_tuple day_res =
+  const long filesize = read_file_to_memory(input_file, &input_buffer, true);
+  struct ll_tuple res =
       parallelize(day02, ll_tuple_add, input_buffer, filesize, 0);
-  print_day_result(day, day_res);
+  struct aoc_day_res day_res = {res};
 
-  // part 1
-  // submit_answer(year, day, day_part_part1, day_res);
-
-  // part 2
-  // submit_answer(year, day, day_part_part2, day_res);
   free(input_buffer);
+  return day_res;
 }
 #endif // AOCC_DAY02_H

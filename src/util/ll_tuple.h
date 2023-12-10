@@ -2,29 +2,20 @@
 #define AOCC_LL_TUPLE_H
 
 #include <malloc.h>
+#include <string.h>
 
 struct ll_tuple {
   long long left;
   long long right;
 };
 
+void ll_tuple_copy(const struct ll_tuple* to,struct ll_tuple* from);
+
 struct ll_tuple ll_tuple_add(const struct ll_tuple res1,
-                           const struct ll_tuple res2) {
-  struct ll_tuple res = {res1.left + res2.left,
-                                res1.right + res2.right};
-  return res;
-}
+                           const struct ll_tuple res2);
 
-void print_two_part_result(const struct ll_tuple result) {
-  printf("result:\npart1:\t%lld\npart2:\t%lld\n", result.left,
-         result.right);
-}
 
-void print_day_result(int day, const struct ll_tuple result) {
-  printf("--------------\n");
-  printf("day%2d\n", day);
-  print_two_part_result(result);
-  printf("\n");
-}
+void print_tuple(const struct ll_tuple tup);
+
 
 #endif // AOCC_LL_TUPLE_H

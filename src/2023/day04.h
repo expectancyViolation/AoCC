@@ -1,11 +1,13 @@
 #ifndef AOCC_DAY04_H
 #define AOCC_DAY04_H
 
-#include "../util/aoc.h"
+#include "../util/aoc.c"
 #include "../util/fenwick.h"
 #include "../util/helpers.h"
 #include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
+#include "../util/aoc_types.h"
+
 
 #include <stdbool.h>
 
@@ -98,27 +100,20 @@ struct ll_tuple day04(char *buf, long buf_len) {
   return result;
 }
 
-void solve_day04() {
-  const int year = 2023;
-  const int day = 4;
+struct aoc_day_res solve_day04(const char *input_file) {
   char *input_buffer;
   // harder to parallelize b.c. of arbitrary range interactions!
-  const long filesize = get_day_input_cached(year, day, &input_buffer);
+  const long filesize = read_file_to_memory(input_file, &input_buffer, true);
 #ifdef DAY04_UNSAFE_PARALLEL
   const struct ll_tuple day_res = parallelize((day04),
               ll_tuple_add,
               input_buffer, filesize, 0);
 #else
-  const struct ll_tuple day_res = day04(input_buffer, filesize);
+  const struct ll_tuple res= day04(input_buffer, filesize);
 #endif
-  print_day_result(day, day_res);
-
-  // part 1
-  // submit_answer(year, day, day_part_part1, day_res);
-
-  // part 2
-  // submit_answer(year, day, day_part_part2, day_res);
+  struct aoc_day_res day_res={res};
   free(input_buffer);
+  return day_res;
 }
 
 #endif // AOCC_DAY04_H
