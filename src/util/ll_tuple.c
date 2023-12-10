@@ -11,3 +11,9 @@ void print_tuple(const struct ll_tuple tup) {
 void ll_tuple_copy(const struct ll_tuple *to, struct ll_tuple *from) {
   memcpy((void *)to, (void *)from, sizeof *to);
 }
+int ll_tuple_compare(const struct ll_tuple *l1, const struct ll_tuple *l2) {
+  const int left_cmp = CMP(l1->left, l2->left);
+  if (left_cmp != 0)
+    return left_cmp;
+  return CMP(l1->right, l2->right);
+}

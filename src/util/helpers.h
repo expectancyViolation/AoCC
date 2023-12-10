@@ -2,7 +2,6 @@
 #define AOCC_HELPERS_H
 
 #include "../../res/cvector.h"
-#include "ll_tuple.h"
 #include "parallelize.h"
 #include <errno.h>
 #include <malloc.h>
@@ -24,6 +23,7 @@
     _a < _b ? _a : _b;                                                         \
   })
 
+#define CMP(a, b) (((a) > (b)) - ((b) > (a)))
 
 
 // DANGER: free string after use

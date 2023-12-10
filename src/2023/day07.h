@@ -16,7 +16,6 @@
 
 #define HAND_SIZE 5
 
-#define CMP(a, b) (((a) > (b)) - ((b) > (a)))
 
 struct hand {
   int largest_match;

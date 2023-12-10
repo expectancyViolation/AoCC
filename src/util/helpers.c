@@ -1,6 +1,7 @@
 #include "helpers.h"
 
 
+
 long read_file_to_memory(const char *filename, char **file_content_out,
                          bool strip_newline) {
   FILE *f = fopen(filename, "rb");

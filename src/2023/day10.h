@@ -11,8 +11,6 @@
 #include "../util/ll_tuple.h"
 #include "../util/parallelize.h"
 
-#define LEFT_HAND true
-
 enum day10_facing {
   facing_none = 0,
   facing_north = 1,
@@ -21,33 +19,10 @@ enum day10_facing {
   facing_west = 4
 };
 
-void day10_print_facing(enum day10_facing facing) {
-  switch (facing) {
-  case facing_none:
-    printf("noner");
-    break;
-  case facing_north:
-    printf("north");
-    break;
-  case facing_east:
-    printf("east");
-    break;
-  case facing_south:
-    printf("south");
-    break;
-  case facing_west:
-    printf("west");
-    break;
-  default:
-    printf("???");
-  }
-}
+const enum day10_facing DAY10_ALL_FACINGS[]={facing_north,facing_east,facing_south,facing_west};
 
-const enum day10_facing DAY10_ALL_FACING[] = {facing_north, facing_east,
-                                              facing_south, facing_west};
+const size_t DAY10_FACINGS_COUNT=sizeof(DAY10_ALL_FACINGS)/sizeof(facing_none);
 
-const size_t DAY10_LEN_ALL_FACING =
-    sizeof(DAY10_ALL_FACING) / sizeof(facing_none);
 
 struct day10_piece {
   enum day10_facing north_connect;
@@ -71,50 +46,61 @@ const struct day10_piece F_BEND = {facing_east, facing_none, facing_none,
 const struct day10_piece GROUND = {facing_none, facing_none, facing_none,
                                    facing_none};
 
-struct day10_move_state {
-  long x;
-  long y;
-  enum day10_facing facing;
-  bool left_hand;
+struct day10_map {
+  const char *buf;
+  long buf_len;
+  long x_extent;
+  long y_extent;
+  struct ll_tuple start_position;
 };
 
-bool day10_at_same_pos(const struct day10_move_state *s1,
-                       const struct day10_move_state *s2) {
-  return (s1->x == s2->x) && (s1->y == s2->y);
+struct day10_map *day10_map_initialize(const char *buf, long buf_len) {
+  struct day10_map *map = malloc(sizeof(*map));
+  map->buf = buf;
+  map->buf_len=buf_len;
+  map->y_extent = (strchr(buf, '\n') - buf);
+  map->x_extent = buf_len / (map->y_extent + 1);
+  ptrdiff_t start_offset = strchr(map->buf, 'S') - map->buf;
+  map->start_position.left = start_offset / (map->y_extent + 1);
+  map->start_position.right = start_offset % (map->y_extent + 1);
+  return map;
 }
 
-void day10_print_move_state(const struct day10_move_state *state) {
-  assert(state != NULL);
-  printf("move state:\n"
-         "\tx:%10ld\n"
-         "\tx:%10ld\n"
-         "\tleft: %d\n\t",
-         state->x, state->y, state->left_hand);
-  day10_print_facing(state->facing);
-  printf("\n\n");
+__attribute__((unused)) void day10_print_map(const struct day10_map *map) {
+  printf("%s\n", map->buf);
+  printf("%ld by %ld\n", map->x_extent, map->y_extent);
 }
 
-void day10_direction_to_delta(enum day10_facing dir, long *dx, long *dy) {
+char day10_lookup_tile(const struct day10_map *map,
+                       const struct ll_tuple *position) {
+  long curr_pos_offset =
+      (position->left) * (map->y_extent + 1) + position->right;
+  if((curr_pos_offset<0)|| (curr_pos_offset>=map->buf_len))
+    return '.';
+  return map->buf[curr_pos_offset];
+}
+
+struct day10_move_state {
+  struct ll_tuple position;
+  enum day10_facing facing;
+};
+
+void day10_step_direction(enum day10_facing dir, struct ll_tuple *position) {
   switch (dir) {
   case facing_north:
-    *dx = -1;
-    *dy = 0;
+    position->left += -1;
     break;
   case facing_east:
-    *dx = 0;
-    *dy = 1;
+    position->right += 1;
     break;
   case facing_south:
-    *dx = 1;
-    *dy = 0;
+    position->left += 1;
     break;
   case facing_west:
-    *dx = 0;
-    *dy = -1;
+    position->right -= 1;
     break;
-  case facing_none:
-    *dx = 0;
-    *dy = 0;
+  default:
+    break;
   }
 }
 
@@ -141,7 +127,7 @@ const struct day10_piece *get_tile_piece(char tile) {
   }
 }
 
-enum day10_facing step_tile(char tile, enum day10_facing dir) {
+enum day10_facing get_new_facing(char tile, enum day10_facing dir) {
   const struct day10_piece *curr_piece = get_tile_piece(tile);
   switch (dir) {
   case facing_none:
@@ -155,82 +141,21 @@ enum day10_facing step_tile(char tile, enum day10_facing dir) {
   case facing_west:
     return curr_piece->west_connect;
   }
+  return facing_none;
 }
 
-bool day10_step(const char *buf, long line_length,
-                struct day10_move_state *state, struct ll_tuple **boundary) {
-  long dx = 0;
-  long dy = 0;
-  enum day10_facing facing_old = state->facing;
-  day10_direction_to_delta(state->facing, &dx, &dy);
-  long curr_pos_offset = (state->x) * line_length + state->y;
-  long next_pos_offset = curr_pos_offset + dx * line_length + dy;
-  char next_tile = buf[next_pos_offset];
-  enum day10_facing next_facing = step_tile(next_tile, state->facing);
+bool day10_step(const struct day10_map *map, struct day10_move_state *state) {
+  struct ll_tuple next_position = {state->position.left, state->position.right};
+  day10_step_direction(state->facing, &next_position);
+  char next_tile = day10_lookup_tile(map, &next_position);
+  enum day10_facing next_facing = get_new_facing(next_tile, state->facing);
   state->facing = next_facing;
   // check if we moved
   bool moved = state->facing != facing_none;
   if (moved) {
-    // boundary calculation
-    struct ll_tuple old_boundary = {};
-    old_boundary.left =
-        2 * (state->x) + dx - ((state->left_hand) ? (dy) : (-dy));
-    old_boundary.right =
-        2 * (state->y) + dy + ((state->left_hand) ? (dx) : (-dx));
     // step
-    state->x += dx;
-    state->y += dy;
-    day10_direction_to_delta(state->facing, &dx, &dy);
-
-    struct ll_tuple new_boundary = {};
-    new_boundary.left =
-        2 * (state->x) + dx - ((state->left_hand) ? (dy) : (-dy));
-    new_boundary.right =
-        2 * (state->y) + dy + ((state->left_hand) ? (dx) : (-dx));
-
-    const long long boundary_distance =
-        llabs(new_boundary.left - old_boundary.left) +
-        llabs(new_boundary.right - old_boundary.right);
-
-    // at start of boundary calculation
-    if(cvector_size(*boundary)==0){
-      struct ll_tuple fake_boundary={227,35};
-      cvector_push_back(*boundary,fake_boundary);
-      cvector_push_back(*boundary,old_boundary);
-    }
-
-    struct ll_tuple intermediary_boundary = {};
-    switch (boundary_distance) {
-    case 0:
-      // "inner" corner => no new boundary point (e.g. when "LEFT HAND" and we
-      // turn left)
-      break;
-    case 2:
-      // straight move: just add new boundary
-      cvector_push_back(*boundary, new_boundary);
-      break;
-    case 4:
-      // "outer" corner => step new boundary 2*(dx,dy ) backwards
-      intermediary_boundary.left = new_boundary.left - 2 * dx;
-      intermediary_boundary.right = new_boundary.right - 2 * dy;
-      cvector_push_back(*boundary, intermediary_boundary);
-      cvector_push_back(*boundary, new_boundary);
-      break;
-    default:
-      assert(false);
-    }
-  /*
-    printf("moved:\n");
-    day10_print_move_state(state);
-
-    printf("old boundary:\n");
-    print_tuple(old_boundary);
-    printf("\n");
-
-    printf("new boundary:\n");
-    print_tuple(new_boundary);
-    printf("\n");
-    */
+    state->position.left = next_position.left;
+    state->position.right = next_position.right;
   }
   return moved;
 }
@@ -244,145 +169,50 @@ long long signed_area(const struct ll_tuple *t1, const struct ll_tuple *t2,
   return v1x * v2y - v2x * v1y;
 }
 
-void day10_print_enlarged(char *buf, long line_length,
-                          const struct ll_tuple *boundary1,
-                          const struct ll_tuple *boundary2) {
-  const int buf_len = strlen(buf) + 1;
-  const int num_lines = buf_len / line_length + 6;
-  const int left_pad = 4;
-  const int new_line_length = 2 * line_length + left_pad + 4;
-  const int new_buf_len = new_line_length * (num_lines + 30);
-  char *out = malloc(new_buf_len);
-  memset(out, ' ', new_buf_len - 1);
-  for (int j = 0; j < num_lines; j++) {
-    for (int i = 0; i < line_length - 1; i++)
-      out[left_pad + 2 * j * new_line_length + 2 * i] =
-          buf[j * line_length + i];
-  }
-  for (int i = new_line_length - 1; i < new_buf_len; i += new_line_length) {
-    out[left_pad + i] = '\n';
-  }
-  for (int i = 0; i < cvector_size(boundary1); i++) {
-    const struct ll_tuple b_el = boundary1[i];
-    print_tuple(b_el);
-    const size_t mark_offset =
-        (b_el.left) * new_line_length + (b_el.right) + left_pad;
-    if (out[mark_offset] != '\n') {
-      out[mark_offset] = 'X';
-    } else {
-      printf("missed:");
-      print_tuple(b_el);
-      printf("\n");
-    }
-  }
-  for (int i = 0; i < cvector_size(boundary2); i++) {
-    const struct ll_tuple b_el = boundary2[i];
-    print_tuple(b_el);
-    const size_t mark_offset =
-        (b_el.left) * new_line_length + (b_el.right) + left_pad;
-    if (out[mark_offset] != '\n') {
-      out[mark_offset] = 'Y';
-    } else {
-      printf("missed:");
-      print_tuple(b_el);
-      printf("\n");
-    }
-  }
-  printf("%s", out);
-}
-
-struct ll_tuple day10(char *buf, __attribute__((unused)) long buf_len) {
-  printf("----\n%s\n", buf);
+struct ll_tuple day10(char *buf, long buf_len) {
   struct ll_tuple res = {};
-  struct day10_move_state current_states[2] = {};
-  struct ll_tuple *boundary = NULL;
+  const struct day10_map *map = day10_map_initialize(buf, buf_len);
 
-  struct ll_tuple *boundary1 = NULL;
+  //day10_print_map(map);
 
-  struct ll_tuple *boundary2 = NULL;
+  struct day10_move_state current_state = {
+      {map->start_position.left, map->start_position.right}, facing_none};
+  for (size_t i = 0; i < DAY10_FACINGS_COUNT; i++) {
+    current_state.facing = DAY10_ALL_FACINGS[i];
+    if (day10_step(map, &current_state))
+      break;
+  }
 
-  const long line_length = strchr(buf, '\n') - buf + 1;
-  printf("line length %ld\n", line_length);
-  ptrdiff_t curr_offset = strchr(buf, 'S') - buf;
+  struct ll_tuple previous_position = {current_state.position.left,
+                                       current_state.position.right};
 
-  int j = 0;
-  for (int i = 0; i < DAY10_LEN_ALL_FACING; i++) {
-    struct day10_move_state temp_state = {};
-    temp_state.x = curr_offset / line_length;
-    temp_state.y = curr_offset % line_length;
-    temp_state.facing = DAY10_ALL_FACING[i];
-    temp_state.left_hand = (LEFT_HAND) ? (1 - j) : j;
-    bool step_ok;
-    if (j == 0) {
-      step_ok = day10_step(buf, line_length, &temp_state, &boundary1);
-    } else {
-      step_ok = day10_step(buf, line_length, &temp_state, &boundary2);
+  long long boundary_size = 1;
+  long long twice_interior_size = 0;
+
+  twice_interior_size += signed_area(&map->start_position, &previous_position,
+                                     &map->start_position);
+
+  while (true) {
+    day10_step(map, &current_state);
+    boundary_size += 1;
+
+    if (current_state.facing == facing_none) {
+      // reached the beginning (if everything went right)
+      break;
     }
-
-    if (step_ok) {
-      memcpy(&current_states[j++], &temp_state,
-             sizeof(struct day10_move_state));
-    }
-  }
-  assert(j == 2);
-  printf("START PARSED\n");
-  for (size_t i = 0; i < 2; i++) {
-    day10_print_move_state(&current_states[i]);
+    // calculate interior
+    twice_interior_size += signed_area(&map->start_position, &previous_position,
+                                       &current_state.position);
+    previous_position.left = current_state.position.left;
+    previous_position.right = current_state.position.right;
   }
 
-  int n_steps = 1;
-  while (!day10_at_same_pos(current_states, current_states + 1)) {
-    day10_step(buf, line_length, current_states, &boundary1);
-    day10_step(buf, line_length, current_states + 1, &boundary2);
-    n_steps++;
-    assert(current_states[0].facing != facing_none);
-    assert(current_states[1].facing != facing_none);
-  }
+  assert((boundary_size % 2) == 0);
+  assert((twice_interior_size % 2) == 0);
 
-  //  for (size_t i = 0; i < 2; i++) {
-  //    day10_print_move_state(&current_states[i]);
-  //  }
-  //  printf("met at %d\n", n_steps);
-  //printf("%s\n", buf);
-  //day10_print_enlarged(buf, line_length, boundary1, boundary2);
-  long long p2 = 0;
+  res.left = boundary_size / 2;
+  res.right = (llabs(twice_interior_size) - boundary_size) / 2 + 1;
 
-  for (int i = 1; i < cvector_size(boundary1); i++) {
-    const long long curr= (signed_area(boundary1, boundary1 + i - 1, boundary1 + i))/4;
-    printf("\n");
-    print_tuple(*boundary1);
-    printf("\n");
-    print_tuple(*(boundary1 + i - 1));
-    printf("\n");
-    print_tuple(*(boundary1 + i));
-    printf("\narea:%lld\n",curr);
-    printf("-------");
-    p2+=curr;
-  }
-  printf("%lld\n",p2);
-  printf("------------------------------------");
-
-  for (int i = 1; i < cvector_size(boundary2); i++) {
-    const long long curr= (signed_area(boundary2, boundary2 + i - 1, boundary2 + i))/4;
-    printf("\n");
-    print_tuple(*boundary2);
-    printf("\n");
-    print_tuple(*(boundary2 + i - 1));
-    printf("\n");
-    print_tuple(*(boundary2 + i));
-    printf("\narea:%lld\n",curr);
-    printf("-------");
-    p2-=curr;
-  }
-  printf("p2double:%lld\n",p2);
-  assert(p2%2==0);
-  p2/=2;
-  printf("%lld\n",p2);
-  printf("------------------------------------");
-  printf("p2:%lld\n", p2);
-
-  res.right = p2;
-  res.left = n_steps;
   return res;
 }
 
