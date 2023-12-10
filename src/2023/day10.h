@@ -192,6 +192,13 @@ bool day10_step(const char *buf, long line_length,
         llabs(new_boundary.left - old_boundary.left) +
         llabs(new_boundary.right - old_boundary.right);
 
+    // at start of boundary calculation
+    if(cvector_size(*boundary)==0){
+      struct ll_tuple fake_boundary={227,35};
+      cvector_push_back(*boundary,fake_boundary);
+      cvector_push_back(*boundary,old_boundary);
+    }
+
     struct ll_tuple intermediary_boundary = {};
     switch (boundary_distance) {
     case 0:
@@ -212,7 +219,7 @@ bool day10_step(const char *buf, long line_length,
     default:
       assert(false);
     }
-
+  /*
     printf("moved:\n");
     day10_print_move_state(state);
 
@@ -223,31 +230,63 @@ bool day10_step(const char *buf, long line_length,
     printf("new boundary:\n");
     print_tuple(new_boundary);
     printf("\n");
+    */
   }
   return moved;
 }
 
+long long signed_area(const struct ll_tuple *t1, const struct ll_tuple *t2,
+                      const struct ll_tuple *t3) {
+  const long long v1x = (t2->left) - (t1->left);
+  const long long v1y = (t2->right) - (t1->right);
+  const long long v2x = (t3->left) - (t1->left);
+  const long long v2y = (t3->right) - (t1->right);
+  return v1x * v2y - v2x * v1y;
+}
+
 void day10_print_enlarged(char *buf, long line_length,
-                          const struct ll_tuple *boundary) {
+                          const struct ll_tuple *boundary1,
+                          const struct ll_tuple *boundary2) {
   const int buf_len = strlen(buf) + 1;
-  const int new_buf_len=4*buf_len;
-  char *out = malloc(4 * buf_len + 4);
-  memset(out, ' ', 4 * buf_len + 4);
-  const int new_line_length=2*line_length-1;
-  for (int i = 0; i < buf_len; i++) {
-    const long line_num = i / (line_length-1);
-    const long line_pos = i % (line_length-1);
-    out[line_num * 4 * line_length + 2 * line_pos+1] = buf[i];
+  const int num_lines = buf_len / line_length + 6;
+  const int left_pad = 4;
+  const int new_line_length = 2 * line_length + left_pad + 4;
+  const int new_buf_len = new_line_length * (num_lines + 30);
+  char *out = malloc(new_buf_len);
+  memset(out, ' ', new_buf_len - 1);
+  for (int j = 0; j < num_lines; j++) {
+    for (int i = 0; i < line_length - 1; i++)
+      out[left_pad + 2 * j * new_line_length + 2 * i] =
+          buf[j * line_length + i];
   }
-  for(int i=0;i<new_buf_len;i+=new_line_length){
-    out[i]='\n';
+  for (int i = new_line_length - 1; i < new_buf_len; i += new_line_length) {
+    out[left_pad + i] = '\n';
   }
-  for (int i = 0; i < cvector_size(boundary); i++) {
-    const struct ll_tuple b_el = boundary[i];
+  for (int i = 0; i < cvector_size(boundary1); i++) {
+    const struct ll_tuple b_el = boundary1[i];
     print_tuple(b_el);
     const size_t mark_offset =
-        (b_el.left) * new_line_length + (b_el.right)+1;
-    out[mark_offset] = 'X';
+        (b_el.left) * new_line_length + (b_el.right) + left_pad;
+    if (out[mark_offset] != '\n') {
+      out[mark_offset] = 'X';
+    } else {
+      printf("missed:");
+      print_tuple(b_el);
+      printf("\n");
+    }
+  }
+  for (int i = 0; i < cvector_size(boundary2); i++) {
+    const struct ll_tuple b_el = boundary2[i];
+    print_tuple(b_el);
+    const size_t mark_offset =
+        (b_el.left) * new_line_length + (b_el.right) + left_pad;
+    if (out[mark_offset] != '\n') {
+      out[mark_offset] = 'Y';
+    } else {
+      printf("missed:");
+      print_tuple(b_el);
+      printf("\n");
+    }
   }
   printf("%s", out);
 }
@@ -257,6 +296,10 @@ struct ll_tuple day10(char *buf, __attribute__((unused)) long buf_len) {
   struct ll_tuple res = {};
   struct day10_move_state current_states[2] = {};
   struct ll_tuple *boundary = NULL;
+
+  struct ll_tuple *boundary1 = NULL;
+
+  struct ll_tuple *boundary2 = NULL;
 
   const long line_length = strchr(buf, '\n') - buf + 1;
   printf("line length %ld\n", line_length);
@@ -268,22 +311,29 @@ struct ll_tuple day10(char *buf, __attribute__((unused)) long buf_len) {
     temp_state.x = curr_offset / line_length;
     temp_state.y = curr_offset % line_length;
     temp_state.facing = DAY10_ALL_FACING[i];
-    temp_state.left_hand = j;
-    if (day10_step(buf, line_length, &temp_state, &boundary)) {
+    temp_state.left_hand = (LEFT_HAND) ? (1 - j) : j;
+    bool step_ok;
+    if (j == 0) {
+      step_ok = day10_step(buf, line_length, &temp_state, &boundary1);
+    } else {
+      step_ok = day10_step(buf, line_length, &temp_state, &boundary2);
+    }
+
+    if (step_ok) {
       memcpy(&current_states[j++], &temp_state,
              sizeof(struct day10_move_state));
     }
   }
   assert(j == 2);
-
+  printf("START PARSED\n");
   for (size_t i = 0; i < 2; i++) {
     day10_print_move_state(&current_states[i]);
   }
 
   int n_steps = 1;
   while (!day10_at_same_pos(current_states, current_states + 1)) {
-    day10_step(buf, line_length, current_states, &boundary);
-    day10_step(buf, line_length, current_states + 1, &boundary);
+    day10_step(buf, line_length, current_states, &boundary1);
+    day10_step(buf, line_length, current_states + 1, &boundary2);
     n_steps++;
     assert(current_states[0].facing != facing_none);
     assert(current_states[1].facing != facing_none);
@@ -293,13 +343,45 @@ struct ll_tuple day10(char *buf, __attribute__((unused)) long buf_len) {
   //    day10_print_move_state(&current_states[i]);
   //  }
   //  printf("met at %d\n", n_steps);
-  printf("boundary is:\n");
-  for (int i = 0; i < cvector_size(boundary); i++) {
-    print_tuple(boundary[i]);
+  //printf("%s\n", buf);
+  //day10_print_enlarged(buf, line_length, boundary1, boundary2);
+  long long p2 = 0;
+
+  for (int i = 1; i < cvector_size(boundary1); i++) {
+    const long long curr= (signed_area(boundary1, boundary1 + i - 1, boundary1 + i))/4;
     printf("\n");
+    print_tuple(*boundary1);
+    printf("\n");
+    print_tuple(*(boundary1 + i - 1));
+    printf("\n");
+    print_tuple(*(boundary1 + i));
+    printf("\narea:%lld\n",curr);
+    printf("-------");
+    p2+=curr;
   }
-  printf("%s\n", buf);
-  day10_print_enlarged(buf, line_length, boundary);
+  printf("%lld\n",p2);
+  printf("------------------------------------");
+
+  for (int i = 1; i < cvector_size(boundary2); i++) {
+    const long long curr= (signed_area(boundary2, boundary2 + i - 1, boundary2 + i))/4;
+    printf("\n");
+    print_tuple(*boundary2);
+    printf("\n");
+    print_tuple(*(boundary2 + i - 1));
+    printf("\n");
+    print_tuple(*(boundary2 + i));
+    printf("\narea:%lld\n",curr);
+    printf("-------");
+    p2-=curr;
+  }
+  printf("p2double:%lld\n",p2);
+  assert(p2%2==0);
+  p2/=2;
+  printf("%lld\n",p2);
+  printf("------------------------------------");
+  printf("p2:%lld\n", p2);
+
+  res.right = p2;
   res.left = n_steps;
   return res;
 }

@@ -77,13 +77,13 @@ int main() {
 
   char *day10_filepath = get_input_file_path(2023, 10);
   fetch_day_input_cached(2023, 10, day10_filepath);
-  const struct aoc_day_res res = solve_day10("/tmp/aoc/2023/day10_example.txt");
+  const struct aoc_day_res res = solve_day10("/tmp/aoc/2023/day10_input.txt");
   // const struct aoc_day_res res=solve_day10(day10_filepath);
   print_aoc_day_result(&res);
   char resp[100] = {};
   sprintf(resp, "%lld", res.result.left);
   printf("resp:%s", resp);
-  submit_answer(2023, 10, day_part_part1, resp);
+  //submit_answer(2023, 10, day_part_part1, resp);
 
   //  test_aoc_parse();
   //  for (int day = 15; day < 26; day++) {
