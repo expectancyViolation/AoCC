@@ -1,8 +1,4 @@
-//
-// Created by matze on 10/12/2023.
-//
-
-#ifndef AOCC_DAY10_H
+#ifndef AOCC_DAY11_H
 #define AOCC_DAY10_H
 
 #include "../util/aoc_types.h"
@@ -19,10 +15,11 @@ enum day10_facing {
   facing_west = 4
 };
 
-const enum day10_facing DAY10_ALL_FACINGS[]={facing_north,facing_east,facing_south,facing_west};
+const enum day10_facing DAY10_ALL_FACINGS[] = {facing_north, facing_east,
+                                               facing_south, facing_west};
 
-const size_t DAY10_FACINGS_COUNT=sizeof(DAY10_ALL_FACINGS)/sizeof(facing_none);
-
+const size_t DAY10_FACINGS_COUNT =
+    sizeof(DAY10_ALL_FACINGS) / sizeof(facing_none);
 
 struct day10_piece {
   enum day10_facing north_connect;
@@ -57,7 +54,7 @@ struct day10_map {
 struct day10_map *day10_map_initialize(const char *buf, long buf_len) {
   struct day10_map *map = malloc(sizeof(*map));
   map->buf = buf;
-  map->buf_len=buf_len;
+  map->buf_len = buf_len;
   map->y_extent = (strchr(buf, '\n') - buf);
   map->x_extent = buf_len / (map->y_extent + 1);
   ptrdiff_t start_offset = strchr(map->buf, 'S') - map->buf;
@@ -75,7 +72,7 @@ char day10_lookup_tile(const struct day10_map *map,
                        const struct ll_tuple *position) {
   long curr_pos_offset =
       (position->left) * (map->y_extent + 1) + position->right;
-  if((curr_pos_offset<0)|| (curr_pos_offset>=map->buf_len))
+  if ((curr_pos_offset < 0) || (curr_pos_offset >= map->buf_len))
     return '.';
   return map->buf[curr_pos_offset];
 }
@@ -173,7 +170,7 @@ struct ll_tuple day10(char *buf, long buf_len) {
   struct ll_tuple res = {};
   const struct day10_map *map = day10_map_initialize(buf, buf_len);
 
-  //day10_print_map(map);
+  // day10_print_map(map);
 
   struct day10_move_state current_state = {
       {map->start_position.left, map->start_position.right}, facing_none};

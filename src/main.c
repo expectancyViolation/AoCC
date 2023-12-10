@@ -77,7 +77,10 @@ int main() {
   result_db_handle db = result_db_init_db("/tmp/ress.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
 
-  run_all_days();
+  //  run_all_days();
+  struct aoc_day_task task={2023,10,"/tmp/aoc_bigboy/2023/day10_input.txt"};
+  struct aoc_benchmark_day bench=benchmark_day(master_solver,task);
+  print_day_benchmark(&bench);
   curl_global_cleanup();
   result_db_close(db);
 }
