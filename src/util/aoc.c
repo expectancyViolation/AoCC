@@ -16,7 +16,6 @@
 #include <unistd.h>
 
 // TODO: make this env variable
-#define SESSION_FILE "/tmp/session.txt"
 #define INPUT_CACHE_DIR "/tmp/aoc"
 
 #define SEP "\t" /* Tab separates the fields */
@@ -98,6 +97,11 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb,
 }
 // end from
 
+
+char* get_session(){
+  return getenv("AOC_SESSION");
+}
+
 // TODO: cache cookie in struct?
 void set_session_cookie(CURL *curl, char *session) {
   char my_cookie[1000] = "adventofcode.com" /* Hostname */
@@ -118,12 +122,11 @@ struct aoc_submission_status
 submit_answer(int year, int day, enum AOC_DAY_PART part, char *answer) {
   CURL *curl;
   CURLcode curl_res;
-  char *session;
+  char *session=get_session();
   struct aoc_submission_status submission_status;
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
   chunk.size = 0;
-  read_file_to_memory(SESSION_FILE, &session, false);
   curl = curl_easy_init();
   if (curl) {
     set_session_cookie(curl, session);
@@ -158,8 +161,7 @@ submit_answer(int year, int day, enum AOC_DAY_PART part, char *answer) {
 void fetch_day_input(int year, int day, char *outfile) {
   CURL *curl;
   CURLcode res;
-  char *session;
-  read_file_to_memory(SESSION_FILE, &session, false);
+  char *session=get_session();
   curl = curl_easy_init();
   if (curl) {
     FILE *f = fopen_mkdir(outfile, "w");
@@ -192,12 +194,11 @@ void fetch_day_input_cached(int year, int day, char *filepath) {
 struct aoc_day_status fetch_day_status(int year, int day) {
   CURL *curl;
   CURLcode res;
-  char *session;
+  char *session=get_session();
   struct aoc_day_status day_status={};
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
   chunk.size = 0;
-  read_file_to_memory(SESSION_FILE, &session, false);
   curl = curl_easy_init();
   if (curl) {
     set_session_cookie(curl, session);
