@@ -70,33 +70,30 @@ __attribute__((unused)) void run_all_days() {
   free(results);
 }
 
-
-
 int main() {
   curl_global_init(CURL_GLOBAL_ALL);
   result_db_handle db = result_db_init_db("/tmp/ress.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
 
-  char* day10_filepath= get_input_file_path(2023,10);
-  fetch_day_input_cached(2023,10,day10_filepath);
-//  const struct aoc_day_res res=solve_day10("/tmp/aoc/2023/day10_example.txt");
-  const struct aoc_day_res res=solve_day10(day10_filepath);
+  char *day10_filepath = get_input_file_path(2023, 10);
+  fetch_day_input_cached(2023, 10, day10_filepath);
+  const struct aoc_day_res res = solve_day10("/tmp/aoc/2023/day10_example.txt");
+  // const struct aoc_day_res res=solve_day10(day10_filepath);
   print_aoc_day_result(&res);
-  char resp[100]={};
-  sprintf(resp,"%lld",res.result.left);
-  printf("resp:%s",resp);
-  submit_answer(2023,10,day_part_part1,resp);
+  char resp[100] = {};
+  sprintf(resp, "%lld", res.result.left);
+  printf("resp:%s", resp);
+  submit_answer(2023, 10, day_part_part1, resp);
 
+  //  test_aoc_parse();
+  //  for (int day = 15; day < 26; day++) {
+  //    //    const struct aoc_day_status status = fetch_day_status(2021, day);
+  //    //    print_aoc_day_status(&status);
+  //    aoc_manager_pull_day_status(manager_handle, 2016, day);
+  //  }
+  // submit_answer(2016,23,day_part_part1,"1234");
 
-//  test_aoc_parse();
-//  for (int day = 15; day < 26; day++) {
-//    //    const struct aoc_day_status status = fetch_day_status(2021, day);
-//    //    print_aoc_day_status(&status);
-//    aoc_manager_pull_day_status(manager_handle, 2016, day);
-//  }
-  //submit_answer(2016,23,day_part_part1,"1234");
-
-  //submit_answer(2016,23,day_part_part1,"12342");
+  // submit_answer(2016,23,day_part_part1,"12342");
 
   /*for (int day = 15; day < 26; day++) {
     struct result_status* result_status;
@@ -109,8 +106,8 @@ int main() {
     free(result_status);
   }*/
 
-//  result_db_test();
-  //run_all_days();
+  //  result_db_test();
+  // run_all_days();
   //  struct aoc_day_res res=solve_day09("/tmp/aoc/2023/day09_input.txt");
   //  print_aoc_day_result(&res);
   curl_global_cleanup();
