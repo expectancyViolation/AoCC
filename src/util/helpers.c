@@ -61,7 +61,7 @@ void align_pointers_on_separator(const char *lower_bound,
 
 long get_first_line_length(char *buf) { return strchr(buf, '\n') - buf + 1; }
 
-long compare_long(const long *l1, const long *l2) { return (*l1) - (*l2); }
+__attribute__((unused)) long compare_long(const long *l1, const long *l2) { return (*l1) - (*l2); }
 
 // from: https://stackoverflow.com/questions/19738919/gcd-function-for-c
 long long gcd(long long a, long long b) {

@@ -15,7 +15,7 @@ aoc_manager_handle aoc_manager_init_manager(result_db_handle db_handle) {
   handle_data->db_handle = db_handle;
   return (aoc_manager_handle)handle_data;
 }
-void aoc_manager_close(aoc_manager_handle handle) {
+__attribute__((unused)) void aoc_manager_close(aoc_manager_handle handle) {
   struct aoc_manager_data *data = aoc_manager_deref_handle(handle);
   free(data);
 }
@@ -99,7 +99,7 @@ void aoc_manager_pull_day_status(aoc_manager_handle handle, int year, int day) {
   }
 }
 
-void aoc_manager_get_day_status(aoc_manager_handle handle, int year, int day,
+bool aoc_manager_get_day_status(aoc_manager_handle handle, int year, int day,
                                 enum AOC_DAY_PART part,
                                 struct result_status **status) {
   struct aoc_manager_data *handle_data = aoc_manager_deref_handle(handle);
@@ -112,7 +112,7 @@ void aoc_manager_get_day_status(aoc_manager_handle handle, int year, int day,
 
   could_load =
       result_status_load_entry(handle_data->db_handle, year, day, part, status);
-  assert(could_load);
+  return could_load;
 }
 
 submission_sanity_flag_array
@@ -122,7 +122,7 @@ check_submission_sanity(const struct result_status *status,
   if (status->solved)
     sanity_flags |= SANITY_ALREADY_SOLVED;
   if (status->solution_type == solution_type_num_solution) {
-    const char *endptr = submission;
+    char *endptr = (char *)submission;
     long submission_num = strtol(submission, &endptr, 10);
     if (endptr == submission) {
       // could not parse as number
@@ -211,11 +211,10 @@ submission_sanity_flag_array
 aoc_manager_sane_submit_llong(aoc_manager_handle handle, int year, int day,
                               enum AOC_DAY_PART part, const long long int guess,
                               AocSubmissionStatus *out_status) {
-  char sol[AOC_SOL_MAX_LEN+1] = {};
+  char sol[AOC_SOL_MAX_LEN + 1] = {};
   sprintf(sol, "%lld", guess);
 
-  AocSubmissionStatus submission_status = {};
   submission_sanity_flag_array submit_ok =
-      aoc_manager_sane_submit(handle, year, day, part, sol, &submission_status);
+      aoc_manager_sane_submit(handle, year, day, part, sol, out_status);
   return submit_ok;
 }

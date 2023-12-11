@@ -42,5 +42,4 @@ typedef struct AocDayRes {
   LLTuple result;
 } AocDayRes;
 
-typedef AocDayRes (*aoc_day_solve)();
 #endif // AOCC_AOC_TYPES_H

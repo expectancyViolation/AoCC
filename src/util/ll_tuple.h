@@ -10,16 +10,16 @@ typedef struct LLTuple {
   long long right;
 }LLTuple;
 
-void ll_tuple_copy(const LLTuple * to,LLTuple * from);
+__attribute__((unused)) void ll_tuple_copy(const LLTuple * to,LLTuple * from);
 
-LLTuple ll_tuple_add(const LLTuple res1,
-                           const LLTuple res2);
+LLTuple ll_tuple_add(LLTuple res1,
+                           LLTuple res2);
 
 int ll_tuple_compare(const LLTuple * l1,const LLTuple * l2);;
 
 int ll_tuple_compare_right_left(const LLTuple * l1,const LLTuple * l2);;
 
-void print_tuple(const LLTuple tup);
+void print_tuple(LLTuple tup);
 
 
 #endif // AOCC_LL_TUPLE_H

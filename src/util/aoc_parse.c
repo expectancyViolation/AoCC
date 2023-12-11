@@ -1,5 +1,7 @@
 #include "aoc_parse.h"
 
+#include "../../res/asprintf.c/asprintf.h"
+
 #define PUZZLE_ANSWER_SEARCH_STRING "Your puzzle answer was <code>"
 #define PUZZLE_ANSWER_NOT_RIGHT "not the right answer"
 #define PUZZLE_ANSWER_RIGHT "gold star"
@@ -54,6 +56,7 @@ bool parse_day_status(char *raw_response, AocDayStatus *out) {
     }
     parse_pos = code_end;
   }
+  return false;
 }
 
 bool parse_submission_status(char *raw_response, AocSubmissionStatus *out) {
@@ -62,7 +65,6 @@ bool parse_submission_status(char *raw_response, AocSubmissionStatus *out) {
 #endif
   char *article_begin = strstr(raw_response, "<article>");
 
-  char *right_answer = strstr(article_begin, PUZZLE_ANSWER_RIGHT);
   const bool not_correct =
       NULL != strstr(article_begin, PUZZLE_ANSWER_NOT_RIGHT);
   const bool correct = NULL != strstr(article_begin, PUZZLE_ANSWER_RIGHT);
@@ -70,8 +72,8 @@ bool parse_submission_status(char *raw_response, AocSubmissionStatus *out) {
   const bool too_high = NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_HIGH);
   const bool already_complete =
       NULL != strstr(article_begin, PUZZLE_ALREADY_COMPLETE);
-  const bool too_recently =
-      NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_RECENTLY);
+//  const bool too_recently =
+//      NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_RECENTLY);
   out->correct = correct;
   out->was_checked = not_correct || correct;
   out->too_high = too_high;
@@ -80,7 +82,7 @@ bool parse_submission_status(char *raw_response, AocSubmissionStatus *out) {
   return false;
 }
 
-void test_aoc_parse() {
+__attribute__((unused)) void test_aoc_parse() {
   char *buff;
   AocSubmissionStatus status = {};
   read_file_to_memory("/tmp/aoc/cache/submit/response_19744.txt", &buff, false);

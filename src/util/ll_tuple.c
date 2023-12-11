@@ -8,7 +8,7 @@ LLTuple ll_tuple_add(const LLTuple res1,
 void print_tuple(const LLTuple tup) {
   printf("(%lld, %lld)", tup.left, tup.right);
 }
-void ll_tuple_copy(const LLTuple *to, LLTuple *from) {
+__attribute__((unused)) void ll_tuple_copy(const LLTuple *to, LLTuple *from) {
   memcpy((void *)to, (void *)from, sizeof *to);
 }
 int ll_tuple_compare(const LLTuple *l1, const LLTuple *l2) {

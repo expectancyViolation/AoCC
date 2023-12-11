@@ -34,7 +34,7 @@ LLTuple day11(char *buf, __attribute__((unused)) long buf_len) {
     curr_offset += 1;
     const LLTuple curr_pos = {curr_pos_offset / line_length,
                               curr_pos_offset % line_length};
-    for (int i = 0; i < cvector_size(positions); i++) {
+    for (size_t i = 0; i < cvector_size(positions); i++) {
       const LLTuple old_pos = positions[i];
       const long long dist = llabs(curr_pos.left - old_pos.left) +
                              llabs(curr_pos.right - old_pos.right);

@@ -3,9 +3,9 @@
 #include "aoc.h"
 
 #include "helpers.h"
-#include "ll_tuple.h"
-#include "result_db.h"
 #include "timer.h"
+
+#include "../../res/asprintf.c/asprintf.h"
 
 #include <curl/curl.h>
 #include <stdbool.h>
@@ -64,8 +64,7 @@ void print_day_benchmark(const AocBenchmarkDay *res) {
 AocBenchmarkDay benchmark_day(aoc_solver fun, AocDayTask task) {
   struct my_perf_timer *timer = start_perf_measurement();
   const AocDayRes res = fun(task);
-  AocBenchmarkDay bench_day = {task, res,
-                                        stop_perf_measurement(timer)};
+  AocBenchmarkDay bench_day = {task, res, stop_perf_measurement(timer)};
   return bench_day;
 }
 
@@ -120,7 +119,7 @@ bool submit_answer(int year, int day, enum AOC_DAY_PART part,
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
   chunk.size = 0;
-  bool parse_ok=false;
+  bool parse_ok = false;
   curl = curl_easy_init();
   if (curl) {
     set_session_cookie(curl, session);
@@ -215,7 +214,7 @@ AocDayStatus fetch_day_status(int year, int day) {
     curl_easy_cleanup(curl);
     return day_status;
   }
-  AocDayStatus empty={};
+  AocDayStatus empty = {};
   return empty;
 }
 

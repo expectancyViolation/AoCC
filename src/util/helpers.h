@@ -34,7 +34,7 @@ void step_forward_to_separator(const char *bound, char **ptr);
 void step_backward_to_separator(const char *bound, char **ptr);
 
 void align_pointer_on_separator(const char *lower_bound,
-                                const char *upper_bound, const int offset,
+                                const char *upper_bound,int offset,
                                 char **ptr);
 
 void align_pointers_on_separator(const char *lower_bound,
@@ -43,7 +43,7 @@ void align_pointers_on_separator(const char *lower_bound,
 
 long get_first_line_length(char *buf);
 
-long compare_long(const long *l1, const long *l2);
+__attribute__((unused)) long compare_long(const long *l1, const long *l2);
 long long gcd(long long a, long long b);
 
 FILE *fopen_mkdir(const char *path, const char *mode);

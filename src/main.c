@@ -100,7 +100,7 @@ void test_submission(aoc_manager_handle manager_handle) {
   print_aoc_submission_status(&sub_status);
 }
 
-void submit_helper(aoc_manager_handle const manager_handle, int year, int day,
+void submit_helper(aoc_manager_handle manager_handle, int year, int day,
                    enum AOC_DAY_PART part, long long guess) {
   AocSubmissionStatus submission_status = {};
   submission_sanity_flag_array submit_ok = aoc_manager_sane_submit_llong(

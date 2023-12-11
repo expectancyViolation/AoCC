@@ -10,7 +10,7 @@ LLTuple parallelize(
   const long chunk_size = filesize / n_chunks;
 #pragma omp parallel for
   for (int i = 0; i < n_chunks; ++i) {
-    LLTuple partial_res={};
+    LLTuple partial_res;
     const long begin_pos = chunk_size * i;
     const long end_pos = min(chunk_size * (i + 1), filesize - 1);
     char *begin_pointer = input_buffer + begin_pos;

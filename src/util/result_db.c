@@ -3,6 +3,8 @@
 #include "../../res/b64.c/b64.h"
 #include "aoc_solution_manager.h"
 
+#include "../../res/asprintf.c/asprintf.h"
+
 #include <assert.h>
 #include <sqlite3.h>
 
@@ -66,7 +68,7 @@ void result_db_initialize_result_status(struct result_status *status) {
   status->num_solution_lower_bound = 1;
   status->num_solution_upper_bound = LLONG_MAX - 1;
   status->num_solution = -1;
-  memset(status->string_solution, 0, AOC_SOL_MAX_LEN);
+  memset(status->string_solution, 0, AOC_SOL_MAX_LEN+1);
 }
 
 // TODO: platform dependent "serialization" :( aka just memcpy
@@ -84,7 +86,6 @@ struct result_status *decode_result_status(char *b64_string) {
 result_db_handle result_db_init_db(char *db_file) {
   struct db_handle_data *handle_data = NULL;
   sqlite3 *db;
-  char *zErrMsg = 0;
   int rc;
   rc = sqlite3_open(db_file, &db);
   if (rc) {

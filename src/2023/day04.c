@@ -1,6 +1,5 @@
 #include "day04.h"
 
-#include "../util/aoc.h"
 #include "../util/fenwick.h"
 #include "../util/parallelize.h"
 
