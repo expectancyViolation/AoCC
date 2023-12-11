@@ -41,7 +41,7 @@ struct day10_map {
   long buf_len;
   long x_extent;
   long y_extent;
-  struct ll_tuple start_position;
+  LLTuple start_position;
 };
 
 struct day10_map *day10_map_initialize(const char *buf, long buf_len) {
@@ -61,8 +61,7 @@ __attribute__((unused)) void day10_print_map(const struct day10_map *map) {
   printf("%ld by %ld\n", map->x_extent, map->y_extent);
 }
 
-char day10_lookup_tile(const struct day10_map *map,
-                       const struct ll_tuple *position) {
+char day10_lookup_tile(const struct day10_map *map, const LLTuple *position) {
   long curr_pos_offset =
       (position->left) * (map->y_extent + 1) + position->right;
   if ((curr_pos_offset < 0) || (curr_pos_offset >= map->buf_len))
@@ -71,11 +70,11 @@ char day10_lookup_tile(const struct day10_map *map,
 }
 
 struct day10_move_state {
-  struct ll_tuple position;
+  LLTuple position;
   enum day10_facing facing;
 };
 
-void day10_step_direction(enum day10_facing dir, struct ll_tuple *position) {
+void day10_step_direction(enum day10_facing dir, LLTuple *position) {
   switch (dir) {
   case facing_north:
     position->left += -1;
@@ -135,7 +134,7 @@ enum day10_facing get_new_facing(char tile, enum day10_facing dir) {
 }
 
 bool day10_step(const struct day10_map *map, struct day10_move_state *state) {
-  struct ll_tuple next_position = {state->position.left, state->position.right};
+  LLTuple next_position = state->position;
   day10_step_direction(state->facing, &next_position);
   char next_tile = day10_lookup_tile(map, &next_position);
   enum day10_facing next_facing = get_new_facing(next_tile, state->facing);
@@ -144,14 +143,12 @@ bool day10_step(const struct day10_map *map, struct day10_move_state *state) {
   bool moved = state->facing != facing_none;
   if (moved) {
     // step
-    state->position.left = next_position.left;
-    state->position.right = next_position.right;
+    state->position=next_position;
   }
   return moved;
 }
 
-long long signed_area(const struct ll_tuple *t1, const struct ll_tuple *t2,
-                      const struct ll_tuple *t3) {
+long long signed_area(const LLTuple *t1, const LLTuple *t2, const LLTuple *t3) {
   const long long v1x = (t2->left) - (t1->left);
   const long long v1y = (t2->right) - (t1->right);
   const long long v2x = (t3->left) - (t1->left);
@@ -159,22 +156,21 @@ long long signed_area(const struct ll_tuple *t1, const struct ll_tuple *t2,
   return v1x * v2y - v2x * v1y;
 }
 
-struct ll_tuple day10(char *buf, long buf_len) {
-  struct ll_tuple res = {};
+LLTuple day10(char *buf, long buf_len) {
+  LLTuple res = {};
   const struct day10_map *map = day10_map_initialize(buf, buf_len);
 
   // day10_print_map(map);
 
   struct day10_move_state current_state = {
-      {map->start_position.left, map->start_position.right}, facing_none};
+      map->start_position, facing_none};
   for (size_t i = 0; i < DAY10_FACINGS_COUNT; i++) {
     current_state.facing = DAY10_ALL_FACINGS[i];
     if (day10_step(map, &current_state))
       break;
   }
 
-  struct ll_tuple previous_position = {current_state.position.left,
-                                       current_state.position.right};
+  LLTuple previous_position = current_state.position;
 
   long long boundary_size = 1;
   long long twice_interior_size = 0;
@@ -193,8 +189,7 @@ struct ll_tuple day10(char *buf, long buf_len) {
     // calculate interior
     twice_interior_size += signed_area(&map->start_position, &previous_position,
                                        &current_state.position);
-    previous_position.left = current_state.position.left;
-    previous_position.right = current_state.position.right;
+    previous_position = current_state.position;
   }
 
   assert((boundary_size % 2) == 0);
@@ -205,14 +200,14 @@ struct ll_tuple day10(char *buf, long buf_len) {
 
   return res;
 }
-struct aoc_day_res solve_day10(const char *input_file) {
+struct AocDayRes solve_day10(const char *input_file) {
   char *input_buffer;
   char *padded_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
   const long padded_buffer_len =
       pad_input(input_buffer, &padded_buffer, filesize, '.');
-  const struct ll_tuple res = day10(padded_buffer, padded_buffer_len);
-  struct aoc_day_res day_res = {res};
+  const LLTuple res = day10(padded_buffer, padded_buffer_len);
+  struct AocDayRes day_res = {res};
   free(padded_buffer);
   free(input_buffer);
   return day_res;

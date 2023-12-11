@@ -73,8 +73,8 @@ void get_required_draw(char *buf, long *game_id_out,
     draw_set_max(required_draw_out, &current_draw);
   }
 }
-struct ll_tuple year23_day02(char *buf, long buf_len) {
-  struct ll_tuple result = {};
+LLTuple year23_day02(char *buf, long buf_len) {
+  LLTuple result = {};
   struct draw draw_limit = {12, 13, 14};
   struct draw required_draw;
 
@@ -92,12 +92,12 @@ struct ll_tuple year23_day02(char *buf, long buf_len) {
   }
   return result;
 }
-struct aoc_day_res solve_year23_day02(const char *input_file) {
+struct AocDayRes solve_year23_day02(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
-  struct ll_tuple res =
+  LLTuple res =
       parallelize(year23_day02, ll_tuple_add, input_buffer, filesize, 0);
-  struct aoc_day_res day_res = {res};
+  struct AocDayRes day_res = {res};
 
   free(input_buffer);
   return day_res;

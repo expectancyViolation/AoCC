@@ -40,8 +40,8 @@ void parse_nodes(char *buf, struct node *nodes, size_t **start_positions) {
       cvector_push_back(*start_positions, curr_node - nodes);
   }
 }
-struct ll_tuple day08(char *buf, long buf_len) {
-  struct ll_tuple day_res = {};
+LLTuple day08(char *buf, long buf_len) {
+  LLTuple day_res = {};
 
   struct node nodes[26 * 26 * 26]; // 26**KEY_LEN   no constexpr in C :(
   struct node *curr_node = NULL;
@@ -92,12 +92,12 @@ struct ll_tuple day08(char *buf, long buf_len) {
   day_res.right = res;
   return day_res;
 }
-struct aoc_day_res solve_day08(const char *input_file) {
+struct AocDayRes solve_day08(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer,false);
-  const struct ll_tuple res = day08(input_buffer, filesize);
+  const LLTuple res = day08(input_buffer, filesize);
 
-  struct aoc_day_res day_res={res};
+  struct AocDayRes day_res={res};
   free(input_buffer);
   return day_res;
 }

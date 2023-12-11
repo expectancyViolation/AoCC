@@ -1,16 +1,16 @@
 #include "parallelize.h"
 
-struct ll_tuple parallelize(
-    struct ll_tuple (*solve)(char *, long),
-    struct ll_tuple (*reduce_partial_result)(struct ll_tuple, struct ll_tuple),
+LLTuple parallelize(
+    LLTuple (*solve)(char *, long),
+    LLTuple (*reduce_partial_result)(LLTuple, LLTuple),
     char *const input_buffer, long filesize, int overlap) {
-  struct ll_tuple result={};
+  LLTuple result={};
   const char *file_end = input_buffer + filesize - 1;
   const int n_chunks = PARALLEL_LOOP_COUNT;
   const long chunk_size = filesize / n_chunks;
 #pragma omp parallel for
   for (int i = 0; i < n_chunks; ++i) {
-    struct ll_tuple partial_res={};
+    LLTuple partial_res={};
     const long begin_pos = chunk_size * i;
     const long end_pos = min(chunk_size * (i + 1), filesize - 1);
     char *begin_pointer = input_buffer + begin_pos;

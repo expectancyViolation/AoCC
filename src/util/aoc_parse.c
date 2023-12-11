@@ -30,7 +30,7 @@ void cache_response(char *subdir, const char *raw_response) {
   free(outfile);
 }
 
-bool parse_day_status(char *raw_response, struct aoc_day_status *out) {
+bool parse_day_status(char *raw_response, struct AocDayStatus *out) {
 #ifdef DEBUG_CACHE_RESPONSES
   cache_response("parse", raw_response);
 #endif
@@ -57,7 +57,7 @@ bool parse_day_status(char *raw_response, struct aoc_day_status *out) {
 }
 
 bool parse_submission_status(char *raw_response,
-                             struct aoc_submission_status *out) {
+                             struct AocSubmissionStatus *out) {
 #ifdef DEBUG_CACHE_RESPONSES
   cache_response("submit", raw_response);
 #endif
@@ -82,7 +82,7 @@ bool parse_submission_status(char *raw_response,
 
 void test_aoc_parse() {
   char *buff;
-  struct aoc_submission_status status = {};
+  struct AocSubmissionStatus status = {};
   read_file_to_memory("/tmp/aoc/cache/submit/response_19744.txt", &buff, false);
 
   parse_submission_status(buff, &status);

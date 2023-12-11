@@ -61,7 +61,7 @@ void result_db_initialize_result_status(struct result_status *status) {
   memset(status, 0, sizeof(*status));
   status->year = 2023;
   status->day = -1;
-  status->part = day_part_undefined;
+  status->part = AOC_DAY_PART_undefined;
   status->solved = false;
   status->num_solution_lower_bound = 1;
   status->num_solution_upper_bound = LLONG_MAX - 1;
@@ -201,7 +201,7 @@ void result_db_test() {
   status.num_solution_upper_bound = 2823;
   status.num_solution_lower_bound = 112;
   status.day = 1;
-  status.part = day_part_part1;
+  status.part = AOC_DAY_PART_part1;
   // check decoding
   char *encoded = encode_result_status(&status);
   printf("encoded:%s", encoded);

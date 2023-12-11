@@ -36,8 +36,8 @@ long long solve(char *buf) {
   }
   return res;
 }
-struct ll_tuple day06(char *buf, long buf_len) {
-  struct ll_tuple day_res = {};
+LLTuple day06(char *buf, long buf_len) {
+  LLTuple day_res = {};
   const size_t buf_size = buf_len * sizeof(*buf);
   char *buf_copy = malloc(buf_size);
   memcpy(buf_copy, buf, buf_size);
@@ -47,12 +47,12 @@ struct ll_tuple day06(char *buf, long buf_len) {
   free(buf_copy);
   return day_res;
 }
-struct aoc_day_res solve_day06(const char *input_file) {
+struct AocDayRes solve_day06(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
-  const struct ll_tuple res = day06(input_buffer, filesize);
+  const LLTuple res = day06(input_buffer, filesize);
   free(input_buffer);
 
-  struct aoc_day_res day_res={res};
+  struct AocDayRes day_res={res};
   return day_res;
 }

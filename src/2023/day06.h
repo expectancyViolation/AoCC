@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct ll_tuple day06(char *buf, long buf_len);
+LLTuple day06(char *buf, long buf_len);
 
-struct aoc_day_res solve_day06(const char *input_file);
+struct AocDayRes solve_day06(const char *input_file);
 
 #endif // AOCC_23DAY06_H

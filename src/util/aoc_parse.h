@@ -8,10 +8,10 @@
 #include <stdbool.h>
 
 // parse
-bool parse_day_status(char *raw_response, struct aoc_day_status *out);
+bool parse_day_status(char *raw_response, struct AocDayStatus *out);
 
 bool parse_submission_status(char *raw_response,
-                             struct aoc_submission_status *out);
+                             struct AocSubmissionStatus *out);
 
 // generate
 char *get_answer_url(int year, int day);

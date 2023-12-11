@@ -113,8 +113,8 @@ void parse_hand(char *line, struct hand *out) {
   }
 }
 
-struct ll_tuple day07(char *buf, long buf_len) {
-  struct ll_tuple day_res = {};
+LLTuple day07(char *buf, long buf_len) {
+  LLTuple day_res = {};
 
   struct hand curr_hand;
   struct hand *hands = NULL;
@@ -144,12 +144,12 @@ struct ll_tuple day07(char *buf, long buf_len) {
 #endif
   return day_res;
 }
-struct aoc_day_res solve_day07(const char *input_file) {
+struct AocDayRes solve_day07(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
-  const struct ll_tuple res = day07(input_buffer, filesize);
+  const LLTuple res = day07(input_buffer, filesize);
   free(input_buffer);
 
-  struct aoc_day_res day_res = {res};
+  struct AocDayRes day_res = {res};
   return day_res;
 }

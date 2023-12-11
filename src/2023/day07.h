@@ -14,8 +14,8 @@
 // TODO FIX:  remove this define!solve both parts simultaneously
 //#define DAY07_PART2
 
-struct ll_tuple day07(char *buf, __attribute__((unused)) long buf_len);
+LLTuple day07(char *buf, __attribute__((unused)) long buf_len);
 
-struct aoc_day_res solve_day07(const char* input_file);
+struct AocDayRes solve_day07(const char* input_file);
 
 #endif // AOCC_23DAY07_H

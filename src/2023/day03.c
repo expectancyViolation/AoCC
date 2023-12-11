@@ -53,8 +53,8 @@ void day03_mark_gears(char *segment_begin, const char *segment_end,
     }
   }
 }
-struct ll_tuple year23_day03(char *buf, long buf_len) {
-  struct ll_tuple result = {};
+LLTuple year23_day03(char *buf, long buf_len) {
+  LLTuple result = {};
   const long line_length = get_first_line_length(buf);
 
   char *curr_number_pos = buf;
@@ -124,22 +124,22 @@ struct ll_tuple year23_day03(char *buf, long buf_len) {
 
   return result;
 }
-struct aoc_day_res solve_year23_day03(const char *input_file) {
+struct AocDayRes solve_year23_day03(const char *input_file) {
   char *input_buffer;
   char *padded_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   const long padded_buffer_len =
       pad_input(input_buffer, &padded_buffer, filesize, '.');
 
-  const struct ll_tuple res = year23_day03(padded_buffer, padded_buffer_len);
+  const LLTuple res = year23_day03(padded_buffer, padded_buffer_len);
 
 
   // parallel seems to be broken :/
-  //  struct ll_tuple res = parallelize(year23_day03, ll_tuple_add,
+  //  LLTuple res = parallelize(year23_day03, ll_tuple_add,
   //  padded_buffer,
   //                                    padded_buffer_len, 0);
   free(padded_buffer);
-  struct aoc_day_res day_res = {res};
+  struct AocDayRes day_res = {res};
 
   free(input_buffer);
   return day_res;

@@ -16,7 +16,7 @@
 #include <unistd.h>
 
 // TODO: make this env variable
-#define INPUT_CACHE_DIR "/tmp/other_aoc"
+#define INPUT_CACHE_DIR "/tmp/aoc"
 
 #define SEP "\t" /* Tab separates the fields */
 
@@ -25,7 +25,7 @@ char *get_input_file_path(int year, int day) {
   asprintf(&res, "%s/%d/day%02d_input.txt", INPUT_CACHE_DIR, year, day);
   return res;
 }
-void print_aoc_day_status(const struct aoc_day_status *status) {
+void print_aoc_day_status(const struct AocDayStatus *status) {
   printf("day status:\n"
          "\tpart1:%20s (%d)\n"
          "\tpart2:%20s (%d)\n",
@@ -33,7 +33,7 @@ void print_aoc_day_status(const struct aoc_day_status *status) {
          status->part2_status.part_solution, status->part1_status.part_solved);
 }
 
-void print_aoc_submission_status(const struct aoc_submission_status *status) {
+void print_aoc_submission_status(const struct AocSubmissionStatus *status) {
   printf("submission status:\n"
          "\twas checked:%d\n"
          "\tcorrect:%d\n"
@@ -43,12 +43,12 @@ void print_aoc_submission_status(const struct aoc_submission_status *status) {
          status->too_high);
 }
 
-void print_aoc_day_task(const struct aoc_day_task *task) {
+void print_aoc_day_task(const struct AocDayTask *task) {
   printf("task:\n\tyear:\t%30d\n\tday:\t%30d\n\tfile:\t%30s\n", task->year,
          task->day, task->input_file);
 }
 
-void print_aoc_day_result(const struct aoc_day_res *result) {
+void print_aoc_day_result(const struct AocDayRes *result) {
   printf("result:\n\tpart1:\t%30lld\n", result->result.left);
   printf("\tpart2:\t%30lld\n", result->result.right);
   printf("\n");
@@ -65,9 +65,9 @@ void print_day_benchmark(const struct aoc_benchmark_day *res) {
 }
 
 struct aoc_benchmark_day benchmark_day(aoc_solver fun,
-                                       struct aoc_day_task task) {
+                                       struct AocDayTask task) {
   struct my_perf_timer *timer = start_perf_measurement();
-  const struct aoc_day_res res = fun(task);
+  const struct AocDayRes res = fun(task);
   struct aoc_benchmark_day bench_day = {task, res,
                                         stop_perf_measurement(timer)};
   return bench_day;
@@ -116,7 +116,7 @@ void set_session_cookie(CURL *curl, char *session) {
   curl_easy_setopt(curl, CURLOPT_COOKIELIST, my_cookie);
 }
 
-bool submit_answer(int year, int day, enum AOC_DAY_PART part, const char *answer,struct aoc_submission_status* out) {
+bool submit_answer(int year, int day, enum AOC_DAY_PART part, const char *answer,struct AocSubmissionStatus * out) {
   CURL *curl;
   CURLcode curl_res;
   char *session = get_session();
@@ -187,11 +187,11 @@ void fetch_day_input_cached(int year, int day, char *filepath) {
   }
 }
 
-struct aoc_day_status fetch_day_status(int year, int day) {
+struct AocDayStatus fetch_day_status(int year, int day) {
   CURL *curl;
   CURLcode res;
   char *session = get_session();
-  struct aoc_day_status day_status = {};
+  struct AocDayStatus day_status = {};
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
   chunk.size = 0;

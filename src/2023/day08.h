@@ -15,8 +15,8 @@
 
 #define KEY_LEN 3
 
-struct ll_tuple day08(char *buf, __attribute__((unused)) long buf_len);
+LLTuple day08(char *buf, __attribute__((unused)) long buf_len);
 
-struct aoc_day_res solve_day08(const char *input_file);
+struct AocDayRes solve_day08(const char *input_file);
 
 #endif // AOCC_23DAY08_H

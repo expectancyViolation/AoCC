@@ -2,7 +2,6 @@
 #define AOCC_HELPERS_H
 
 #include "../../res/cvector.h"
-#include "parallelize.h"
 #include <errno.h>
 #include <malloc.h>
 #include <stdbool.h>

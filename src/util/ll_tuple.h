@@ -2,25 +2,24 @@
 #define AOCC_LL_TUPLE_H
 
 #include "helpers.h"
-
 #include <malloc.h>
 #include <string.h>
 
-struct ll_tuple {
+typedef struct LLTuple {
   long long left;
   long long right;
-};
+}LLTuple;
 
-void ll_tuple_copy(const struct ll_tuple* to,struct ll_tuple* from);
+void ll_tuple_copy(const LLTuple * to,LLTuple * from);
 
-struct ll_tuple ll_tuple_add(const struct ll_tuple res1,
-                           const struct ll_tuple res2);
+LLTuple ll_tuple_add(const LLTuple res1,
+                           const LLTuple res2);
 
-int ll_tuple_compare(const struct ll_tuple* l1,const struct ll_tuple* l2);;
+int ll_tuple_compare(const LLTuple * l1,const LLTuple * l2);;
 
-int ll_tuple_compare_right_left(const struct ll_tuple* l1,const struct ll_tuple* l2);;
+int ll_tuple_compare_right_left(const LLTuple * l1,const LLTuple * l2);;
 
-void print_tuple(const struct ll_tuple tup);
+void print_tuple(const LLTuple tup);
 
 
 #endif // AOCC_LL_TUPLE_H

@@ -197,8 +197,8 @@ long long solve_mappings(void parse(char *line, struct range **vec),
   return min_el;
 }
 
-struct aoc_day_res solve_day05(const char *input_file) {
-  struct ll_tuple res= {};
+struct AocDayRes solve_day05(const char *input_file) {
+  LLTuple res= {};
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   const size_t input_size = filesize * sizeof(char);
@@ -215,6 +215,6 @@ struct aoc_day_res solve_day05(const char *input_file) {
   free(input_copy);
   free(input_buffer);
 
-  struct aoc_day_res day_res={res};
+  struct AocDayRes day_res={res};
   return day_res;
 }

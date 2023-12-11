@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
-struct ll_tuple year23_day01(char *buf, __attribute__((unused)) long buf_len);
+LLTuple year23_day01(char *buf, __attribute__((unused)) long buf_len);
 
-struct aoc_day_res solve_year23_day01(const char *input_file);
+struct AocDayRes solve_year23_day01(const char *input_file);
 #endif // AOCC_23DAY01_H

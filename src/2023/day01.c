@@ -41,8 +41,8 @@ int get_last(const char *buffer, bool part2) {
   return 0;
 }
 
-struct ll_tuple year23_day01(char *buf, long buf_len) {
-  struct ll_tuple result = {};
+LLTuple year23_day01(char *buf, long buf_len) {
+  LLTuple result = {};
   char **buf_pos = &buf;
   while (*buf_pos != NULL) {
     char *line = strsep(buf_pos, "\n");
@@ -51,12 +51,12 @@ struct ll_tuple year23_day01(char *buf, long buf_len) {
   }
   return result;
 }
-struct aoc_day_res solve_year23_day01(const char *input_file) {
+struct AocDayRes solve_year23_day01(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
-  struct ll_tuple res =
+  LLTuple res =
       parallelize(year23_day01, ll_tuple_add, input_buffer, filesize, 0);
-  struct aoc_day_res day_res = {res};
+  struct AocDayRes day_res = {res};
   free(input_buffer);
   return day_res;
 }

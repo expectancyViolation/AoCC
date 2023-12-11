@@ -14,6 +14,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-struct aoc_day_res solve_day05(const char *input_file);
+struct AocDayRes solve_day05(const char *input_file);
 
 #endif // AOCC_23DAY05_H

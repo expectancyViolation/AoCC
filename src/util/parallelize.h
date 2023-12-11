@@ -11,8 +11,9 @@
 #include <stdbool.h>
 #include <string.h>
 
-struct ll_tuple parallelize(struct ll_tuple solve(char *buffer, long buf_len),
-                 struct ll_tuple reduce_partial_result(struct ll_tuple tup1, struct ll_tuple tup2),
+LLTuple
+parallelize(LLTuple solve(char *buffer, long buf_len),
+                 LLTuple reduce_partial_result(LLTuple tup1, LLTuple tup2),
                  char *const input_buffer, long filesize,
                  int overlap);
 

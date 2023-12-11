@@ -1,7 +1,3 @@
-//
-// Created by matze on 10/12/2023.
-//
-
 #ifndef AOCC_AOC_TYPES_H
 #define AOCC_AOC_TYPES_H
 
@@ -11,41 +7,41 @@
 
 #define AOC_SOL_MAX_LEN 100
 
+typedef struct AocDayRes (*aoc_day_solve)();
 
-typedef struct aoc_day_res (*aoc_day_solve)();
+typedef enum AOC_DAY_PART {
+  AOC_DAY_PART_undefined = 0,
+  AOC_DAY_PART_part1 = 1,
+  AOC_DAY_PART_part2 = 2
+} AOC_DAY_PART;
 
-enum AOC_DAY_PART {
-  day_part_undefined = 0,
-  day_part_part1 = 1,
-  day_part_part2 = 2
-};
 
-struct aoc_part_status {
+typedef struct AocPartStatus {
   bool part_solved;
   char part_solution[AOC_SOL_MAX_LEN];
-};
+} AocPartStatus;
 
-struct aoc_day_status {
-  struct aoc_part_status part1_status;
-  struct aoc_part_status part2_status;
-};
+typedef struct AocDayStatus {
+  struct AocPartStatus part1_status;
+  struct AocPartStatus part2_status;
+} AocDayStatus;
 
-struct aoc_submission_status {
+typedef struct AocSubmissionStatus {
   bool was_checked;
   bool correct;
   bool too_low;
   bool too_high;
   bool already_complete;
-};
+} AocSubmissionStatus;
 
-struct aoc_day_task {
+typedef struct AocDayTask {
   int year;
   int day;
   char *input_file;
-};
+} AocDayTask;
 
-struct aoc_day_res {
-  struct ll_tuple result;
-};
+typedef struct AocDayRes {
+  LLTuple result;
+} AocDayRes;
 
 #endif // AOCC_AOC_TYPES_H

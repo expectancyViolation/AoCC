@@ -48,8 +48,8 @@ int count_matches_brittle(char *ticket, const char *winning_numbers) {
   }
   return curr_matches;
 }
-struct ll_tuple year23_day04(char *buf, long buf_len) {
-  struct ll_tuple result = {};
+LLTuple year23_day04(char *buf, long buf_len) {
+  LLTuple result = {};
   const int tree_size =
       (int)(buf_len / DAY04_MIN_LINE_LEN); // this has to be larger than the
   // number of lines
@@ -87,18 +87,18 @@ struct ll_tuple year23_day04(char *buf, long buf_len) {
   free(range_tree);
   return result;
 }
-struct aoc_day_res solve_year23_day04(const char *input_file) {
+struct AocDayRes solve_year23_day04(const char *input_file) {
   char *input_buffer;
   // harder to parallelize b.c. of arbitrary range interactions!
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
 #ifdef DAY04_UNSAFE_PARALLEL
-  const struct ll_tuple day_res = parallelize((day04),
+  const LLTuple day_res = parallelize((day04),
               ll_tuple_add,
               input_buffer, filesize, 0);
 #else
-  const struct ll_tuple res= year23_day04(input_buffer, filesize);
+  const LLTuple res= year23_day04(input_buffer, filesize);
 #endif
-  struct aoc_day_res day_res={res};
+  struct AocDayRes day_res={res};
   free(input_buffer);
   return day_res;
 }
