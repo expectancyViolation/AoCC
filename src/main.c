@@ -45,6 +45,8 @@ struct aoc_day_res master_solver(const struct aoc_day_task task) {
       return solve_day09(file);
     case 10:
       return solve_day10(file);
+    case 11:
+      return solve_day11(file);
     default:
       printf("unsolved y:%d d:%d\n", task.year, task.day);
       assert(false);
@@ -63,7 +65,7 @@ void generate_tasks(struct aoc_day_task **tasks) {
 }
 
 __attribute__((unused)) void run_all_days() {
-  struct aoc_day_task *tasks;
+  struct aoc_day_task *tasks=NULL;
   generate_tasks(&tasks);
   size_t num_of_tasks = cvector_size(tasks);
   struct aoc_benchmark_day *results = malloc(num_of_tasks * sizeof(*results));

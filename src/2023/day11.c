@@ -22,14 +22,12 @@ struct ll_tuple gen_position_counts(struct ll_tuple **pos,
 
 struct ll_tuple day11(char *buf, long buf_len) {
   struct ll_tuple result = {};
-  printf("%s\n", buf);
   const long line_length = strchr(buf, '\n') - buf + 1;
   char *curr_offset = buf;
   struct ll_tuple *positions = NULL;
   long long res = 0;
   while (true) {
     curr_offset = strchr(curr_offset, '#');
-    printf("%x\n", curr_offset);
     if (curr_offset == NULL)
       break;
     const ptrdiff_t curr_pos_offset = curr_offset - buf;
@@ -46,7 +44,7 @@ struct ll_tuple day11(char *buf, long buf_len) {
   }
 
   long long p2_res=res;
-  printf("res is(before fill):%lld\n",res);
+
   // two passes: swap tuples in between to scan both dimensions
   for (int i = 0; i < 2; i++) {
     qsort(positions, cvector_size(positions), sizeof(*positions),
@@ -64,12 +62,8 @@ struct ll_tuple day11(char *buf, long buf_len) {
       res += left * right * dist;
       p2_res+=left*right*dist*999999;
 
-      //assert(right >= 0);
-      //assert(left >= 0);
       left += pos_cnt.right;
       right -= pos_cnt.right;
-      //printf("l:%lld,r:%lld,pos:%lld\n",left,right,pos);
-      //printf("curr-start:%ld,end-stat:%ld\n",curr_index-positions,end- positions);
       prev_pos = pos;
     }
     for (int j = 0; j < cvector_size(positions); j++) {
@@ -81,7 +75,6 @@ struct ll_tuple day11(char *buf, long buf_len) {
 
   result.left = res;
   result.right=p2_res;
-  printf("%lld", res);
 
   cvector_free(positions);
   return result;
