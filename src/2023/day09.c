@@ -48,7 +48,7 @@ AocDayRes solve_day09(const char *input_file) {
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
   LLTuple res = parallelize(day09, ll_tuple_add, input_buffer, filesize, 0);
 
-  AocDayRes day_res = {res};
+  AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(input_buffer);
   return day_res;
 }

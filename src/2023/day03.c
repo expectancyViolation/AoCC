@@ -140,7 +140,7 @@ AocDayRes solve_year23_day03(const char *input_file) {
   //  padded_buffer,
   //                                    padded_buffer_len, 0);
   free(padded_buffer);
-  AocDayRes day_res = {res};
+  AocDayRes day_res = aoc_day_res_from_tuple(&res);
 
   free(input_buffer);
   return day_res;

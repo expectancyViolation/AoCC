@@ -72,8 +72,8 @@ bool parse_submission_status(char *raw_response, AocSubmissionStatus *out) {
   const bool too_high = NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_HIGH);
   const bool already_complete =
       NULL != strstr(article_begin, PUZZLE_ALREADY_COMPLETE);
-//  const bool too_recently =
-//      NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_RECENTLY);
+  //  const bool too_recently =
+  //      NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_RECENTLY);
   out->correct = correct;
   out->was_checked = not_correct || correct;
   out->too_high = too_high;
@@ -105,8 +105,14 @@ char *get_status_url(int year, int day) {
   asprintf(&res, "https://adventofcode.com/%d/day/%d", year, day);
   return res;
 }
-char *format_answer_payload(enum AOC_DAY_PART part, char const *answer) {
+char *format_answer_payload(enum AOC_DAY_PART part, const AocPartRes *guess) {
   char *res;
-  asprintf(&res, "level=%d&answer=%s", part, answer);
-  return res;
+  switch (guess->type) {
+  case AOC_PART_RES_TYPE_string:
+    asprintf(&res, "level=%d&answer=%s", part, guess->res_string);
+    return res;
+  case AOC_PART_RES_TYPE_llong:
+    asprintf(&res, "level=%d&answer=%lld", part, guess->res_ll);
+    return res;
+  }
 }

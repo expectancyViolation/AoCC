@@ -206,7 +206,7 @@ AocDayRes solve_day10(const char *input_file) {
   const long padded_buffer_len =
       pad_input(input_buffer, &padded_buffer, filesize, '.');
   const LLTuple res = day10(padded_buffer, padded_buffer_len);
-  AocDayRes day_res = {res};
+  AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(padded_buffer);
   free(input_buffer);
   return day_res;

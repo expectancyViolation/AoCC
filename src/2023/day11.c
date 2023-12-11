@@ -5,7 +5,7 @@ AocDayRes solve_day11(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
   const LLTuple res = day11(input_buffer, filesize);
-  AocDayRes day_res = {res};
+  AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(input_buffer);
   return day_res;
 }

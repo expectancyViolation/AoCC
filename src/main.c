@@ -66,7 +66,7 @@ void generate_tasks(AocDayTask **tasks) {
   }
 }
 
-__attribute__((unused)) void run_all_days() {
+void run_all_days(aoc_manager_handle manager) {
   AocDayTask *tasks = NULL;
   generate_tasks(&tasks);
   size_t num_of_tasks = cvector_size(tasks);
@@ -78,7 +78,18 @@ __attribute__((unused)) void run_all_days() {
     results[i] = benchmark_day(master_solver, task);
   }
   for (size_t i = 0; i < num_of_tasks; i++) {
+    const AocBenchmarkDay result = results[i];
+    print_aoc_day_result(&result.result);
     print_day_benchmark(&results[i]);
+    const AocDayTask task = tasks[i];
+    bool part1_correct = aoc_manager_validate_solution(
+        manager, task.year, task.day, AOC_DAY_PART_part1,
+        result.result.part1_res);
+    bool part2_correct = aoc_manager_validate_solution(
+        manager, task.year, task.day, AOC_DAY_PART_part2,
+        result.result.part2_res);
+    printf("P1:%s\t P2:%s\n", (part1_correct ? "✅" : "❌"),
+           (part2_correct ? "✅" : "❌"));
   }
   free(results);
 }
@@ -95,15 +106,17 @@ void test_submission(aoc_manager_handle manager_handle) {
   }
   //  AocBenchmarkDay bench = benchmark_day(master_solver, task);
   AocSubmissionStatus sub_status;
-  aoc_manager_sane_submit(manager_handle, year, 1, AOC_DAY_PART_part1,
-                          "1238786787", &sub_status);
+  const AocPartRes part_res = {.type = AOC_PART_RES_TYPE_string,
+                               .res_string = "1234556789"};
+  aoc_manager_sane_submit(manager_handle, year, 1, AOC_DAY_PART_part1, part_res,
+                          &sub_status);
   print_aoc_submission_status(&sub_status);
 }
 
 void submit_helper(aoc_manager_handle manager_handle, int year, int day,
-                   enum AOC_DAY_PART part, long long guess) {
+                   enum AOC_DAY_PART part, const AocPartRes guess) {
   AocSubmissionStatus submission_status = {};
-  submission_sanity_flag_array submit_ok = aoc_manager_sane_submit_llong(
+  submission_sanity_flag_array submit_ok = aoc_manager_sane_submit(
       manager_handle, year, day, part, guess, &submission_status);
   if (submit_ok == 0) {
     print_aoc_submission_status(&submission_status);
@@ -120,16 +133,16 @@ void solve_current_day(aoc_manager_handle manager_handle) {
 
   // part 1
   submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
-                res.result.left);
+                res.part1_res);
 
   // part 2
   submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
-                res.result.right);
+                res.part2_res);
 }
 
 int main() {
   curl_global_init(CURL_GLOBAL_ALL);
-  result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vn.db");
+  result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
   // solve_current_day(manager_handle);
 
@@ -137,7 +150,7 @@ int main() {
   //      .year = 2023, .day = 11, .input_file = "/tmp/day11_bigboy.txt"};
   //   AocBenchmarkDay bench=benchmark_day(master_solver, task);
   //   print_day_benchmark(&bench);
-  run_all_days();
+  run_all_days(manager_handle);
 
   curl_global_cleanup();
   result_db_close(db);

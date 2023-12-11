@@ -11,13 +11,13 @@
 
 typedef void *result_db_handle;
 
-enum solution_type {
-  solution_type_unknown = 0,
-  solution_type_num_solution = 1,
-  solution_type_string_solution = 2
+enum SOLUTION_TYPE {
+  SOLUTION_TYPE_unknown = 0,
+  SOLUTION_TYPE_num = 1,
+  SOLUTION_TYPE_string = 2
 };
 
-void print_solution_type(enum solution_type sol);
+void print_solution_type(enum SOLUTION_TYPE sol);
 
 struct submission{
   char string_solution[AOC_SOL_MAX_LEN+1];
@@ -28,7 +28,7 @@ struct result_status {
   int day;
   enum AOC_DAY_PART part;
   bool solved;
-  enum solution_type solution_type;
+  enum SOLUTION_TYPE solution_type;
   long long num_solution;
   long long num_solution_lower_bound;
   long long num_solution_upper_bound;

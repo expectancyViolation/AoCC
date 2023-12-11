@@ -58,6 +58,6 @@ AocDayRes solve_day06(const char *input_file) {
   const LLTuple res = day06(input_buffer, filesize);
   free(input_buffer);
 
-  AocDayRes day_res = {res};
+  AocDayRes day_res = aoc_day_res_from_tuple(&res);
   return day_res;
 }

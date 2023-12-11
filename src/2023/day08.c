@@ -69,7 +69,7 @@ LLTuple day08(char *buf, __attribute__((unused)) long buf_len) {
       //  first goal state (at step k) loops back onto second element
       //  => period (of size k) is entered at second element
       //  => sequence is only at goal at step k*n
-      // this also implies that k is solution_type_num_solution to part 1:
+      // this also implies that k is SOLUTION_TYPE_num to part 1:
       // since we only enter one **Z state=> it has to be ZZZ
       pos_to_key((curr_node - nodes), b);
       if (b[2] == 'Z') {
@@ -100,7 +100,7 @@ AocDayRes solve_day08(const char *input_file) {
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
   const LLTuple res = day08(input_buffer, filesize);
 
-  AocDayRes day_res = {res};
+  AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(input_buffer);
   return day_res;
 }

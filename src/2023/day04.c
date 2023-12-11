@@ -103,7 +103,7 @@ AocDayRes solve_year23_day04(const char *input_file) {
 #else
   const LLTuple res = year23_day04(input_buffer, filesize);
 #endif
-  AocDayRes day_res = {res};
+  AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(input_buffer);
   return day_res;
 }

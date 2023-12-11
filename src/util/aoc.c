@@ -47,9 +47,22 @@ void print_aoc_day_task(const AocDayTask *task) {
          task->day, task->input_file);
 }
 
+void print_aoc_part_res(const AocPartRes *res) {
+  switch (res->type) {
+  case AOC_PART_RES_TYPE_llong:
+    printf("%30lld", res->res_ll);
+    return;
+  case AOC_PART_RES_TYPE_string:
+    printf("%30s", res->res_string);
+    return;
+  }
+}
+
 void print_aoc_day_result(const AocDayRes *result) {
-  printf("result:\n\tpart1:\t%30lld\n", result->result.left);
-  printf("\tpart2:\t%30lld\n", result->result.right);
+  printf("result:\n\tpart1:");
+  print_aoc_part_res(&(result->part1_res));
+  printf("\n\tpart2:");
+  print_aoc_part_res(&(result->part2_res));
   printf("\n");
 }
 
@@ -112,7 +125,7 @@ void set_session_cookie(CURL *curl, char *session) {
 }
 
 bool submit_answer(int year, int day, enum AOC_DAY_PART part,
-                   const char *answer, AocSubmissionStatus *out) {
+                   const AocPartRes *guess, AocSubmissionStatus *out) {
   CURL *curl;
   CURLcode curl_res;
   char *session = get_session();
@@ -128,7 +141,7 @@ bool submit_answer(int year, int day, enum AOC_DAY_PART part,
     char *post_url = get_answer_url(year, day);
     printf("url: %s\n", post_url);
     curl_easy_setopt(curl, CURLOPT_URL, post_url);
-    char *post_fields = format_answer_payload(part, answer);
+    char *post_fields = format_answer_payload(part, guess);
     printf("fields: %s\n", post_fields);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields);
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -196,6 +209,7 @@ AocDayStatus fetch_day_status(int year, int day) {
   if (curl) {
     set_session_cookie(curl, session);
     char *status_url = get_status_url(year, day);
+    printf("STATUS URL:%s\n",status_url);
     curl_easy_setopt(curl, CURLOPT_URL, status_url);
     free(status_url);
 

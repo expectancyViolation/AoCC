@@ -226,6 +226,6 @@ AocDayRes solve_day05(const char *input_file) {
   free(input_copy);
   free(input_buffer);
 
-  AocDayRes day_res = {res};
+  AocDayRes day_res = aoc_day_res_from_tuple(&res);
   return day_res;
 }
