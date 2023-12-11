@@ -106,7 +106,7 @@ char *get_status_url(int year, int day) {
   return res;
 }
 char *format_answer_payload(enum AOC_DAY_PART part, const AocPartRes *guess) {
-  char *res;
+  char *res=NULL;
   switch (guess->type) {
   case AOC_PART_RES_TYPE_string:
     asprintf(&res, "level=%d&answer=%s", part, guess->res_string);
@@ -115,4 +115,5 @@ char *format_answer_payload(enum AOC_DAY_PART part, const AocPartRes *guess) {
     asprintf(&res, "level=%d&answer=%lld", part, guess->res_ll);
     return res;
   }
+  return res;
 }

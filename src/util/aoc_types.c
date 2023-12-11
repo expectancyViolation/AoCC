@@ -1,7 +1,5 @@
 #include "aoc_types.h"
 
-AOC_DAY_PART AOC_DAY_PART_BOTH_PARTS[2]={AOC_DAY_PART_part1,AOC_DAY_PART_part2};
-
 void parse_aoc_part_res(const char *string, AocPartRes *out) {
   char *endpos = string;
   const long long parsed_ll = (strtol(string, &endpos, 10));

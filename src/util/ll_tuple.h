@@ -17,9 +17,9 @@ LLTuple ll_tuple_add(LLTuple res1,
 
 int ll_tuple_compare(const LLTuple * l1,const LLTuple * l2);;
 
-int ll_tuple_compare_right_left(const LLTuple * l1,const LLTuple * l2);;
+__attribute__((unused)) int ll_tuple_compare_right_left(const LLTuple * l1,const LLTuple * l2);;
 
-void print_tuple(LLTuple tup);
+__attribute__((unused)) void print_tuple(LLTuple tup);
 
 
 #endif // AOCC_LL_TUPLE_H

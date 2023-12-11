@@ -216,8 +216,6 @@ aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
   submit_answer(year, day, part, &guess, out_status);
   bool refetch =
       aoc_manager_update_result_status(read_status, &guess, out_status);
-  printf("concluded:\n");
-  print_result_status(read_status);
   result_status_store_entry(handle_data->db_handle, read_status, true);
   if (refetch) {
     printf("detected inconsistencies. refetching...");
@@ -228,8 +226,6 @@ aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
 bool aoc_manager_validate_solution(aoc_manager_handle handle, int year, int day,
                                    enum AOC_DAY_PART part,
                                    const AocPartRes guess) {
-  struct aoc_manager_data *handle_data = aoc_manager_deref_handle(handle);
-
   // first try to validate via site
   struct result_status *read_status = NULL;
   aoc_manager_get_day_status(handle, year, day, part, &read_status);

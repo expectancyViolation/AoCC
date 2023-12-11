@@ -164,8 +164,8 @@ bool result_status_load_entry(result_db_handle handle, int year, int day,
   sqlite3_exec(handle_data->db, query,
                (int (*)(void *, int, char **, char **))get_key_cb, out,
                &errmsg);
-  free(query);
-  free(key);
+  free((*void)query);
+  free((*void)key);
   if (errmsg != NULL) {
     printf("load error:%s\n", errmsg);
     return false;

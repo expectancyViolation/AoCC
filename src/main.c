@@ -19,6 +19,8 @@
 
 #define CURRENT_DAY 11
 
+#define CHECKMARK(x) ((x) ? ("✅") : ("❌"))
+
 // TODO: use function pointers instead of massive switch?
 AocDayRes master_solver(const AocDayTask task) {
   const char *file = task.input_file;
@@ -66,6 +68,15 @@ void generate_tasks(AocDayTask **tasks) {
   }
 }
 
+void validate_day_result(aoc_manager_handle manager, const AocDayRes *result,
+                         const AocDayTask *task) {
+  bool part1_correct = aoc_manager_validate_solution(
+      manager, task->year, task->day, AOC_DAY_PART_part1, result->part1_res);
+  bool part2_correct = aoc_manager_validate_solution(
+      manager, task->year, task->day, AOC_DAY_PART_part2, result->part2_res);
+  printf("P1:%s\t P2:%s\n", CHECKMARK(part1_correct), CHECKMARK(part2_correct));
+}
+
 void run_all_days(aoc_manager_handle manager) {
   AocDayTask *tasks = NULL;
   generate_tasks(&tasks);
@@ -82,14 +93,7 @@ void run_all_days(aoc_manager_handle manager) {
     print_aoc_day_result(&result.result);
     print_day_benchmark(&results[i]);
     const AocDayTask task = tasks[i];
-    bool part1_correct = aoc_manager_validate_solution(
-        manager, task.year, task.day, AOC_DAY_PART_part1,
-        result.result.part1_res);
-    bool part2_correct = aoc_manager_validate_solution(
-        manager, task.year, task.day, AOC_DAY_PART_part2,
-        result.result.part2_res);
-    printf("P1:%s\t P2:%s\n", (part1_correct ? "✅" : "❌"),
-           (part2_correct ? "✅" : "❌"));
+    validate_day_result(manager, &(result.result), &task);
   }
   free(results);
 }
