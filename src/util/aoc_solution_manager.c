@@ -2,17 +2,6 @@
 #include "aoc.h"
 #include <stdlib.h>
 
-enum submission_sanity_flags {
-  SANITY_ALREADY_SOLVED = 1 << 0,
-  SANITY_TOO_LOW = 1 << 1,
-  SANITY_TOO_HIGH = 1 << 2,
-  SANITY_WRONG_FORMAT = 1 << 3,
-  SANITY_GUESS_ALREADY_TRIED = 1 << 4
-  // TODO
-};
-
-typedef int submission_sanity_flag_array;
-
 struct aoc_manager_data {
   result_db_handle db_handle;
 };
@@ -35,6 +24,7 @@ void parse_solution_into_status(const char *sol_string,
                                 struct result_status *status) {
   char *endpos;
   const long num = (strtol(sol_string, &endpos, 10));
+  status->solved = true;
   if (endpos == sol_string) {
     // failed to parse => degrade to string solution
     strncpy(status->string_solution, sol_string, AOC_SOL_MAX_LEN);
@@ -153,12 +143,18 @@ check_submission_sanity(const struct result_status *status,
   return sanity_flags;
 }
 
-void aoc_manager_update_result_status(
+bool aoc_manager_update_result_status(
     struct result_status *status, const char *guess,
     const struct aoc_submission_status *submission_status) {
+
+  if (submission_status->already_complete && (!status->solved)) {
+    // inconsistent state
+    return true;
+  }
+
   if (!submission_status->was_checked) {
     // no new info
-    return;
+    return false;
   }
   if (submission_status->correct) {
     parse_solution_into_status(guess, status);
@@ -180,12 +176,13 @@ void aoc_manager_update_result_status(
            status->submissions[i].string_solution, AOC_SOL_MAX_LEN);
   }
   strncpy(status->submissions[0].string_solution, guess, AOC_SOL_MAX_LEN);
+  return false;
 }
 
-struct aoc_submission_status aoc_manager_sane_submit(aoc_manager_handle handle,
-                                                     int year, int day,
-                                                     enum AOC_DAY_PART part,
-                                                     const char *guess) {
+submission_sanity_flag_array
+aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
+                        enum AOC_DAY_PART part, const char *guess,
+                        struct aoc_submission_status *out_status) {
   struct aoc_manager_data *handle_data = aoc_manager_deref_handle(handle);
 
   struct result_status *read_status = NULL;
@@ -195,13 +192,18 @@ struct aoc_submission_status aoc_manager_sane_submit(aoc_manager_handle handle,
   printf("sanity:%x\n", sanity_array);
   if (sanity_array != 0) {
     print_result_status(read_status);
-    assert("guess not sane.aborting..." == NULL);
+    // assert("guess not sane.aborting..." == NULL);
+    return sanity_array;
   }
-  struct aoc_submission_status submission_status =
-      submit_answer(year, day, part, guess);
-  aoc_manager_update_result_status(read_status, guess, &submission_status);
+  submit_answer(year, day, part, guess, out_status);
+  bool refetch =
+      aoc_manager_update_result_status(read_status, guess, out_status);
   printf("concluded:\n");
   print_result_status(read_status);
   result_status_store_entry(handle_data->db_handle, read_status, true);
-  return submission_status;
+  if(refetch){
+    printf("detected inconsistencies. refetching...");
+    aoc_manager_pull_day_status(handle,year,day);
+  }
+  return sanity_array;
 }

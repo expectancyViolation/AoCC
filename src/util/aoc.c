@@ -16,7 +16,7 @@
 #include <unistd.h>
 
 // TODO: make this env variable
-#define INPUT_CACHE_DIR "/tmp/aoc"
+#define INPUT_CACHE_DIR "/tmp/other_aoc"
 
 #define SEP "\t" /* Tab separates the fields */
 
@@ -54,13 +54,7 @@ void print_aoc_day_result(const struct aoc_day_res *result) {
   printf("\n");
 }
 
-typedef struct aoc_day_res (*aoc_solver)(const struct aoc_day_task task);
 
-struct aoc_benchmark_day {
-  struct aoc_day_task task;
-  struct aoc_day_res result;
-  double solve_duration;
-};
 
 void print_day_benchmark(const struct aoc_benchmark_day *res) {
   printf("--------------\n");
@@ -122,14 +116,10 @@ void set_session_cookie(CURL *curl, char *session) {
   curl_easy_setopt(curl, CURLOPT_COOKIELIST, my_cookie);
 }
 
-// TODO: cache wrong answers?
-// TODO: evaluate and cache hints and prevent impossible submissions?
-struct aoc_submission_status
-submit_answer(int year, int day, enum AOC_DAY_PART part, const char *answer) {
+bool submit_answer(int year, int day, enum AOC_DAY_PART part, const char *answer,struct aoc_submission_status* out) {
   CURL *curl;
   CURLcode curl_res;
   char *session = get_session();
-  struct aoc_submission_status submission_status;
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
   chunk.size = 0;
@@ -154,13 +144,13 @@ submit_answer(int year, int day, enum AOC_DAY_PART part, const char *answer) {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",
               curl_easy_strerror(curl_res));
 
-    bool parse_ok = parse_submission_status(chunk.memory, &submission_status);
+    bool parse_ok = parse_submission_status(chunk.memory, out);
     curl_easy_cleanup(curl);
     free(post_url);
     free(post_fields);
   }
   free(chunk.memory);
-  return submission_status;
+  return true;
 }
 
 // TODO: detect "please don't fetch..."?

@@ -8,14 +8,27 @@
 #include "result_db.h"
 typedef void *aoc_manager_handle;
 
+enum submission_sanity_flags {
+  SANITY_ALREADY_SOLVED = 1 << 0,
+  SANITY_TOO_LOW = 1 << 1,
+  SANITY_TOO_HIGH = 1 << 2,
+  SANITY_WRONG_FORMAT = 1 << 3,
+  SANITY_GUESS_ALREADY_TRIED = 1 << 4
+  // TODO
+};
+
+typedef int submission_sanity_flag_array;
+
 aoc_manager_handle aoc_manager_init_manager(result_db_handle db_handle);
 
 void aoc_manager_close(aoc_manager_handle handle);
 
 void aoc_manager_pull_day_status(aoc_manager_handle handle, int year, int day);
 
-struct aoc_submission_status aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
-                             enum AOC_DAY_PART part, const char *guess);
+submission_sanity_flag_array
+aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
+                        enum AOC_DAY_PART part, const char *guess,
+                        struct aoc_submission_status *out_status);
 
 void aoc_manager_get_day_status(aoc_manager_handle handle, int year, int day,
                                 enum AOC_DAY_PART part,

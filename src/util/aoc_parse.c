@@ -10,6 +10,7 @@
 #define PUZZLE_ANSWER_WAIT_FIVE_MINUTES "5 minutes"
 #define PUZZLE_LEFT_TO_WAIT_BEGIN "You have"
 #define PUZZLE_LEFT_TO_WAIT_END "left to wait"
+#define PUZZLE_ALREADY_COMPLETE "already complete"
 
 #define DEBUG_CACHE_RESPONSES
 #define DEBUG_CACHE_RESPONSES_DIR "/tmp/aoc/cache"
@@ -68,12 +69,14 @@ bool parse_submission_status(char *raw_response,
   const bool correct = NULL != strstr(article_begin, PUZZLE_ANSWER_RIGHT);
   const bool too_low = NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_LOW);
   const bool too_high = NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_HIGH);
+  const bool already_complete = NULL != strstr(article_begin, PUZZLE_ALREADY_COMPLETE);
   const bool too_recently =
       NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_RECENTLY);
   out->correct = correct;
   out->was_checked = not_correct || correct;
   out->too_high = too_high;
   out->too_low = too_low;
+  out->already_complete=already_complete;
   return false;
 }
 

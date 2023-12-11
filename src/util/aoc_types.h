@@ -35,6 +35,7 @@ struct aoc_submission_status {
   bool correct;
   bool too_low;
   bool too_high;
+  bool already_complete;
 };
 
 struct aoc_day_task {

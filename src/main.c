@@ -1,4 +1,5 @@
 #include <curl/curl.h>
+#include <unistd.h>
 
 #include "2023/day01.h"
 #include "2023/day02.h"
@@ -10,6 +11,7 @@
 #include "2023/day08.h"
 #include "2023/day09.h"
 #include "2023/day10.h"
+#include "util/aoc.h"
 #include "util/aoc_solution_manager.h"
 #include "util/result_db.h"
 #include "util/timer.h"
@@ -23,13 +25,13 @@ struct aoc_day_res master_solver(const struct aoc_day_task task) {
   case 2023:
     switch (task.day) {
     case 1:
-      return solve_day01(file);
+      return solve_year23_day01(file);
     case 2:
-      return solve_day02(file);
+      return solve_year23_day02(file);
     case 3:
-      return solve_day03(file);
+      return solve_year23_day03(file);
     case 4:
-      return solve_day04(file);
+      return solve_year23_day04(file);
     case 5:
       return solve_day05(file);
     case 6:
@@ -52,13 +54,17 @@ struct aoc_day_res master_solver(const struct aoc_day_task task) {
   }
 }
 
-__attribute__((unused)) void run_all_days() {
-  struct aoc_day_task *tasks = NULL;
+void generate_tasks(struct aoc_day_task **tasks) {
   for (int i = 1; i <= CURRENT_DAY; i++) {
     const struct aoc_day_task task = {2023, i, get_input_file_path(2023, i)};
-    cvector_push_back(tasks, task);
+    cvector_push_back(*tasks, task);
   }
-  size_t num_of_tasks = CURRENT_DAY;
+}
+
+__attribute__((unused)) void run_all_days() {
+  struct aoc_day_task *tasks;
+  generate_tasks(&tasks);
+  size_t num_of_tasks = cvector_size(tasks);
   struct aoc_benchmark_day *results = malloc(num_of_tasks * sizeof(*results));
 #pragma omp parallel for
   for (size_t i = 0; i < num_of_tasks; i++) {
@@ -72,30 +78,53 @@ __attribute__((unused)) void run_all_days() {
   free(results);
 }
 
-
-void test_submission(aoc_manager_handle manager_handle){
+void test_submission(aoc_manager_handle manager_handle) {
   enum AOC_DAY_PART parts[] = {day_part_part1, day_part_part2};
   const int year = 2017;
-  struct result_status* status=NULL;
+  struct result_status *status = NULL;
   for (int day = 1; day < 5; day++) {
-    for(int i=0;i<2;i++) {
-      aoc_manager_get_day_status(manager_handle, year, day, parts[i],&status);
+    for (int i = 0; i < 2; i++) {
+      aoc_manager_get_day_status(manager_handle, year, day, parts[i], &status);
       print_result_status(status);
     }
   }
   //  struct aoc_benchmark_day bench = benchmark_day(master_solver, task);
-  struct aoc_submission_status sub_status =
-      aoc_manager_sane_submit(manager_handle, year, 1, day_part_part1, "1238786787");
+  struct aoc_submission_status sub_status;
+  aoc_manager_sane_submit(
+      manager_handle, year, 1, day_part_part1, "1238786787",&sub_status);
   print_aoc_submission_status(&sub_status);
-
 }
 
 int main() {
   curl_global_init(CURL_GLOBAL_ALL);
-  result_db_handle db = result_db_init_db("/tmp/ress3.db");
+  result_db_handle db = result_db_init_db("/tmp/other_aoc/ress.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
 
-  //  run_all_days();
+  // run_all_days();
+
+  struct aoc_day_task *tasks=NULL;
+  generate_tasks(&tasks);
+  const size_t num_of_tasks = cvector_size(tasks);
+  struct result_status * status=NULL;
+  struct aoc_submission_status  submission_status={};
+
+  aoc_manager_pull_day_status(manager_handle,2023,1);
+  for (int i = 0; i < num_of_tasks; i++) {
+    const struct aoc_day_task task = tasks[i];
+    struct aoc_day_res res = master_solver(tasks[i]);
+      char sol[50] = {};
+      sprintf(sol, "%lld", res.result.left);
+      aoc_manager_get_day_status(manager_handle,task.year,task.day,day_part_part1,&status);
+      print_result_status(status);
+      submission_sanity_flag_array submit_ok=aoc_manager_sane_submit(manager_handle, task.year, task.day,
+                              day_part_part1, sol,&submission_status);
+      if(submit_ok==0) {
+        print_aoc_submission_status(&submission_status);
+        printf("submitted solution. sleeping...\n");
+        usleep(65*1000*1000);
+      }
+  }
+
   //  print_day_benchmark(&bench);
   curl_global_cleanup();
   result_db_close(db);

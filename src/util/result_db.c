@@ -23,8 +23,9 @@ void print_result_status(const struct result_status *status) {
   printf("status:\n"
          "\tyear:        %10d\n"
          "\tday:         %10d\n"
-         "\tpart:        %10d\n",
-         status->year, status->day, status->part);
+         "\tpart:        %10d\n"
+         "\tsolved:      %10d\n" ,
+         status->year, status->day, status->part,status->solved);
   printf("solution type: ");
   print_solution_type(status->solution_type);
   printf("\n");
