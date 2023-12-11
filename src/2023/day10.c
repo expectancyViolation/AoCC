@@ -156,7 +156,7 @@ long long signed_area(const LLTuple *t1, const LLTuple *t2, const LLTuple *t3) {
   return v1x * v2y - v2x * v1y;
 }
 
-LLTuple day10(char *buf, long buf_len) {
+LLTuple year23_day10(char *buf, long buf_len) {
   LLTuple res = {};
   const struct day10_map *map = day10_map_initialize(buf, buf_len);
 
@@ -199,13 +199,13 @@ LLTuple day10(char *buf, long buf_len) {
 
   return res;
 }
-AocDayRes solve_day10(const char *input_file) {
+AocDayRes solve_year23_day10(const char *input_file) {
   char *input_buffer;
   char *padded_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
   const long padded_buffer_len =
       pad_input(input_buffer, &padded_buffer, filesize, '.');
-  const LLTuple res = day10(padded_buffer, padded_buffer_len);
+  const LLTuple res = year23_day10(padded_buffer, padded_buffer_len);
   AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(padded_buffer);
   free(input_buffer);

@@ -223,6 +223,8 @@ aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
   }
   return sanity_array;
 }
+
+// TODO split into "domain" (decider) and "service"
 bool aoc_manager_validate_solution(aoc_manager_handle handle, int year, int day,
                                    enum AOC_DAY_PART part,
                                    const AocPartRes guess) {
@@ -234,7 +236,7 @@ bool aoc_manager_validate_solution(aoc_manager_handle handle, int year, int day,
   }
   // TODO: do we trust cached info? (maybe optional "no_cache"?)
   if (!guess_and_solution_types_match(guess.type, read_status->solution_type)) {
-    printf("SOLUTION TYPE mismatch");
+//    printf("SOLUTION TYPE mismatch\n");
     return false;
   }
 

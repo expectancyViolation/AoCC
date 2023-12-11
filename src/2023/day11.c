@@ -1,10 +1,10 @@
 #include "day11.h"
 
 
-AocDayRes solve_day11(const char *input_file) {
+AocDayRes solve_year23_day11(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
-  const LLTuple res = day11(input_buffer, filesize);
+  const LLTuple res = year23_day11(input_buffer, filesize);
   AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(input_buffer);
   return day_res;
@@ -20,7 +20,7 @@ LLTuple gen_position_counts(LLTuple **pos, const LLTuple *end) {
   return result;
 }
 
-LLTuple day11(char *buf, __attribute__((unused)) long buf_len) {
+LLTuple year23_day11(char *buf, __attribute__((unused)) long buf_len) {
   LLTuple result = {};
   const long line_length = strchr(buf, '\n') - buf + 1;
   char *curr_offset = buf;

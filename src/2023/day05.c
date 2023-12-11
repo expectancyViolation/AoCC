@@ -208,7 +208,7 @@ static long long solve_mappings(void parse(char *line, struct Day05Range **vec),
   return min_el;
 }
 
-AocDayRes solve_day05(const char *input_file) {
+AocDayRes solve_year23_day05(const char *input_file) {
   LLTuple res = {};
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);

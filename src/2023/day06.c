@@ -41,7 +41,7 @@ static long long solve(char *buf) {
   }
   return res;
 }
-LLTuple day06(char *buf, long buf_len) {
+LLTuple year23_day06(char *buf, long buf_len) {
   LLTuple day_res = {};
   const size_t buf_size = buf_len * sizeof(*buf);
   char *buf_copy = malloc(buf_size);
@@ -52,10 +52,10 @@ LLTuple day06(char *buf, long buf_len) {
   free(buf_copy);
   return day_res;
 }
-AocDayRes solve_day06(const char *input_file) {
+AocDayRes solve_year23_day06(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
-  const LLTuple res = day06(input_buffer, filesize);
+  const LLTuple res = year23_day06(input_buffer, filesize);
   free(input_buffer);
 
   AocDayRes day_res = aoc_day_res_from_tuple(&res);

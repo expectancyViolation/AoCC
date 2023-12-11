@@ -30,7 +30,7 @@ LLTuple get_extrapolated_val(char *line) {
   res.right *= (-1);
   return res;
 }
-LLTuple day09(char *buf, __attribute__((unused)) long buf_len) {
+LLTuple year23_day09(char *buf, __attribute__((unused)) long buf_len) {
   LLTuple day_res = {};
   char **curr_pos = &buf;
   while (true) {
@@ -43,10 +43,11 @@ LLTuple day09(char *buf, __attribute__((unused)) long buf_len) {
   }
   return day_res;
 }
-AocDayRes solve_day09(const char *input_file) {
+AocDayRes solve_year23_day09(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
-  LLTuple res = parallelize(day09, ll_tuple_add, input_buffer, filesize, 0);
+  LLTuple res =
+      parallelize(year23_day09, ll_tuple_add, input_buffer, filesize, 0);
 
   AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(input_buffer);

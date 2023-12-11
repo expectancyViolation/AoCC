@@ -32,6 +32,9 @@ add_executable(aocc
         src/util/parallelize.c
         src/util/aoc.c
         src/util/fenwick.c
+        src/2022/year22.c
+        src/2022/day01.c
+        src/2022/day01.h
         src/2023/day01.c
         src/2023/day02.c
         src/2023/day03.c
@@ -43,6 +46,7 @@ add_executable(aocc
         src/2023/day09.c
         src/2023/day10.c
         src/2023/day11.c
+        src/2023/year23.c
         src/util/aoc_types.c
 )
 

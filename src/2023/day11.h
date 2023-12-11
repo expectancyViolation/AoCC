@@ -5,8 +5,8 @@
 #include "../util/ll_tuple.h"
 
 
-LLTuple day11(char *buf, __attribute__((unused)) long buf_len);
+LLTuple year23_day11(char *buf, __attribute__((unused)) long buf_len);
 
-AocDayRes solve_day11(const char *input_file);
+AocDayRes solve_year23_day11(const char *input_file);
 
 #endif // AOCC_23DAY11_H

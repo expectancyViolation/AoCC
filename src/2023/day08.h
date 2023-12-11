@@ -6,9 +6,9 @@
 
 #define KEY_LEN 3
 
-LLTuple day08(char *buf,
+LLTuple year23_day08(char *buf,
               __attribute__((unused)) __attribute__((unused)) long buf_len);
 
-AocDayRes solve_day08(const char *input_file);
+AocDayRes solve_year23_day08(const char *input_file);
 
 #endif // AOCC_23DAY08_H
