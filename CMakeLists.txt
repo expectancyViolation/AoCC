@@ -35,6 +35,7 @@ add_executable(aocc src/main.c src/util/helpers.c src/util/timer.c src/util/resu
         src/2023/day09.c
         src/2023/day10.c
         src/util/fenwick.c
+        src/2023/day11.c
 )
 
 target_link_libraries(aocc m)
