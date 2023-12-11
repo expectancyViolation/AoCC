@@ -17,3 +17,10 @@ int ll_tuple_compare(const struct ll_tuple *l1, const struct ll_tuple *l2) {
     return left_cmp;
   return CMP(l1->right, l2->right);
 }
+int ll_tuple_compare_right_left(const struct ll_tuple *l1,
+                                const struct ll_tuple *l2) {
+  const int right_cmp = CMP(l1->right, l2->right);
+  if (right_cmp != 0)
+    return right_cmp;
+  return CMP(l1->left, l2->left);
+}

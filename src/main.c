@@ -17,7 +17,7 @@
 #include "util/result_db.h"
 #include "util/timer.h"
 
-#define CURRENT_DAY 10
+#define CURRENT_DAY 11
 
 // TODO: use function pointers instead of massive switch?
 struct aoc_day_res master_solver(const struct aoc_day_task task) {
@@ -96,69 +96,45 @@ void test_submission(aoc_manager_handle manager_handle) {
   print_aoc_submission_status(&sub_status);
 }
 
-int solve_current_day(aoc_manager_handle manager_handle) {
-  int current_day = 11;
-  char const *file = "/tmp/lul.txt";
-  fetch_day_input_cached(2023, current_day, file);
-  const struct aoc_day_res res = solve_day11(file);
-  print_aoc_day_result(&res);
-
+void submit_helper(aoc_manager_handle const manager_handle, int year, int day,
+                   enum AOC_DAY_PART part, struct aoc_day_res const *res) {
   char sol[50] = {};
-  sprintf(sol, "%lld", res.result.left);
+  sprintf(sol, "%lld",
+          (part == day_part_part1) ? (res->result.left) : (res->result.right));
 
   struct aoc_submission_status submission_status = {};
-  bool submit_ok =
-      aoc_manager_sane_submit(manager_handle, 2023, current_day, day_part_part1,
-                              sol, &submission_status);
-
-  if (submit_ok == 0) {
-    print_aoc_submission_status(&submission_status);
-  }
-
-  sprintf(sol, "%lld", res.result.left);
-
-  submit_ok = aoc_manager_sane_submit(manager_handle, 2023, current_day,
-                                      day_part_part1, sol, &submission_status);
+  bool submit_ok = aoc_manager_sane_submit(manager_handle, year, day, part, sol,
+                                           &submission_status);
 
   if (submit_ok == 0) {
     print_aoc_submission_status(&submission_status);
   }
 }
 
+int solve_current_day(aoc_manager_handle manager_handle) {
+  const int current_day = 11;
+  const int current_year = 2023;
+  char const *file = "/tmp/lul.txt";
+  fetch_day_input_cached(current_year, current_day, file);
+  const struct aoc_day_res res = solve_day11(file);
+  print_aoc_day_result(&res);
+  // part 1
+  submit_helper(manager_handle, current_year, current_day, day_part_part1,
+                &res);
+
+  // part 2
+  submit_helper(manager_handle, current_year, current_day, day_part_part2,
+                &res);
+}
+
 int main() {
   curl_global_init(CURL_GLOBAL_ALL);
   result_db_handle db = result_db_init_db("/tmp/other_aoc/ress.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
-  solve_current_day(manager_handle);
+  //solve_current_day(manager_handle);
 
-  // run_all_days();
+  run_all_days();
 
-  //  struct aoc_day_task *tasks=NULL;
-  //  generate_tasks(&tasks);
-  //  const size_t num_of_tasks = cvector_size(tasks);
-  //  struct result_status * status=NULL;
-  //  struct aoc_submission_status  submission_status={};
-  //
-  //  aoc_manager_pull_day_status(manager_handle,2023,1);
-  //  for (int i = 0; i < num_of_tasks; i++) {
-  //    const struct aoc_day_task task = tasks[i];
-  //    struct aoc_day_res res = master_solver(tasks[i]);
-  //      char sol[50] = {};
-  //      sprintf(sol, "%lld", res.result.left);
-  //      aoc_manager_get_day_status(manager_handle,task.year,task.day,day_part_part1,&status);
-  //      print_result_status(status);
-  //      submission_sanity_flag_array
-  //      submit_ok=aoc_manager_sane_submit(manager_handle, task.year,
-  //      task.day,
-  //                              day_part_part1, sol,&submission_status);
-  //      if(submit_ok==0) {
-  //        print_aoc_submission_status(&submission_status);
-  //        printf("submitted solution. sleeping...\n");
-  //        usleep(65*1000*1000);
-  //      }
-  //  }
-
-  //  print_day_benchmark(&bench);
   curl_global_cleanup();
   result_db_close(db);
 }

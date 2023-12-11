@@ -18,6 +18,8 @@ struct ll_tuple ll_tuple_add(const struct ll_tuple res1,
 
 int ll_tuple_compare(const struct ll_tuple* l1,const struct ll_tuple* l2);;
 
+int ll_tuple_compare_right_left(const struct ll_tuple* l1,const struct ll_tuple* l2);;
+
 void print_tuple(const struct ll_tuple tup);
 
 
