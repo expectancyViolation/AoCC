@@ -20,7 +20,7 @@
 #define CURRENT_DAY 11
 
 // TODO: use function pointers instead of massive switch?
-struct AocDayRes master_solver(const struct AocDayTask task) {
+AocDayRes master_solver(const AocDayTask task) {
   const char *file = task.input_file;
   switch (task.year) {
   case 2023:
@@ -55,23 +55,25 @@ struct AocDayRes master_solver(const struct AocDayTask task) {
   default:
     assert(false);
   }
+  AocDayRes res = {};
+  return res;
 }
 
-void generate_tasks(struct AocDayTask **tasks) {
+void generate_tasks(AocDayTask **tasks) {
   for (int i = 1; i <= CURRENT_DAY; i++) {
-    const struct AocDayTask task = {2023, i, get_input_file_path(2023, i)};
+    const AocDayTask task = {2023, i, get_input_file_path(2023, i)};
     cvector_push_back(*tasks, task);
   }
 }
 
 __attribute__((unused)) void run_all_days() {
-  struct AocDayTask *tasks = NULL;
+  AocDayTask *tasks = NULL;
   generate_tasks(&tasks);
   size_t num_of_tasks = cvector_size(tasks);
-  struct aoc_benchmark_day *results = malloc(num_of_tasks * sizeof(*results));
+  AocBenchmarkDay *results = malloc(num_of_tasks * sizeof(*results));
 #pragma omp parallel for
   for (size_t i = 0; i < num_of_tasks; i++) {
-    const struct AocDayTask task = tasks[i];
+    const AocDayTask task = tasks[i];
     fetch_day_input_cached(task.year, task.day, task.input_file);
     results[i] = benchmark_day(master_solver, task);
   }
@@ -91,29 +93,29 @@ void test_submission(aoc_manager_handle manager_handle) {
       print_result_status(status);
     }
   }
-  //  struct aoc_benchmark_day bench = benchmark_day(master_solver, task);
-  struct AocSubmissionStatus sub_status;
-  aoc_manager_sane_submit(manager_handle, year, 1, AOC_DAY_PART_part1, "1238786787",
-                          &sub_status);
+  //  AocBenchmarkDay bench = benchmark_day(master_solver, task);
+  AocSubmissionStatus sub_status;
+  aoc_manager_sane_submit(manager_handle, year, 1, AOC_DAY_PART_part1,
+                          "1238786787", &sub_status);
   print_aoc_submission_status(&sub_status);
 }
 
 void submit_helper(aoc_manager_handle const manager_handle, int year, int day,
-                   enum AOC_DAY_PART part,long long guess) {
-  AocSubmissionStatus submission_status={};
-  submission_sanity_flag_array submit_ok = aoc_manager_sane_submit_llong(manager_handle, year, day, part, guess,
-                                           &submission_status);
+                   enum AOC_DAY_PART part, long long guess) {
+  AocSubmissionStatus submission_status = {};
+  submission_sanity_flag_array submit_ok = aoc_manager_sane_submit_llong(
+      manager_handle, year, day, part, guess, &submission_status);
   if (submit_ok == 0) {
     print_aoc_submission_status(&submission_status);
   }
 }
 
-int solve_current_day(aoc_manager_handle manager_handle) {
+void solve_current_day(aoc_manager_handle manager_handle) {
   const int current_day = 11;
   const int current_year = 2023;
   char const *file = "/tmp/day11.txt";
   fetch_day_input_cached(current_year, current_day, file);
-  const struct AocDayRes res = solve_day11(file);
+  const AocDayRes res = solve_day11(file);
   print_aoc_day_result(&res);
 
   // part 1
@@ -129,13 +131,13 @@ int main() {
   curl_global_init(CURL_GLOBAL_ALL);
   result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vn.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
- // solve_current_day(manager_handle);
+  // solve_current_day(manager_handle);
 
-//  struct AocDayTask task = {
-//      .year = 2023, .day = 11, .input_file = "/tmp/day11_bigboy.txt"};
-//   struct aoc_benchmark_day bench=benchmark_day(master_solver, task);
-//   print_day_benchmark(&bench);
-   run_all_days();
+  //  AocDayTask task = {
+  //      .year = 2023, .day = 11, .input_file = "/tmp/day11_bigboy.txt"};
+  //   AocBenchmarkDay bench=benchmark_day(master_solver, task);
+  //   print_day_benchmark(&bench);
+  run_all_days();
 
   curl_global_cleanup();
   result_db_close(db);

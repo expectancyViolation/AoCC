@@ -1,16 +1,16 @@
 #include "day11.h"
 
-struct AocDayRes solve_day11(const char *input_file) {
+
+AocDayRes solve_day11(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
   const LLTuple res = day11(input_buffer, filesize);
-  struct AocDayRes day_res = {res};
+  AocDayRes day_res = {res};
   free(input_buffer);
   return day_res;
 }
 
-LLTuple gen_position_counts(LLTuple **pos,
-                                    const LLTuple *end) {
+LLTuple gen_position_counts(LLTuple **pos, const LLTuple *end) {
   assert(*pos != end);
   LLTuple result = {(*pos)->left, 0};
   while ((*pos != end) && ((*pos)->left == result.left)) {
@@ -20,7 +20,7 @@ LLTuple gen_position_counts(LLTuple **pos,
   return result;
 }
 
-LLTuple day11(char *buf, long buf_len) {
+LLTuple day11(char *buf, __attribute__((unused)) long buf_len) {
   LLTuple result = {};
   const long line_length = strchr(buf, '\n') - buf + 1;
   char *curr_offset = buf;
@@ -33,7 +33,7 @@ LLTuple day11(char *buf, long buf_len) {
     const ptrdiff_t curr_pos_offset = curr_offset - buf;
     curr_offset += 1;
     const LLTuple curr_pos = {curr_pos_offset / line_length,
-                                      curr_pos_offset % line_length};
+                              curr_pos_offset % line_length};
     for (int i = 0; i < cvector_size(positions); i++) {
       const LLTuple old_pos = positions[i];
       const long long dist = llabs(curr_pos.left - old_pos.left) +
@@ -66,7 +66,7 @@ LLTuple day11(char *buf, long buf_len) {
       right -= pos_cnt.right;
       prev_pos = pos;
     }
-    for (int j = 0; j < cvector_size(positions); j++) {
+    for (size_t j = 0; j < cvector_size(positions); j++) {
       const long long tmp = positions[j].left;
       positions[j].left = positions[j].right;
       positions[j].right = tmp;

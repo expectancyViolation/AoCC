@@ -143,7 +143,7 @@ bool day10_step(const struct day10_map *map, struct day10_move_state *state) {
   bool moved = state->facing != facing_none;
   if (moved) {
     // step
-    state->position=next_position;
+    state->position = next_position;
   }
   return moved;
 }
@@ -162,8 +162,7 @@ LLTuple day10(char *buf, long buf_len) {
 
   // day10_print_map(map);
 
-  struct day10_move_state current_state = {
-      map->start_position, facing_none};
+  struct day10_move_state current_state = {map->start_position, facing_none};
   for (size_t i = 0; i < DAY10_FACINGS_COUNT; i++) {
     current_state.facing = DAY10_ALL_FACINGS[i];
     if (day10_step(map, &current_state))
@@ -200,14 +199,14 @@ LLTuple day10(char *buf, long buf_len) {
 
   return res;
 }
-struct AocDayRes solve_day10(const char *input_file) {
+AocDayRes solve_day10(const char *input_file) {
   char *input_buffer;
   char *padded_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
   const long padded_buffer_len =
       pad_input(input_buffer, &padded_buffer, filesize, '.');
   const LLTuple res = day10(padded_buffer, padded_buffer_len);
-  struct AocDayRes day_res = {res};
+  AocDayRes day_res = {res};
   free(padded_buffer);
   free(input_buffer);
   return day_res;

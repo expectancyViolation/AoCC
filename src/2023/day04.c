@@ -1,12 +1,19 @@
 #include "day04.h"
 
+#include "../util/aoc.h"
+#include "../util/fenwick.h"
+#include "../util/parallelize.h"
+
+#include <stdbool.h>
+
 #define DAY04_MIN_LINE_LEN 10 // assume a line is at least 10 bytes long
 #define MAX_WIN_NUMBER 100    // assume winning numbers are 2 digit
 #define num_bitmask 0b1111
 
 // #define DAY04_UNSAFE_PARALLEL
 
-__attribute__((unused)) void parse_winning(char *line, char *winning_numbers) {
+__attribute__((unused)) static void parse_winning(char *line,
+                                                  char *winning_numbers) {
   while (line != NULL) {
     const long win_num = strtol(line, &line, 10);
     if (win_num == 0)
@@ -16,7 +23,7 @@ __attribute__((unused)) void parse_winning(char *line, char *winning_numbers) {
   }
 }
 
-void parse_winning_brittle(char *line, char *winning_numbers) {
+static void parse_winning_brittle(char *line, char *winning_numbers) {
   while (*line != 0) {
     line++;
     int val = ((*(line++)) & num_bitmask) * 10;
@@ -25,8 +32,8 @@ void parse_winning_brittle(char *line, char *winning_numbers) {
   }
 }
 
-__attribute__((unused)) int count_matches(char *ticket,
-                                          const char *winning_numbers) {
+__attribute__((unused)) static int count_matches(char *ticket,
+                                                 const char *winning_numbers) {
 
   int curr_matches = 0;
   while (true) {
@@ -38,7 +45,7 @@ __attribute__((unused)) int count_matches(char *ticket,
   return curr_matches;
 }
 
-int count_matches_brittle(char *ticket, const char *winning_numbers) {
+static int count_matches_brittle(char *ticket, const char *winning_numbers) {
   int curr_matches = 0;
   while (*ticket != 0) {
     ticket++;
@@ -87,18 +94,17 @@ LLTuple year23_day04(char *buf, long buf_len) {
   free(range_tree);
   return result;
 }
-struct AocDayRes solve_year23_day04(const char *input_file) {
+AocDayRes solve_year23_day04(const char *input_file) {
   char *input_buffer;
-  // harder to parallelize b.c. of arbitrary range interactions!
+  // harder to parallelize b.c. of arbitrary Day05Range interactions!
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
 #ifdef DAY04_UNSAFE_PARALLEL
-  const LLTuple day_res = parallelize((day04),
-              ll_tuple_add,
-              input_buffer, filesize, 0);
+  const LLTuple day_res =
+      parallelize((day04), ll_tuple_add, input_buffer, filesize, 0);
 #else
-  const LLTuple res= year23_day04(input_buffer, filesize);
+  const LLTuple res = year23_day04(input_buffer, filesize);
 #endif
-  struct AocDayRes day_res={res};
+  AocDayRes day_res = {res};
   free(input_buffer);
   return day_res;
 }

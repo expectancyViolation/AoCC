@@ -1,5 +1,11 @@
 #include "day09.h"
+
 #include "../util/parallelize.h"
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
 LLTuple get_extrapolated_val(char *line) {
   long long *numbers = NULL;
   char *endpos;
@@ -24,7 +30,7 @@ LLTuple get_extrapolated_val(char *line) {
   res.right *= (-1);
   return res;
 }
-LLTuple day09(char *buf, long buf_len) {
+LLTuple day09(char *buf, __attribute__((unused)) long buf_len) {
   LLTuple day_res = {};
   char **curr_pos = &buf;
   while (true) {
@@ -37,13 +43,12 @@ LLTuple day09(char *buf, long buf_len) {
   }
   return day_res;
 }
-struct AocDayRes solve_day09(const char *input_file) {
+AocDayRes solve_day09(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
-  LLTuple res =
-      parallelize(day09, ll_tuple_add, input_buffer, filesize, 0);
+  LLTuple res = parallelize(day09, ll_tuple_add, input_buffer, filesize, 0);
 
-  struct AocDayRes day_res = {res};
+  AocDayRes day_res = {res};
   free(input_buffer);
   return day_res;
 }

@@ -24,12 +24,12 @@ void aoc_manager_pull_day_status(aoc_manager_handle handle, int year, int day);
 submission_sanity_flag_array
 aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
                         enum AOC_DAY_PART part, const char *guess,
-                        struct AocSubmissionStatus *out_status);
+                        AocSubmissionStatus *out_status);
 
 submission_sanity_flag_array
 aoc_manager_sane_submit_llong(aoc_manager_handle handle, int year, int day,
 enum AOC_DAY_PART part, const long long guess,
-struct AocSubmissionStatus *out_status);
+AocSubmissionStatus *out_status);
 
 void aoc_manager_get_day_status(aoc_manager_handle handle, int year, int day,
                                 enum AOC_DAY_PART part,

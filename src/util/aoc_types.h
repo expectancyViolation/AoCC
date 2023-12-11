@@ -7,7 +7,6 @@
 
 #define AOC_SOL_MAX_LEN 100
 
-typedef struct AocDayRes (*aoc_day_solve)();
 
 typedef enum AOC_DAY_PART {
   AOC_DAY_PART_undefined = 0,
@@ -15,15 +14,14 @@ typedef enum AOC_DAY_PART {
   AOC_DAY_PART_part2 = 2
 } AOC_DAY_PART;
 
-
 typedef struct AocPartStatus {
   bool part_solved;
-  char part_solution[AOC_SOL_MAX_LEN];
+  char part_solution[AOC_SOL_MAX_LEN+1];
 } AocPartStatus;
 
-typedef struct AocDayStatus {
-  struct AocPartStatus part1_status;
-  struct AocPartStatus part2_status;
+typedef struct AocDayStatus{
+  AocPartStatus part1_status;
+  AocPartStatus part2_status;
 } AocDayStatus;
 
 typedef struct AocSubmissionStatus {
@@ -44,4 +42,5 @@ typedef struct AocDayRes {
   LLTuple result;
 } AocDayRes;
 
+typedef AocDayRes (*aoc_day_solve)();
 #endif // AOCC_AOC_TYPES_H

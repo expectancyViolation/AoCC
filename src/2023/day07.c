@@ -1,4 +1,9 @@
 #include "day07.h"
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define HAND_SIZE 5
 
 struct hand {
@@ -113,7 +118,7 @@ void parse_hand(char *line, struct hand *out) {
   }
 }
 
-LLTuple day07(char *buf, long buf_len) {
+LLTuple day07(char *buf, __attribute__((unused)) long buf_len) {
   LLTuple day_res = {};
 
   struct hand curr_hand;
@@ -144,12 +149,12 @@ LLTuple day07(char *buf, long buf_len) {
 #endif
   return day_res;
 }
-struct AocDayRes solve_day07(const char *input_file) {
+AocDayRes solve_day07(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   const LLTuple res = day07(input_buffer, filesize);
   free(input_buffer);
 
-  struct AocDayRes day_res = {res};
+  AocDayRes day_res = {res};
   return day_res;
 }

@@ -8,16 +8,16 @@
 #include <stdbool.h>
 
 // parse
-bool parse_day_status(char *raw_response, struct AocDayStatus *out);
+bool parse_day_status(char *raw_response, AocDayStatus*out);
 
 bool parse_submission_status(char *raw_response,
-                             struct AocSubmissionStatus *out);
+                             AocSubmissionStatus *out);
 
 // generate
 char *get_answer_url(int year, int day);
 char *get_input_url(int year, int day);
 char *get_status_url(int year, int day);
-char *format_answer_payload(enum AOC_DAY_PART part, char *answer);
+char *format_answer_payload(enum AOC_DAY_PART part, char const *answer);
 
 void test_aoc_parse();
 

@@ -20,7 +20,7 @@ enum solution_type {
 void print_solution_type(enum solution_type sol);
 
 struct submission{
-  char string_solution[AOC_SOL_MAX_LEN];
+  char string_solution[AOC_SOL_MAX_LEN+1];
 };
 
 struct result_status {
@@ -32,7 +32,7 @@ struct result_status {
   long long num_solution;
   long long num_solution_lower_bound;
   long long num_solution_upper_bound;
-  char string_solution[100];
+  char string_solution[AOC_SOL_MAX_LEN+1];
   struct submission submissions[RESULT_STATUS_SUBMISSION_HISTORY_SIZE];
   // struct timespec next_guess_cooldown; TODO: use this for auto-retry?
 };

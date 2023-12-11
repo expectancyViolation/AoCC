@@ -1,11 +1,16 @@
 #include "day06.h"
 
+#include <math.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
 // to nudge floating point results in correct direction
 #define EPS 0.00000000001
 
 // from:
 // https://stackoverflow.com/questions/1726302/remove-spaces-from-a-string-in-c
-void remove_spaces(char *s) {
+static void remove_spaces(char *s) {
   char *d = s;
   do {
     while (*d == ' ') {
@@ -14,7 +19,7 @@ void remove_spaces(char *s) {
   } while ((*s++ = *d++));
 }
 
-long long solve(char *buf) {
+static long long solve(char *buf) {
   char *line1 = strsep(&buf, "\n");
   char *line2 = buf;
   strsep(&line1, ":");
@@ -47,12 +52,12 @@ LLTuple day06(char *buf, long buf_len) {
   free(buf_copy);
   return day_res;
 }
-struct AocDayRes solve_day06(const char *input_file) {
+AocDayRes solve_day06(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   const LLTuple res = day06(input_buffer, filesize);
   free(input_buffer);
 
-  struct AocDayRes day_res={res};
+  AocDayRes day_res = {res};
   return day_res;
 }

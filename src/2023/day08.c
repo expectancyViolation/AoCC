@@ -1,5 +1,8 @@
 #include "day08.h"
 
+#include <stdbool.h>
+#include <string.h>
+
 struct node {
   struct node *left;
   struct node *right;
@@ -40,7 +43,7 @@ void parse_nodes(char *buf, struct node *nodes, size_t **start_positions) {
       cvector_push_back(*start_positions, curr_node - nodes);
   }
 }
-LLTuple day08(char *buf, long buf_len) {
+LLTuple day08(char *buf, __attribute__((unused)) long buf_len) {
   LLTuple day_res = {};
 
   struct node nodes[26 * 26 * 26]; // 26**KEY_LEN   no constexpr in C :(
@@ -92,12 +95,12 @@ LLTuple day08(char *buf, long buf_len) {
   day_res.right = res;
   return day_res;
 }
-struct AocDayRes solve_day08(const char *input_file) {
+AocDayRes solve_day08(const char *input_file) {
   char *input_buffer;
-  const long filesize = read_file_to_memory(input_file, &input_buffer,false);
+  const long filesize = read_file_to_memory(input_file, &input_buffer, false);
   const LLTuple res = day08(input_buffer, filesize);
 
-  struct AocDayRes day_res={res};
+  AocDayRes day_res = {res};
   free(input_buffer);
   return day_res;
 }

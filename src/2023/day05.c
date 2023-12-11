@@ -1,18 +1,27 @@
 #include "day05.h"
 
-struct range {
+#include "../util/parallelize.h"
+
+#include <limits.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+struct Day05Range {
   long long begin;
   long long end;
 };
 
-struct mapping {
-  struct range r;
+struct Day05Mapping {
+  struct Day05Range r;
   long long offset;
 };
 
-bool range_is_empty(const struct range *r) { return (r->begin) >= (r->end); }
+static bool range_is_empty(const struct Day05Range *r) {
+  return (r->begin) >= (r->end);
+}
 
-int range_compare_lex(const struct range *r1, const struct range *r2) {
+static int range_compare_lex(const struct Day05Range *r1,
+                             const struct Day05Range *r2) {
   const long diff_begin = (r1->begin) - (r2->begin);
   const long diff_end = (r1->end) - (r2->end);
   // prevent compare function overflow
@@ -20,23 +29,25 @@ int range_compare_lex(const struct range *r1, const struct range *r2) {
                            : (diff_end > 0) - (diff_end < 0);
 }
 
-int mapping_compare_lex(const struct mapping *m1, const struct mapping *m2) {
+static int mapping_compare_lex(const struct Day05Mapping *m1,
+                               const struct Day05Mapping *m2) {
   return range_compare_lex(&m1->r, &m2->r);
 }
 
-void range_intersect(const struct range *r1, const struct range *r2,
-                     struct range *result) {
+static void range_intersect(const struct Day05Range *r1,
+                            const struct Day05Range *r2,
+                            struct Day05Range *result) {
   result->begin = max(r1->begin, r2->begin);
   result->end = min(r1->end, r2->end);
 }
 
-void shift_range(struct range *r, long offset) {
+static void shift_range(struct Day05Range *r, long offset) {
   r->begin += offset;
   r->end += offset;
 }
 
-void parse_seeds_p1(char *line, struct range **vec) {
-  struct range parsed_range;
+static void parse_seeds_p1(char *line, struct Day05Range **vec) {
+  struct Day05Range parsed_range;
   strsep(&line, ":");
   char *endpos;
   while (true) {
@@ -50,8 +61,8 @@ void parse_seeds_p1(char *line, struct range **vec) {
   }
 }
 
-void parse_seeds_p2(char *line, struct range **vec) {
-  struct range parsed_range;
+static void parse_seeds_p2(char *line, struct Day05Range **vec) {
+  struct Day05Range parsed_range;
   strsep(&line, ":");
   char *endpos;
   while (true) {
@@ -66,14 +77,14 @@ void parse_seeds_p2(char *line, struct range **vec) {
 }
 
 // merge contiguous intervals
-void merge_seed_arr(struct range **v, struct range **out) {
-  qsort(*v, cvector_size(*v), sizeof(struct range),
+static void merge_seed_arr(struct Day05Range **v, struct Day05Range **out) {
+  qsort(*v, cvector_size(*v), sizeof(struct Day05Range),
         (__compar_fn_t)range_compare_lex);
-  struct range temp_range;
+  struct Day05Range temp_range;
   temp_range.begin = (*v)[0].begin;
   temp_range.end = (*v)[0].end;
   for (size_t i = 1; i < cvector_size(*v); i++) {
-    const struct range *curr_range = &(*v)[i];
+    const struct Day05Range *curr_range = &(*v)[i];
     if (curr_range->begin > temp_range.end) {
       // temp_range closes
       cvector_push_back(*out, temp_range);
@@ -87,16 +98,16 @@ void merge_seed_arr(struct range **v, struct range **out) {
   cvector_push_back(*out, temp_range);
 }
 
-long long solve_mappings(void parse(char *line, struct range **vec),
-                         char *buf) {
+static long long solve_mappings(void parse(char *line, struct Day05Range **vec),
+                                char *buf) {
   char *seed_line = strsep(&buf, "\n");
-  struct range *source = NULL;
+  struct Day05Range *source = NULL;
   parse(seed_line, &source);
-  struct range *dest = NULL;
-  struct range temp_range;
-  struct mapping temp_mapping;
-  struct mapping *mappings = NULL;
-  struct mapping *filled_mappings = NULL;
+  struct Day05Range *dest = NULL;
+  struct Day05Range temp_range;
+  struct Day05Mapping temp_mapping;
+  struct Day05Mapping *mappings = NULL;
+  struct Day05Mapping *filled_mappings = NULL;
 
   strsep(&buf, "\n"); // remove first newline
   while (true) {
@@ -117,11 +128,11 @@ long long solve_mappings(void parse(char *line, struct range **vec),
       temp_mapping.offset = destination_range_begin - source_range_begin;
       cvector_push_back(mappings, temp_mapping);
     }
-    qsort(mappings, cvector_size(mappings), sizeof(struct mapping),
+    qsort(mappings, cvector_size(mappings), sizeof(struct Day05Mapping),
           (__compar_fn_t)mapping_compare_lex);
 
-    const struct mapping *m_it;
-    const struct range *r_it;
+    const struct Day05Mapping *m_it;
+    const struct Day05Range *r_it;
     temp_mapping.r.begin =
         LLONG_MIN >> 2; // avoid overflow issues when shifting
     temp_mapping.r.end = LLONG_MIN >> 2;
@@ -148,8 +159,8 @@ long long solve_mappings(void parse(char *line, struct range **vec),
 
     // sort to intersect ranges by linear scan
     qsort(filled_mappings, cvector_size(filled_mappings),
-          sizeof(struct mapping), (__compar_fn_t)mapping_compare_lex);
-    qsort(source, cvector_size(source), sizeof(struct range),
+          sizeof(struct Day05Mapping), (__compar_fn_t)mapping_compare_lex);
+    qsort(source, cvector_size(source), sizeof(struct Day05Range),
           (__compar_fn_t)range_compare_lex);
 
     cvector_clear(dest);
@@ -169,7 +180,7 @@ long long solve_mappings(void parse(char *line, struct range **vec),
         }
         ++r_it;
       }
-      // step back since last interval might extend into next mapping
+      // step back since last interval might extend into next Day05Mapping
       --r_it;
     }
     cvector_clear(source);
@@ -197,8 +208,8 @@ long long solve_mappings(void parse(char *line, struct range **vec),
   return min_el;
 }
 
-struct AocDayRes solve_day05(const char *input_file) {
-  LLTuple res= {};
+AocDayRes solve_day05(const char *input_file) {
+  LLTuple res = {};
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   const size_t input_size = filesize * sizeof(char);
@@ -215,6 +226,6 @@ struct AocDayRes solve_day05(const char *input_file) {
   free(input_copy);
   free(input_buffer);
 
-  struct AocDayRes day_res={res};
+  AocDayRes day_res = {res};
   return day_res;
 }

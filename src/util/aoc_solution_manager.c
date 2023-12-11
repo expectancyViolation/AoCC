@@ -38,7 +38,7 @@ void parse_solution_into_status(const char *sol_string,
 }
 
 // TODO: this is weird: better to store guesses and status separately?
-void merge_aoc_and_db_status(const struct AocPartStatus *part_status,
+void merge_aoc_and_db_status(const AocPartStatus *part_status,
                              const struct result_status *db_status,
                              struct result_status *res_status) {
   res_status->solved = part_status->part_solved;
@@ -59,7 +59,7 @@ void merge_aoc_and_db_status(const struct AocPartStatus *part_status,
 
 void handle_pulled_part_status(result_db_handle db_handle, int year, int day,
                                enum AOC_DAY_PART day_part,
-                               const struct AocPartStatus *part_status) {
+                               const AocPartStatus *part_status) {
   struct result_status res_status;
   result_db_initialize_result_status(&res_status);
   res_status.year = year;
@@ -89,7 +89,7 @@ void aoc_manager_pull_day_status(aoc_manager_handle handle, int year, int day) {
   if (day > 25)
     return;
   struct aoc_manager_data *handle_data = aoc_manager_deref_handle(handle);
-  struct AocDayStatus day_status = fetch_day_status(year, day);
+  AocDayStatus day_status = fetch_day_status(year, day);
   print_aoc_day_status(&day_status);
   handle_pulled_part_status(handle_data->db_handle, year, day,
                             AOC_DAY_PART_part1, &day_status.part1_status);
@@ -145,7 +145,7 @@ check_submission_sanity(const struct result_status *status,
 
 bool aoc_manager_update_result_status(
     struct result_status *status, const char *guess,
-    const struct AocSubmissionStatus *submission_status) {
+    const AocSubmissionStatus *submission_status) {
 
   if (submission_status->already_complete && (!status->solved)) {
     // inconsistent state
@@ -182,7 +182,7 @@ bool aoc_manager_update_result_status(
 submission_sanity_flag_array
 aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
                         enum AOC_DAY_PART part, const char *guess,
-                        struct AocSubmissionStatus *out_status) {
+                        AocSubmissionStatus *out_status) {
   struct aoc_manager_data *handle_data = aoc_manager_deref_handle(handle);
 
   struct result_status *read_status = NULL;
@@ -210,11 +210,11 @@ aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
 submission_sanity_flag_array
 aoc_manager_sane_submit_llong(aoc_manager_handle handle, int year, int day,
                               enum AOC_DAY_PART part, const long long int guess,
-                              struct AocSubmissionStatus *out_status) {
-  char sol[AOC_SOL_MAX_LEN] = {};
+                              AocSubmissionStatus *out_status) {
+  char sol[AOC_SOL_MAX_LEN+1] = {};
   sprintf(sol, "%lld", guess);
 
-  struct AocSubmissionStatus submission_status = {};
+  AocSubmissionStatus submission_status = {};
   submission_sanity_flag_array submit_ok =
       aoc_manager_sane_submit(handle, year, day, part, sol, &submission_status);
   return submit_ok;

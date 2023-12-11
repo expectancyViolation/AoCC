@@ -17,13 +17,21 @@ if (OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif ()
 
-add_executable(aocc src/main.c src/util/helpers.c src/util/timer.c src/util/result_db.c
-         res/b64.c/buffer.c res/b64.c/encode.c res/b64.c/decode.c
+add_executable(aocc
+        res/b64.c/buffer.c
+        res/b64.c/encode.c
+        res/b64.c/decode.c
+        res/asprintf.c/asprintf.c
+        src/main.c
+        src/util/helpers.c
+        src/util/timer.c
+        src/util/result_db.c
         src/util/aoc_solution_manager.c
         src/util/ll_tuple.c
         src/util/aoc_parse.c
         src/util/parallelize.c
         src/util/aoc.c
+        src/util/fenwick.c
         src/2023/day01.c
         src/2023/day02.c
         src/2023/day03.c
@@ -34,7 +42,6 @@ add_executable(aocc src/main.c src/util/helpers.c src/util/timer.c src/util/resu
         src/2023/day08.c
         src/2023/day09.c
         src/2023/day10.c
-        src/util/fenwick.c
         src/2023/day11.c
 )
 

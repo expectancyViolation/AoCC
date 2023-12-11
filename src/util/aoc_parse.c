@@ -30,7 +30,7 @@ void cache_response(char *subdir, const char *raw_response) {
   free(outfile);
 }
 
-bool parse_day_status(char *raw_response, struct AocDayStatus *out) {
+bool parse_day_status(char *raw_response, AocDayStatus *out) {
 #ifdef DEBUG_CACHE_RESPONSES
   cache_response("parse", raw_response);
 #endif
@@ -56,8 +56,7 @@ bool parse_day_status(char *raw_response, struct AocDayStatus *out) {
   }
 }
 
-bool parse_submission_status(char *raw_response,
-                             struct AocSubmissionStatus *out) {
+bool parse_submission_status(char *raw_response, AocSubmissionStatus *out) {
 #ifdef DEBUG_CACHE_RESPONSES
   cache_response("submit", raw_response);
 #endif
@@ -69,20 +68,21 @@ bool parse_submission_status(char *raw_response,
   const bool correct = NULL != strstr(article_begin, PUZZLE_ANSWER_RIGHT);
   const bool too_low = NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_LOW);
   const bool too_high = NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_HIGH);
-  const bool already_complete = NULL != strstr(article_begin, PUZZLE_ALREADY_COMPLETE);
+  const bool already_complete =
+      NULL != strstr(article_begin, PUZZLE_ALREADY_COMPLETE);
   const bool too_recently =
       NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_RECENTLY);
   out->correct = correct;
   out->was_checked = not_correct || correct;
   out->too_high = too_high;
   out->too_low = too_low;
-  out->already_complete=already_complete;
+  out->already_complete = already_complete;
   return false;
 }
 
 void test_aoc_parse() {
   char *buff;
-  struct AocSubmissionStatus status = {};
+  AocSubmissionStatus status = {};
   read_file_to_memory("/tmp/aoc/cache/submit/response_19744.txt", &buff, false);
 
   parse_submission_status(buff, &status);
@@ -103,7 +103,7 @@ char *get_status_url(int year, int day) {
   asprintf(&res, "https://adventofcode.com/%d/day/%d", year, day);
   return res;
 }
-char *format_answer_payload(enum AOC_DAY_PART part, char *answer) {
+char *format_answer_payload(enum AOC_DAY_PART part, char const *answer) {
   char *res;
   asprintf(&res, "level=%d&answer=%s", part, answer);
   return res;
