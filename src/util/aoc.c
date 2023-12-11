@@ -20,7 +20,6 @@
 
 #define SEP "\t" /* Tab separates the fields */
 
-
 char *get_input_file_path(int year, int day) {
   char *res;
   asprintf(&res, "%s/%d/day%02d_input.txt", INPUT_CACHE_DIR, year, day);
@@ -32,6 +31,16 @@ void print_aoc_day_status(const struct aoc_day_status *status) {
          "\tpart2:%20s (%d)\n",
          status->part1_status.part_solution, status->part1_status.part_solved,
          status->part2_status.part_solution, status->part1_status.part_solved);
+}
+
+void print_aoc_submission_status(const struct aoc_submission_status *status) {
+  printf("submission status:\n"
+         "\twas checked:%d\n"
+         "\tcorrect:%d\n"
+         "\ttoo_low:%d\n"
+         "\ttoo_high:%d\n",
+         status->was_checked, status->correct, status->too_low,
+         status->too_high);
 }
 
 void print_aoc_day_task(const struct aoc_day_task *task) {
@@ -97,10 +106,7 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb,
 }
 // end from
 
-
-char* get_session(){
-  return getenv("AOC_SESSION");
-}
+char *get_session() { return getenv("AOC_SESSION"); }
 
 // TODO: cache cookie in struct?
 void set_session_cookie(CURL *curl, char *session) {
@@ -119,10 +125,10 @@ void set_session_cookie(CURL *curl, char *session) {
 // TODO: cache wrong answers?
 // TODO: evaluate and cache hints and prevent impossible submissions?
 struct aoc_submission_status
-submit_answer(int year, int day, enum AOC_DAY_PART part, char *answer) {
+submit_answer(int year, int day, enum AOC_DAY_PART part, const char *answer) {
   CURL *curl;
   CURLcode curl_res;
-  char *session=get_session();
+  char *session = get_session();
   struct aoc_submission_status submission_status;
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
@@ -149,19 +155,19 @@ submit_answer(int year, int day, enum AOC_DAY_PART part, char *answer) {
               curl_easy_strerror(curl_res));
 
     bool parse_ok = parse_submission_status(chunk.memory, &submission_status);
-    // printf("response:%s\n",chunk.memory);
     curl_easy_cleanup(curl);
     free(post_url);
     free(post_fields);
   }
   free(chunk.memory);
+  return submission_status;
 }
 
 // TODO: detect "please don't fetch..."?
 void fetch_day_input(int year, int day, char *outfile) {
   CURL *curl;
   CURLcode res;
-  char *session=get_session();
+  char *session = get_session();
   curl = curl_easy_init();
   if (curl) {
     FILE *f = fopen_mkdir(outfile, "w");
@@ -194,8 +200,8 @@ void fetch_day_input_cached(int year, int day, char *filepath) {
 struct aoc_day_status fetch_day_status(int year, int day) {
   CURL *curl;
   CURLcode res;
-  char *session=get_session();
-  struct aoc_day_status day_status={};
+  char *session = get_session();
+  struct aoc_day_status day_status = {};
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
   chunk.size = 0;
@@ -215,8 +221,7 @@ struct aoc_day_status fetch_day_status(int year, int day) {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",
               curl_easy_strerror(res));
 
-    parse_day_status(chunk.memory,&day_status);
-
+    parse_day_status(chunk.memory, &day_status);
 
     free(chunk.memory);
     curl_easy_cleanup(curl);

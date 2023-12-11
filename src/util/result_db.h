@@ -7,13 +7,20 @@
 
 #define RESULT_STATUS_VERSION "v0_0_1"
 #define RESULT_STATUS_DEFAULT_YEAR 2023
+#define RESULT_STATUS_SUBMISSION_HISTORY_SIZE 20
 
 typedef void *result_db_handle;
 
 enum solution_type {
-  solution_type_no_solution = 0,
+  solution_type_unknown = 0,
   solution_type_num_solution = 1,
   solution_type_string_solution = 2
+};
+
+void print_solution_type(enum solution_type sol);
+
+struct submission{
+  char string_solution[AOC_SOL_MAX_LEN];
 };
 
 struct result_status {
@@ -26,6 +33,7 @@ struct result_status {
   long long num_solution_lower_bound;
   long long num_solution_upper_bound;
   char string_solution[100];
+  struct submission submissions[RESULT_STATUS_SUBMISSION_HISTORY_SIZE];
   // struct timespec next_guess_cooldown; TODO: use this for auto-retry?
 };
 

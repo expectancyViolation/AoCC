@@ -72,15 +72,31 @@ __attribute__((unused)) void run_all_days() {
   free(results);
 }
 
+
+void test_submission(aoc_manager_handle manager_handle){
+  enum AOC_DAY_PART parts[] = {day_part_part1, day_part_part2};
+  const int year = 2017;
+  struct result_status* status=NULL;
+  for (int day = 1; day < 5; day++) {
+    for(int i=0;i<2;i++) {
+      aoc_manager_get_day_status(manager_handle, year, day, parts[i],&status);
+      print_result_status(status);
+    }
+  }
+  //  struct aoc_benchmark_day bench = benchmark_day(master_solver, task);
+  struct aoc_submission_status sub_status =
+      aoc_manager_sane_submit(manager_handle, year, 1, day_part_part1, "1238786787");
+  print_aoc_submission_status(&sub_status);
+
+}
+
 int main() {
   curl_global_init(CURL_GLOBAL_ALL);
-  result_db_handle db = result_db_init_db("/tmp/ress.db");
+  result_db_handle db = result_db_init_db("/tmp/ress3.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
 
   //  run_all_days();
-  struct aoc_day_task task={2023,10,"/tmp/aoc_bigboy/2023/day10_input.txt"};
-  struct aoc_benchmark_day bench=benchmark_day(master_solver,task);
-  print_day_benchmark(&bench);
+  //  print_day_benchmark(&bench);
   curl_global_cleanup();
   result_db_close(db);
 }

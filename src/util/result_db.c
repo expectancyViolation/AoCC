@@ -19,32 +19,45 @@ const char *kv_create_query =
     "varchar(1023) PRIMARY KEY, value varchar(1023));";
 
 void print_result_status(const struct result_status *status) {
+  assert(status != NULL);
   printf("status:\n"
          "\tyear:        %10d\n"
          "\tday:         %10d\n"
          "\tpart:        %10d\n",
          status->year, status->day, status->part);
-  switch (status->solution_type) {
-  case solution_type_num_solution:
-    printf("\tsolution:    %10lld\n"
+  printf("solution type: ");
+  print_solution_type(status->solution_type);
+  printf("\n");
+  if (status->solved) {
+    switch (status->solution_type) {
+    case solution_type_num_solution:
+      printf("\tsolution:    %10lld\n", status->num_solution);
+      break;
+    case solution_type_string_solution:
+      printf("\tsolution:    %10s\n", status->string_solution);
+      break;
+    default:
+      assert(false);
+    }
+  } else {
+    printf("\tno solution so far :(\n");
+  }
+  if (status->solution_type == solution_type_num_solution) {
+    printf("bounds\n"
            "\tlower_bound: %10lld\n"
            "\tupper_bound: %10lld\n",
-           status->num_solution, status->num_solution_lower_bound,
-           status->num_solution_upper_bound);
-    break;
-  case solution_type_string_solution:
-    printf("\tsolution:    %10s\n", status->string_solution);
-    break;
-  case solution_type_no_solution:
-    printf("\tno solution so far :(\n");
-    break;
-
-  default:
-    assert(false);
+           status->num_solution_lower_bound, status->num_solution_upper_bound);
   }
+  printf("previous submissions:\n");
+  //for (int i = 0; i < RESULT_STATUS_SUBMISSION_HISTORY_SIZE; i++) {
+    for (int i = 0; i < 5; i++) {
+    printf("%03d:%s\n", i, status->submissions[i].string_solution);
+  }
+  printf("....\n");
 };
 
 void result_db_initialize_result_status(struct result_status *status) {
+  memset(status, 0, sizeof(*status));
   status->year = 2023;
   status->day = -1;
   status->part = day_part_undefined;
@@ -52,6 +65,7 @@ void result_db_initialize_result_status(struct result_status *status) {
   status->num_solution_lower_bound = 1;
   status->num_solution_upper_bound = LLONG_MAX - 1;
   status->num_solution = -1;
+  memset(status->string_solution, 0, AOC_SOL_MAX_LEN);
 }
 
 // TODO: platform dependent "serialization" :( aka just memcpy
@@ -114,9 +128,9 @@ char *get_select_query(const char *key) {
 int get_key_cb(struct result_status **out, int ncols, char **cols,
                char **col_names) {
   for (int i = 0; i < ncols; i++) {
-    //printf("%s:%s\n", col_names[i], cols[i]);
+    // printf("%s:%s\n", col_names[i], cols[i]);
     if (strcmp(col_names[i], "value") == 0) {
-      //printf("decoding:%s\n", cols[i]);
+      // printf("decoding:%s\n", cols[i]);
       *out = decode_result_status(cols[i]);
     }
   }
@@ -138,7 +152,9 @@ char *get_insert_query(const char *key, const char *value, bool overwrite) {
 }
 
 bool result_status_load_entry(result_db_handle handle, int year, int day,
-                              enum AOC_DAY_PART part, struct result_status **out) {
+                              enum AOC_DAY_PART part,
+                              struct result_status **out) {
+  *out = NULL;
   struct db_handle_data *handle_data = db_handle_deref_handle(handle);
   const char *key = result_status_combine_id(year, day, part);
   const char *query = get_select_query(key);
@@ -153,7 +169,7 @@ bool result_status_load_entry(result_db_handle handle, int year, int day,
     printf("load error:%s\n", errmsg);
     return false;
   }
-  return true;
+  return *out != NULL;
 }
 
 bool result_status_store_entry(result_db_handle handle,
@@ -163,7 +179,7 @@ bool result_status_store_entry(result_db_handle handle,
   char *key = result_status_get_id(status);
   char *value = encode_result_status(status);
   char *query = get_insert_query(key, value, overwrite);
-  printf("store query:%s\n",query);
+  printf("store query:%s\n", query);
   char *errmsg;
   sqlite3_exec(handle_data->db, query,
                (int (*)(void *, int, char **, char **))get_key_cb, NULL,
@@ -207,3 +223,16 @@ void result_db_test() {
   result_db_close(handle);
   free(returned_status);
 }
+void print_solution_type(enum solution_type sol) {
+  switch (sol) {
+  case solution_type_num_solution:
+    printf("number");
+    return;
+  case solution_type_string_solution:
+    printf("string");
+    return;
+  case solution_type_unknown:
+    printf("unknown");
+    return;
+  }
+};

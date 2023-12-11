@@ -11,7 +11,6 @@
 #define PUZZLE_LEFT_TO_WAIT_BEGIN "You have"
 #define PUZZLE_LEFT_TO_WAIT_END "left to wait"
 
-
 #define DEBUG_CACHE_RESPONSES
 #define DEBUG_CACHE_RESPONSES_DIR "/tmp/aoc/cache"
 
@@ -64,11 +63,17 @@ bool parse_submission_status(char *raw_response,
   char *article_begin = strstr(raw_response, "<article>");
 
   char *right_answer = strstr(article_begin, PUZZLE_ANSWER_RIGHT);
-  const bool not_correct = NULL!= strstr(article_begin, PUZZLE_ANSWER_NOT_RIGHT);
-  const bool correct = NULL !=  strstr(article_begin, PUZZLE_ANSWER_RIGHT);
-  const bool too_low= NULL !=  strstr(article_begin, PUZZLE_ANSWER_TOO_LOW);
-  const bool too_high= NULL !=  strstr(article_begin, PUZZLE_ANSWER_TOO_HIGH);
-  const bool too_recently= NULL !=  strstr(article_begin, PUZZLE_ANSWER_TOO_RECENTLY);
+  const bool not_correct =
+      NULL != strstr(article_begin, PUZZLE_ANSWER_NOT_RIGHT);
+  const bool correct = NULL != strstr(article_begin, PUZZLE_ANSWER_RIGHT);
+  const bool too_low = NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_LOW);
+  const bool too_high = NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_HIGH);
+  const bool too_recently =
+      NULL != strstr(article_begin, PUZZLE_ANSWER_TOO_RECENTLY);
+  out->correct = correct;
+  out->was_checked = not_correct || correct;
+  out->too_high = too_high;
+  out->too_low = too_low;
   return false;
 }
 
