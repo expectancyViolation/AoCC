@@ -1,6 +1,5 @@
 #include "day11.h"
 
-
 AocDayRes solve_year23_day11(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, false);
@@ -25,7 +24,7 @@ LLTuple year23_day11(char *buf, __attribute__((unused)) long buf_len) {
   const long line_length = strchr(buf, '\n') - buf + 1;
   char *curr_offset = buf;
   LLTuple *positions = NULL;
-  long long res = 0;
+  // TODO: don't need vector, just scan as you go!
   while (true) {
     curr_offset = strchr(curr_offset, '#');
     if (curr_offset == NULL)
@@ -34,16 +33,10 @@ LLTuple year23_day11(char *buf, __attribute__((unused)) long buf_len) {
     curr_offset += 1;
     const LLTuple curr_pos = {curr_pos_offset / line_length,
                               curr_pos_offset % line_length};
-    for (size_t i = 0; i < cvector_size(positions); i++) {
-      const LLTuple old_pos = positions[i];
-      const long long dist = llabs(curr_pos.left - old_pos.left) +
-                             llabs(curr_pos.right - old_pos.right);
-      res += dist;
-    }
     cvector_push_back(positions, curr_pos);
   }
-
-  long long p2_res = res;
+  long long res = 0;
+  long long p2_res = 0;
 
   // two passes: swap tuples in between to scan both dimensions
   for (int i = 0; i < 2; i++) {
@@ -58,9 +51,11 @@ LLTuple year23_day11(char *buf, __attribute__((unused)) long buf_len) {
     while (curr_index != end) {
       const LLTuple pos_cnt = gen_position_counts(&curr_index, end);
       const long long pos = pos_cnt.left;
-      const long long dist = pos - prev_pos - 1;
-      res += left * right * dist;
-      p2_res += left * right * dist * 999999;
+      const long long p1dist = 2 * (pos - prev_pos - 1) + 1;
+
+      const long long p2dist = 1000000 * (pos - prev_pos - 1) + 1;
+      res += left * right * p1dist;
+      p2_res += left * right * p2dist;
 
       left += pos_cnt.right;
       right -= pos_cnt.right;
