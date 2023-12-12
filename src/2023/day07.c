@@ -1,4 +1,5 @@
 #include "day07.h"
+#include "../util/helpers.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -66,7 +67,7 @@ int compare_hand(const struct hand *h1, const struct hand *h2) {
 }
 
 void parse_hand(char *line, struct hand *out) {
-  char sorted_hand[HAND_SIZE + 1] = {};
+  char sorted_hand[HAND_SIZE + 1] = {0};
 
   // parse
   memcpy(sorted_hand, line, HAND_SIZE);
@@ -118,8 +119,8 @@ void parse_hand(char *line, struct hand *out) {
   }
 }
 
-LLTuple year23_day07(char *buf, __attribute__((unused)) long buf_len) {
-  LLTuple day_res = {};
+LLTuple year23_day07(char *buf,  long buf_len) {
+  LLTuple day_res = {0};
 
   struct hand curr_hand;
   struct hand *hands = NULL;

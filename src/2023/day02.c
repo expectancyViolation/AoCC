@@ -26,7 +26,7 @@ static void draw_set_max(struct Draw *draw_to_set, const struct Draw *draw_other
   draw_to_set->blue = max(draw_to_set->blue, draw_other->blue);
 }
 
-__attribute__((unused)) static void print_draw(const struct Draw *draw_) {
+ static void print_draw(const struct Draw *draw_) {
   printf("----\ndraw:\n r = %d\n g = %d\n b = %d\n", draw_->red, draw_->green,
          draw_->blue);
 }
@@ -81,8 +81,8 @@ static void get_required_draw(char *buf, long *game_id_out,
     draw_set_max(required_draw_out, &current_draw);
   }
 }
-LLTuple year23_day02(char *buf, __attribute__((unused)) long buf_len) {
-  LLTuple result = {};
+LLTuple year23_day02(char *buf,  long buf_len) {
+  LLTuple result={0};
   struct Draw draw_limit = {12, 13, 14};
   struct Draw required_draw;
 

@@ -6,19 +6,9 @@
 #include "../../res/asprintf.c/asprintf.h"
 
 #include <assert.h>
+#ifdef SQLITE_AVAILABLE
 #include <sqlite3.h>
-
-struct db_handle_data {
-  sqlite3 *db;
-};
-
-struct db_handle_data *db_handle_deref_handle(aoc_manager_handle handle) {
-  return (struct db_handle_data *)handle;
-}
-
-const char *kv_create_query =
-    "CREATE TABLE IF NOT EXISTS kv_store (key "
-    "varchar(1023) PRIMARY KEY, value varchar(1023));";
+#endif
 
 void print_result_status(const struct result_status *status) {
   assert(status != NULL);
@@ -59,17 +49,19 @@ void print_result_status(const struct result_status *status) {
   printf("....\n");
 };
 
-void result_db_initialize_result_status(struct result_status *status) {
-  memset(status, 0, sizeof(*status));
-  status->year = 2023;
-  status->day = -1;
-  status->part = AOC_DAY_PART_undefined;
-  status->solved = false;
-  status->num_solution_lower_bound = 1;
-  status->num_solution_upper_bound = LLONG_MAX - 1;
-  status->num_solution = -1;
-  memset(status->string_solution, 0, AOC_SOL_MAX_LEN + 1);
-}
+void print_solution_type(enum SOLUTION_TYPE sol) {
+  switch (sol) {
+  case SOLUTION_TYPE_num:
+    printf("number");
+    return;
+  case SOLUTION_TYPE_string:
+    printf("string");
+    return;
+  case SOLUTION_TYPE_unknown:
+    printf("unknown");
+    return;
+  }
+};
 
 // TODO: platform dependent "serialization" :( aka just memcpy
 char *encode_result_status(const struct result_status *status) {
@@ -81,6 +73,42 @@ struct result_status *decode_result_status(char *b64_string) {
   struct result_status *status =
       (struct result_status *)b64_decode(b64_string, strlen(b64_string));
   return status;
+}
+
+char *result_status_combine_id(int year, int day, enum AOC_DAY_PART part) {
+  char *res;
+  asprintf(&res, "solve_%d_%02d_part_%d_%s", year, day, part,
+           RESULT_STATUS_VERSION);
+  return res;
+}
+
+char *result_status_get_id(const struct result_status *status) {
+  return result_status_combine_id(status->year, status->day, status->part);
+};
+
+#ifdef SQLITE_AVAILABLE
+struct db_handle_data {
+  sqlite3 *db;
+};
+
+struct db_handle_data *db_handle_deref_handle(aoc_manager_handle handle) {
+  return (struct db_handle_data *)handle;
+}
+
+const char *kv_create_query =
+    "CREATE TABLE IF NOT EXISTS kv_store (key "
+    "varchar(1023) PRIMARY KEY, value varchar(1023));";
+
+void result_db_initialize_result_status(struct result_status *status) {
+  memset(status, 0, sizeof(*status));
+  status->year = 2023;
+  status->day = -1;
+  status->part = AOC_DAY_PART_undefined;
+  status->solved = false;
+  status->num_solution_lower_bound = 1;
+  status->num_solution_upper_bound = LLONG_MAX - 1;
+  status->num_solution = -1;
+  memset(status->string_solution, 0, AOC_SOL_MAX_LEN + 1);
 }
 
 result_db_handle result_db_init_db(char *db_file) {
@@ -108,17 +136,6 @@ void result_db_close(result_db_handle handle) {
     printf("close:%d\n", sqlite3_close(handle_data->db));
   }
 }
-
-char *result_status_combine_id(int year, int day, enum AOC_DAY_PART part) {
-  char *res;
-  asprintf(&res, "solve_%d_%02d_part_%d_%s", year, day, part,
-           RESULT_STATUS_VERSION);
-  return res;
-}
-
-char *result_status_get_id(const struct result_status *status) {
-  return result_status_combine_id(status->year, status->day, status->part);
-};
 
 // TODO: raw SQL 🤢
 char *get_select_query(const char *key) {
@@ -219,16 +236,4 @@ void result_db_test() {
   result_db_close(handle);
   free(returned_status);
 }
-void print_solution_type(enum SOLUTION_TYPE sol) {
-  switch (sol) {
-  case SOLUTION_TYPE_num:
-    printf("number");
-    return;
-  case SOLUTION_TYPE_string:
-    printf("string");
-    return;
-  case SOLUTION_TYPE_unknown:
-    printf("unknown");
-    return;
-  }
-};
+#endif // SQLITE_AVAILABLE

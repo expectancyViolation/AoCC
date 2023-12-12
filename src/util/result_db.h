@@ -9,8 +9,6 @@
 #define RESULT_STATUS_DEFAULT_YEAR 2023
 #define RESULT_STATUS_SUBMISSION_HISTORY_SIZE 20
 
-typedef void *result_db_handle;
-
 enum SOLUTION_TYPE {
   SOLUTION_TYPE_unknown = 0,
   SOLUTION_TYPE_num = 1,
@@ -19,8 +17,8 @@ enum SOLUTION_TYPE {
 
 void print_solution_type(enum SOLUTION_TYPE sol);
 
-struct submission{
-  char string_solution[AOC_SOL_MAX_LEN+1];
+struct submission {
+  char string_solution[AOC_SOL_MAX_LEN + 1];
 };
 
 struct result_status {
@@ -32,20 +30,22 @@ struct result_status {
   long long num_solution;
   long long num_solution_lower_bound;
   long long num_solution_upper_bound;
-  char string_solution[AOC_SOL_MAX_LEN+1];
+  char string_solution[AOC_SOL_MAX_LEN + 1];
   struct submission submissions[RESULT_STATUS_SUBMISSION_HISTORY_SIZE];
   // struct timespec next_guess_cooldown; TODO: use this for auto-retry?
 };
 
 void print_result_status(const struct result_status *status);
 
-result_db_handle result_db_init_db(char *db_file);
-
-void result_db_close(result_db_handle handle);
+char *result_status_get_id(const struct result_status *status);
 
 void result_db_initialize_result_status(struct result_status *status);
 
-char *result_status_get_id(const struct result_status *status);
+#ifdef SQLITE_AVAILABLE
+typedef void *result_db_handle;
+result_db_handle result_db_init_db(char *db_file);
+
+void result_db_close(result_db_handle handle);
 
 bool result_status_load_entry(result_db_handle handle, int year, int day,
                               enum AOC_DAY_PART part,
@@ -56,5 +56,6 @@ bool result_status_store_entry(result_db_handle handle,
                                bool overwrite);
 
 void result_db_test();
+#endif // SQLITE_AVAILABLE
 
 #endif // AOCC_RESULT_DB_H

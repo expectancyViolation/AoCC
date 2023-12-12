@@ -60,7 +60,7 @@ void parse_aoc_part_res(const char *string, AocPartRes *out);
 void format_aoc_part_res(const AocPartRes *res, char *out);
 AocPartRes aoc_part_res_from_llong(long long val);
 
-typedef struct AocDayRes {
+typedef struct _AocDayRes {
   AocPartRes part1_res;
   AocPartRes part2_res;
 } AocDayRes;

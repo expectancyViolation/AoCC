@@ -1,6 +1,7 @@
 #include "aoc_parse.h"
 
 #include "../../res/asprintf.c/asprintf.h"
+#include "timer.h"
 
 #define PUZZLE_ANSWER_SEARCH_STRING "Your puzzle answer was <code>"
 #define PUZZLE_ANSWER_NOT_RIGHT "not the right answer"
@@ -82,9 +83,9 @@ bool parse_submission_status(char *raw_response, AocSubmissionStatus *out) {
   return false;
 }
 
-__attribute__((unused)) void test_aoc_parse() {
+ void test_aoc_parse() {
   char *buff;
-  AocSubmissionStatus status = {};
+  struct AocSubmissionStatus status = {0};
   read_file_to_memory("/tmp/aoc/cache/submit/response_19744.txt", &buff, false);
 
   parse_submission_status(buff, &status);

@@ -56,7 +56,7 @@ static void day03_mark_gears(char *segment_begin, const char *segment_end,
   }
 }
 LLTuple year23_day03(char *buf, long buf_len) {
-  LLTuple result = {};
+  LLTuple result = {0};
   const long line_length = get_first_line_length(buf);
 
   char *curr_number_pos = buf;

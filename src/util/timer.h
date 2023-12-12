@@ -11,6 +11,11 @@ struct my_perf_timer {
   bool running;
 };
 
+#ifdef WIN32
+#define CLOCK_MONOTONIC 0
+int clock_gettime(int _, struct timespec *spec);
+#endif
+
 struct my_perf_timer *start_perf_measurement();
 
 double stop_perf_measurement(struct my_perf_timer *timer);

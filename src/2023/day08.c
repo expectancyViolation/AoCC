@@ -43,8 +43,8 @@ void parse_nodes(char *buf, struct node *nodes, size_t **start_positions) {
       cvector_push_back(*start_positions, curr_node - nodes);
   }
 }
-LLTuple year23_day08(char *buf, __attribute__((unused)) long buf_len) {
-  LLTuple day_res = {};
+LLTuple year23_day08(char *buf,  long buf_len) {
+  LLTuple day_res = {0};
 
   struct node nodes[26 * 26 * 26]; // 26**KEY_LEN   no constexpr in C :(
   struct node *curr_node = NULL;
@@ -63,7 +63,7 @@ LLTuple year23_day08(char *buf, __attribute__((unused)) long buf_len) {
   for (size_t i = 0; i < cvector_size(start_positions); i++) {
     curr_node = nodes + start_positions[i];
     long long j;
-    char b[4] = {};
+    char b[4] = {0};
     for (j = 0; curr_node != target; j++) {
       // input is easier than general case:
       //  first goal state (at step k) loops back onto second element

@@ -1,5 +1,7 @@
+#ifdef CURL_AVAILABLE
 #include <curl/curl.h>
-#include <unistd.h>
+#endif
+// #include <unistd.h>
 
 #include "2022/day01.h"
 
@@ -14,7 +16,7 @@
 
 #define CURRENT_DAY 12
 
-#define CHECKMARK(x) ((x) ? ("✅") : ("❌"))
+#define CHECKMARK(x) ((x) ? ("v") : ("x"))
 
 // TODO: use function pointers instead of massive switch?
 AocDayRes master_solver(const AocDayTask task) {
@@ -26,7 +28,7 @@ AocDayRes master_solver(const AocDayTask task) {
   default:
     assert(false);
   }
-  AocDayRes res = {};
+  AocDayRes res = {0};
   return res;
 }
 
@@ -36,6 +38,8 @@ void generate_tasks(AocDayTask **tasks, int year) {
     cvector_push_back(*tasks, task);
   }
 }
+
+#ifdef SQLITE_AVAILABLE
 
 bool validate_day_result(aoc_manager_handle manager, const AocDayRes *result,
                          const AocDayTask *task) {
@@ -62,9 +66,9 @@ void run_all_days(aoc_manager_handle manager, int year) {
     const AocBenchmarkDay result = results[i];
     const AocDayTask task = tasks[i];
     bool both_correct = validate_day_result(manager, &(result.result), &task);
-//    print_aoc_day_result(&result.result);
-//    if (both_correct)
-      print_day_benchmark(&results[i]);
+    //    print_aoc_day_result(&result.result);
+    //    if (both_correct)
+    print_day_benchmark(&results[i]);
   }
   free(results);
 }
@@ -90,7 +94,7 @@ void test_submission(aoc_manager_handle manager_handle) {
 
 void submit_helper(aoc_manager_handle manager_handle, int year, int day,
                    enum AOC_DAY_PART part, const AocPartRes guess) {
-  AocSubmissionStatus submission_status = {};
+  AocSubmissionStatus submission_status = {0};
   submission_sanity_flag_array submit_ok = aoc_manager_sane_submit(
       manager_handle, year, day, part, guess, &submission_status);
   if (submit_ok == 0) {
@@ -105,32 +109,48 @@ void solve_current_day(aoc_manager_handle manager_handle) {
   fetch_day_input_cached(current_year, current_day, file);
   const AocDayRes res = solve_year23_day12(file);
   print_aoc_day_result(&res);
-  struct result_status stat={};
-  aoc_manager_get_day_status(manager_handle,current_year,current_day,AOC_DAY_PART_part2,&stat);
+  struct result_status stat = {0};
+  aoc_manager_get_day_status(manager_handle, current_year, current_day,
+                             AOC_DAY_PART_part2, &stat);
   print_result_status(&stat);
 
   // part 1
-   submit_helper(manager_handle, current_year, current_day,
-   AOC_DAY_PART_part1,
+  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
                 res.part1_res);
 
   // part 2
-   submit_helper(manager_handle, current_year, current_day,
-   AOC_DAY_PART_part2,
+  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
                 res.part2_res);
 }
+
+#endif // SQLITE_AVAILABLE
 
 int main() {
   curl_global_init(CURL_GLOBAL_ALL);
   result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
-  //solve_current_day(manager_handle);
+  solve_current_day(manager_handle);
 
-//    AocDayTask task = {
-//        .year = 2023, .day = 11, .input_file = "/tmp/day11_bigboy.txt"};
-//     AocBenchmarkDay bench=benchmark_day(master_solver, task);
-//     print_day_benchmark(&bench);
-  run_all_days(manager_handle, 2023);
+  AocDayTask task = {
+      .year = 2023, .day = 12, .input_file = "/tmp/aoc/2023/day12_input.txt"};
+
+  AocDayTask taskbb1 = {
+      .year = 2023, .day = 12, .input_file = "/tmp/aoc/day12_bigboy1.txt"};
+
+  AocDayTask taskbb2 = {
+      .year = 2023, .day = 12, .input_file = "/tmp/aoc/day12_bigboy2.txt"};
+  AocDayTask tasks[]={task,taskbb1,taskbb2};
+  for(int i=0;i<3;i++){
+    AocBenchmarkDay bench = benchmark_day(master_solver, (tasks[i]));
+    print_day_benchmark(&bench);
+  }
+
+  //    AocDayTask task_bb = {
+  //        .year = 2023, .day = 12, .input_file =
+  //        "/tmp/aoc/2023/day12_input.txt"};
+  //    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+  //    print_day_benchmark(&benchbb);
+  //   run_all_days(manager_handle, 2023);
 
   curl_global_cleanup();
   result_db_close(db);

@@ -11,7 +11,7 @@
 
 // #define DAY04_UNSAFE_PARALLEL
 
-__attribute__((unused)) static void parse_winning(char *line,
+ static void parse_winning(char *line,
                                                   char *winning_numbers) {
   while (line != NULL) {
     const long win_num = strtol(line, &line, 10);
@@ -31,7 +31,7 @@ static void parse_winning_brittle(char *line, char *winning_numbers) {
   }
 }
 
-__attribute__((unused)) static int count_matches(char *ticket,
+ static int count_matches(char *ticket,
                                                  const char *winning_numbers) {
 
   int curr_matches = 0;
@@ -55,7 +55,7 @@ static int count_matches_brittle(char *ticket, const char *winning_numbers) {
   return curr_matches;
 }
 LLTuple year23_day04(char *buf, long buf_len) {
-  LLTuple result = {};
+  LLTuple result = {0};
   const int tree_size =
       (int)(buf_len / DAY04_MIN_LINE_LEN); // this has to be larger than the
   // number of lines

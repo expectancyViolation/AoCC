@@ -19,8 +19,8 @@ LLTuple gen_position_counts(LLTuple **pos, const LLTuple *end) {
   return result;
 }
 
-LLTuple year23_day11(char *buf, __attribute__((unused)) long buf_len) {
-  LLTuple result = {};
+LLTuple year23_day11(char *buf,  long buf_len) {
+  LLTuple result = {0};
   const long line_length = strchr(buf, '\n') - buf + 1;
   char *curr_offset = buf;
   LLTuple *positions = NULL;

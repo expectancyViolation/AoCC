@@ -2,6 +2,8 @@
 #include "aoc.h"
 #include <stdlib.h>
 
+
+#ifdef SQLITE_AVAILABLE
 struct aoc_manager_data {
   result_db_handle db_handle;
 };
@@ -15,7 +17,7 @@ aoc_manager_handle aoc_manager_init_manager(result_db_handle db_handle) {
   handle_data->db_handle = db_handle;
   return (aoc_manager_handle)handle_data;
 }
-__attribute__((unused)) void aoc_manager_close(aoc_manager_handle handle) {
+ void aoc_manager_close(aoc_manager_handle handle) {
   struct aoc_manager_data *data = aoc_manager_deref_handle(handle);
   free(data);
 }
@@ -145,7 +147,7 @@ check_submission_sanity(const struct result_status *status,
         sanity_flags |= SANITY_TOO_HIGH;
     }
   }
-  char guess_string[AOC_SOL_MAX_LEN + 1] = {};
+  char guess_string[AOC_SOL_MAX_LEN + 1] = {0};
   switch (guess.type) {
   case AOC_PART_RES_TYPE_llong:
     sprintf(guess_string, "%lld", guess.res_ll);
@@ -248,3 +250,5 @@ bool aoc_manager_validate_solution(aoc_manager_handle handle, int year, int day,
   }
   return false;
 }
+
+#endif // SQLITE_AVAILABLE

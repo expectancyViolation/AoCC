@@ -42,7 +42,7 @@ static long long solve(char *buf) {
   return res;
 }
 LLTuple year23_day06(char *buf, long buf_len) {
-  LLTuple day_res = {};
+  LLTuple day_res = {0};
   const size_t buf_size = buf_len * sizeof(*buf);
   char *buf_copy = malloc(buf_size);
   memcpy(buf_copy, buf, buf_size);

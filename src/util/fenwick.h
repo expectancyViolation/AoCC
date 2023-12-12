@@ -10,6 +10,6 @@ void fenwick_add_zero_range(long *tree, int tree_size, int i, long val);
 void fenwick_add_range(long *tree, int tree_size, int lower, int upper,
                        long val);
 
-__attribute__((unused)) void test_fenwick();
+ void test_fenwick();
 
 #endif // AOCC_FENWICK_H

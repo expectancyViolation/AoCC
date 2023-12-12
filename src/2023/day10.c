@@ -56,7 +56,7 @@ struct day10_map *day10_map_initialize(const char *buf, long buf_len) {
   return map;
 }
 
-__attribute__((unused)) void day10_print_map(const struct day10_map *map) {
+ void day10_print_map(const struct day10_map *map) {
   printf("%s\n", map->buf);
   printf("%ld by %ld\n", map->x_extent, map->y_extent);
 }
@@ -157,7 +157,7 @@ long long signed_area(const LLTuple *t1, const LLTuple *t2, const LLTuple *t3) {
 }
 
 LLTuple year23_day10(char *buf, long buf_len) {
-  LLTuple res = {};
+  LLTuple res = {0};
   const struct day10_map *map = day10_map_initialize(buf, buf_len);
 
   // day10_print_map(map);

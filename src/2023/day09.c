@@ -30,8 +30,8 @@ LLTuple get_extrapolated_val(char *line) {
   res.right *= (-1);
   return res;
 }
-LLTuple year23_day09(char *buf, __attribute__((unused)) long buf_len) {
-  LLTuple day_res = {};
+LLTuple year23_day09(char *buf,  long buf_len) {
+  LLTuple day_res = {0};
   char **curr_pos = &buf;
   while (true) {
     char *const line = strsep(curr_pos, "\n");

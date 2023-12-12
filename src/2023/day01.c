@@ -47,8 +47,8 @@ static int get_last(const char *buffer, bool part2) {
   return 0;
 }
 
-LLTuple year23_day01(char *buf, __attribute__((unused)) long buf_len) {
-  LLTuple result = {};
+LLTuple year23_day01(char *buf,  long buf_len) {
+  LLTuple result = {0};
   char **buf_pos = &buf;
   while (*buf_pos != NULL) {
     char *line = strsep(buf_pos, "\n");

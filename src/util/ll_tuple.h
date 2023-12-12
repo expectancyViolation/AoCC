@@ -5,21 +5,21 @@
 #include <malloc.h>
 #include <string.h>
 
-typedef struct LLTuple {
+typedef struct _LLTuple {
   long long left;
   long long right;
 }LLTuple;
 
-__attribute__((unused)) void ll_tuple_copy(const LLTuple * to,LLTuple * from);
+ void ll_tuple_copy(const LLTuple * to,LLTuple * from);
 
 LLTuple ll_tuple_add(LLTuple res1,
                            LLTuple res2);
 
 int ll_tuple_compare(const LLTuple * l1,const LLTuple * l2);;
 
-__attribute__((unused)) int ll_tuple_compare_right_left(const LLTuple * l1,const LLTuple * l2);;
+ int ll_tuple_compare_right_left(const LLTuple * l1,const LLTuple * l2);;
 
-__attribute__((unused)) void print_tuple(LLTuple tup);
+ void print_tuple(LLTuple tup);
 
 
 #endif // AOCC_LL_TUPLE_H

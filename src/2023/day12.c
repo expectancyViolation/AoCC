@@ -1,6 +1,6 @@
 #include "day12.h"
 
-#define MAX_PATTERN_SIZE 200
+#define MAX_PATTERN_SIZE 10000
 
 typedef struct _TempBuff {
   long long buf[MAX_PATTERN_SIZE][MAX_PATTERN_SIZE];
@@ -52,16 +52,16 @@ void fill_target_pattern(char *nums, char *out_target_pattern) {
   *out_target_pattern = 0;
 }
 
-LLTuple year23_day12(char *buf, __attribute__((unused)) long buf_len) {
+LLTuple year23_day12(char *buf,  long buf_len) {
   LLTuple res = {0, 0};
-  TempBuff temp_buf = {};
+  TempBuff *temp_buf = malloc(sizeof(*temp_buf));
   char **curr_pos = &buf;
   while (true) {
-    char target_pattern[MAX_PATTERN_SIZE] = {};
-    char rec[MAX_PATTERN_SIZE] = {};
+    char target_pattern[MAX_PATTERN_SIZE] = {0};
+    char rec[MAX_PATTERN_SIZE] = {0};
 
     char *line = strsep(curr_pos, "\n");
-    if (*line == 0)
+    if ((line==NULL) || (*line == 0))
       break;
 
     char *record = strsep(&line, " ");
@@ -70,7 +70,7 @@ LLTuple year23_day12(char *buf, __attribute__((unused)) long buf_len) {
     // extend pattern
     const size_t pattern_len = strlen(target_pattern);
     assert((pattern_len + 1) * 5 < MAX_PATTERN_SIZE);
-    char extended_target_pattern[MAX_PATTERN_SIZE] = {};
+    char extended_target_pattern[MAX_PATTERN_SIZE] = {0};
     char *tar_pos = extended_target_pattern;
     for (int i = 0; i < 5; i++) {
       memcpy(tar_pos, target_pattern, pattern_len);
@@ -80,7 +80,7 @@ LLTuple year23_day12(char *buf, __attribute__((unused)) long buf_len) {
     // extend record
     const size_t rec_len = strlen(record);
     assert((rec_len + 1) * 5 < MAX_PATTERN_SIZE);
-    char extended_record[MAX_PATTERN_SIZE] = {};
+    char extended_record[MAX_PATTERN_SIZE] = {0};
     char *ext_pos = extended_record;
     for (int i = 0; i < 5; i++) {
       memcpy(ext_pos, record, rec_len);
@@ -96,9 +96,9 @@ LLTuple year23_day12(char *buf, __attribute__((unused)) long buf_len) {
     // end state
     extended_target_pattern[strlen(extended_target_pattern) - 1] = '.';
 
-    res.left += get_line_poss(record, target_pattern, &temp_buf);
+    res.left += get_line_poss(record, target_pattern, temp_buf);
     res.right +=
-        get_line_poss(extended_record, extended_target_pattern, &temp_buf);
+        get_line_poss(extended_record, extended_target_pattern, temp_buf);
   }
   return res;
 }

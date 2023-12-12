@@ -1,6 +1,7 @@
 #ifndef AOCC_AOC_SOLUTION_MANAGER_H
 #define AOCC_AOC_SOLUTION_MANAGER_H
 
+#ifdef SQLITE_AVAILABLE
 #include "result_db.h"
 typedef void *aoc_manager_handle;
 
@@ -17,7 +18,7 @@ typedef int submission_sanity_flag_array;
 
 aoc_manager_handle aoc_manager_init_manager(result_db_handle db_handle);
 
-__attribute__((unused)) void aoc_manager_close(aoc_manager_handle handle);
+ void aoc_manager_close(aoc_manager_handle handle);
 
 void aoc_manager_pull_day_status(aoc_manager_handle handle, int year, int day);
 
@@ -26,12 +27,12 @@ aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
                         enum AOC_DAY_PART part, AocPartRes guess,
                         AocSubmissionStatus *out_status);
 
-
-bool
-aoc_manager_validate_solution(aoc_manager_handle handle,int year,int day,enum AOC_DAY_PART part,AocPartRes guess);
+bool aoc_manager_validate_solution(aoc_manager_handle handle, int year, int day,
+                                   enum AOC_DAY_PART part, AocPartRes guess);
 
 bool aoc_manager_get_day_status(aoc_manager_handle handle, int year, int day,
                                 enum AOC_DAY_PART part,
                                 struct result_status **status);
 
+#endif // SQLITE_AVAILABLE
 #endif // AOCC_AOC_SOLUTION_MANAGER_H

@@ -19,6 +19,6 @@ char *get_input_url(int year, int day);
 char *get_status_url(int year, int day);
 char *format_answer_payload(enum AOC_DAY_PART part, const AocPartRes* guess);
 
-__attribute__((unused)) void test_aoc_parse();
+ void test_aoc_parse();
 
 #endif // AOCC_AOC_PARSE_H

@@ -43,6 +43,6 @@ AocDayRes year23_solver(const AocDayTask task) {
     printf("unsolved y:%d d:%d\n", task.year, task.day);
     assert(false);
   }
-  AocDayRes res = {};
+  AocDayRes res = {0};
   return res;
 }

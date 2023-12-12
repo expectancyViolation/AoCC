@@ -7,12 +7,18 @@
 
 #include "../../res/asprintf.c/asprintf.h"
 
+#ifdef CURL_AVAILABLE
 #include <curl/curl.h>
+#endif
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 
 // TODO: make this env variable
 #define INPUT_CACHE_DIR "/tmp/aoc"
@@ -111,6 +117,7 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb,
 char *get_session() { return getenv("AOC_SESSION"); }
 
 // TODO: cache cookie in struct?
+#ifdef CURL_AVAILABLE
 void set_session_cookie(CURL *curl, char *session) {
   char my_cookie[1000] = "adventofcode.com" /* Hostname */
       SEP "TRUE"                            /* Include subdomains */
@@ -123,16 +130,18 @@ void set_session_cookie(CURL *curl, char *session) {
   strcat(my_cookie, session);
   curl_easy_setopt(curl, CURLOPT_COOKIELIST, my_cookie);
 }
+#endif // CURL_AVAILABLE
 
 bool submit_answer(int year, int day, enum AOC_DAY_PART part,
                    const AocPartRes *guess, AocSubmissionStatus *out) {
+  bool parse_ok = false;
+#ifdef CURL_AVAILABLE
   CURL *curl;
   CURLcode curl_res;
   char *session = get_session();
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
   chunk.size = 0;
-  bool parse_ok = false;
   curl = curl_easy_init();
   if (curl) {
     set_session_cookie(curl, session);
@@ -160,11 +169,13 @@ bool submit_answer(int year, int day, enum AOC_DAY_PART part,
     free(post_fields);
   }
   free(chunk.memory);
+#endif // CURL_AVAILABLE
   return parse_ok;
 }
 
 // TODO: detect "please don't fetch..."?
 void fetch_day_input(int year, int day, char const *outfile) {
+#ifdef CURL_AVAILABLE
   CURL *curl;
   CURLcode res;
   char *session = get_session();
@@ -187,6 +198,7 @@ void fetch_day_input(int year, int day, char const *outfile) {
     fclose(f);
     curl_easy_cleanup(curl);
   }
+#endif // CURL_AVAILABLE
 }
 
 void fetch_day_input_cached(int year, int day, char const *filepath) {
@@ -198,10 +210,11 @@ void fetch_day_input_cached(int year, int day, char const *filepath) {
 }
 
 AocDayStatus fetch_day_status(int year, int day) {
+#ifdef CURL_AVAILABLE
   CURL *curl;
   CURLcode res;
   char *session = get_session();
-  AocDayStatus day_status = {};
+  AocDayStatus day_status = {0};
   struct MemoryStruct chunk;
   chunk.memory = malloc(1);
   chunk.size = 0;
@@ -209,7 +222,7 @@ AocDayStatus fetch_day_status(int year, int day) {
   if (curl) {
     set_session_cookie(curl, session);
     char *status_url = get_status_url(year, day);
-    printf("STATUS URL:%s\n",status_url);
+    printf("STATUS URL:%s\n", status_url);
     curl_easy_setopt(curl, CURLOPT_URL, status_url);
     free(status_url);
 
@@ -228,7 +241,8 @@ AocDayStatus fetch_day_status(int year, int day) {
     curl_easy_cleanup(curl);
     return day_status;
   }
-  AocDayStatus empty = {};
+#endif // CURL_AVAILABLE
+  AocDayStatus empty = {0};
   return empty;
 }
 

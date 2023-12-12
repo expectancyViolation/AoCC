@@ -79,7 +79,7 @@ static void parse_seeds_p2(char *line, struct Day05Range **vec) {
 // merge contiguous intervals
 static void merge_seed_arr(struct Day05Range **v, struct Day05Range **out) {
   qsort(*v, cvector_size(*v), sizeof(struct Day05Range),
-        (__compar_fn_t)range_compare_lex);
+        (__compar_fn_t) range_compare_lex);
   struct Day05Range temp_range;
   temp_range.begin = (*v)[0].begin;
   temp_range.end = (*v)[0].end;
@@ -209,7 +209,7 @@ static long long solve_mappings(void parse(char *line, struct Day05Range **vec),
 }
 
 AocDayRes solve_year23_day05(const char *input_file) {
-  LLTuple res = {};
+  LLTuple res = {0};
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   const size_t input_size = filesize * sizeof(char);

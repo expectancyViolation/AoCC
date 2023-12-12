@@ -2,13 +2,26 @@
 cmake_minimum_required(VERSION 3.16)
 project(aocc C)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 set(CMAKE_C_STANDARD 11)
 
 
-find_package(CURL REQUIRED)
+find_package(CURL)
 
-find_package(SQLite3 REQUIRED)
+if (CURL_FOUND)
+    add_compile_definitions(CURL_AVAILABLE)
+endif ()
+
+find_package(SQLite3)
+
+if (SQLite3_FOUND)
+    add_compile_definitions(SQLITE_AVAILABLE)
+endif ()
+
+if (WIN32)
+    add_compile_definitions(_AMD64_)
+endif ()
+
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -51,6 +64,12 @@ add_executable(aocc
         src/2023/day12.c
 )
 
-target_link_libraries(aocc m)
-target_link_libraries(aocc CURL::libcurl)
-target_link_libraries(aocc SQLite::SQLite3)
+if (NOT WIN32)
+    target_link_libraries(aocc m)
+endif ()
+if (CURL_FOUND)
+    target_link_libraries(aocc CURL::libcurl)
+endif ()
+if (SQLite3_FOUND)
+    target_link_libraries(aocc SQLite::SQLite3)
+endif ()
