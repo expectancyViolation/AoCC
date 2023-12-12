@@ -48,6 +48,7 @@ add_executable(aocc
         src/2023/day11.c
         src/2023/year23.c
         src/util/aoc_types.c
+        src/2023/day12.c
 )
 
 target_link_libraries(aocc m)

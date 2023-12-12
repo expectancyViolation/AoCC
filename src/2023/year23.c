@@ -10,6 +10,7 @@
 #include "day09.h"
 #include "day10.h"
 #include "day11.h"
+#include "day12.h"
 
 AocDayRes year23_solver(const AocDayTask task) {
   const char *file = task.input_file;
@@ -36,6 +37,8 @@ AocDayRes year23_solver(const AocDayTask task) {
     return solve_year23_day10(file);
   case 11:
     return solve_year23_day11(file);
+  case 12:
+    return solve_year23_day12(file);
   default:
     printf("unsolved y:%d d:%d\n", task.year, task.day);
     assert(false);

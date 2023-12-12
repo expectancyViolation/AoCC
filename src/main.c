@@ -5,13 +5,14 @@
 
 #include "2022/year22.h"
 #include "2023/day11.h"
+#include "2023/day12.h"
 #include "2023/year23.h"
 #include "util/aoc.h"
 #include "util/aoc_solution_manager.h"
 #include "util/result_db.h"
 #include "util/timer.h"
 
-#define CURRENT_DAY 11
+#define CURRENT_DAY 12
 
 #define CHECKMARK(x) ((x) ? ("✅") : ("❌"))
 
@@ -98,29 +99,32 @@ void submit_helper(aoc_manager_handle manager_handle, int year, int day,
 }
 
 void solve_current_day(aoc_manager_handle manager_handle) {
-  const int current_day = 11;
+  const int current_day = 12;
   const int current_year = 2023;
-  char const *file = "/tmp/day11_bigboy.txt";
+  char const *file = "/tmp/day12___.txt";
   fetch_day_input_cached(current_year, current_day, file);
-  const AocDayRes res = solve_year23_day11(file);
+  const AocDayRes res = solve_year23_day12(file);
   print_aoc_day_result(&res);
+  struct result_status stat={};
+  aoc_manager_get_day_status(manager_handle,current_year,current_day,AOC_DAY_PART_part2,&stat);
+  print_result_status(&stat);
 
   // part 1
-  // submit_helper(manager_handle, current_year, current_day,
-  // AOC_DAY_PART_part1,
-  //              res.part1_res);
+   submit_helper(manager_handle, current_year, current_day,
+   AOC_DAY_PART_part1,
+                res.part1_res);
 
   // part 2
-  // submit_helper(manager_handle, current_year, current_day,
-  // AOC_DAY_PART_part2,
-  //              res.part2_res);
+   submit_helper(manager_handle, current_year, current_day,
+   AOC_DAY_PART_part2,
+                res.part2_res);
 }
 
 int main() {
   curl_global_init(CURL_GLOBAL_ALL);
   result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
-//  solve_current_day(manager_handle);
+  //solve_current_day(manager_handle);
 
 //    AocDayTask task = {
 //        .year = 2023, .day = 11, .input_file = "/tmp/day11_bigboy.txt"};
