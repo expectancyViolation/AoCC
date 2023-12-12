@@ -11,8 +11,7 @@
 
 // #define DAY04_UNSAFE_PARALLEL
 
- static void parse_winning(char *line,
-                                                  char *winning_numbers) {
+static void parse_winning(char *line, char *winning_numbers) {
   while (line != NULL) {
     const long win_num = strtol(line, &line, 10);
     if (win_num == 0)
@@ -31,8 +30,7 @@ static void parse_winning_brittle(char *line, char *winning_numbers) {
   }
 }
 
- static int count_matches(char *ticket,
-                                                 const char *winning_numbers) {
+static int count_matches(char *ticket, const char *winning_numbers) {
 
   int curr_matches = 0;
   while (true) {

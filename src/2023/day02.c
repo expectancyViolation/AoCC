@@ -7,31 +7,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-typedef struct Draw {
+typedef struct _Draw {
   int red;
   int green;
   int blue;
 } Draw;
-static const struct Draw EMPTY_DRAW;
+static const Draw EMPTY_DRAW;
 
-static bool draw_is_leq(const struct Draw *draw1, const struct Draw *draw2) {
+static bool draw_is_leq(const Draw *draw1, const Draw *draw2) {
   return (draw1->red <= draw2->red) && (draw1->green <= draw2->green) &&
          (draw1->blue <= draw2->blue);
 }
 
-static void draw_set_max(struct Draw *draw_to_set, const struct Draw *draw_other) {
+static void draw_set_max(Draw *draw_to_set,
+                         const Draw *draw_other) {
   draw_to_set->red = max(draw_to_set->red, draw_other->red);
   draw_to_set->green = max(draw_to_set->green, draw_other->green);
   draw_to_set->blue = max(draw_to_set->blue, draw_other->blue);
 }
 
- static void print_draw(const struct Draw *draw_) {
+static void print_draw(const Draw *draw_) {
   printf("----\ndraw:\n r = %d\n g = %d\n b = %d\n", draw_->red, draw_->green,
          draw_->blue);
 }
 
-static int draw_power(const struct Draw *draw_) {
+static int draw_power(const Draw *draw_) {
   return (draw_->red) * (draw_->blue) * (draw_->green);
 }
 
@@ -40,7 +40,7 @@ static void advance_space(char **buf_pos) {
     ++*buf_pos;
 }
 
-static void get_next_draw(char **buf_pos, struct Draw *next_draw) {
+static void get_next_draw(char **buf_pos, Draw *next_draw) {
   *next_draw = EMPTY_DRAW;
   char *draw = strsep(buf_pos, ";");
   char **draw_pos = &draw;
@@ -72,8 +72,8 @@ static long parse_game_id(char **buf_pos) {
 }
 
 static void get_required_draw(char *buf, long *game_id_out,
-                       struct Draw *required_draw_out) {
-  struct Draw current_draw;
+                              Draw *required_draw_out) {
+  Draw current_draw;
   char **buf_pos = &buf;
   *game_id_out = parse_game_id(buf_pos);
   while (*buf_pos != NULL) {
@@ -81,10 +81,10 @@ static void get_required_draw(char *buf, long *game_id_out,
     draw_set_max(required_draw_out, &current_draw);
   }
 }
-LLTuple year23_day02(char *buf,  long buf_len) {
-  LLTuple result={0};
-  struct Draw draw_limit = {12, 13, 14};
-  struct Draw required_draw;
+LLTuple year23_day02(char *buf, long buf_len) {
+  LLTuple result = {0};
+  Draw draw_limit = {12, 13, 14};
+  Draw required_draw;
 
   long game_id = -1;
   char **buf_pos = &buf;

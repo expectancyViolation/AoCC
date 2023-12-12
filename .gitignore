@@ -5,3 +5,5 @@ cmake-build-release-wsl
 a.out
 /cmake-build-debug-esp/
 /cmake-build-release-mingw/
+/cmake-build-release-visual-studio/
+/cmake-build-debug-visual-studio/

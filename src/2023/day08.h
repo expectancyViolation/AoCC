@@ -6,8 +6,7 @@
 
 #define KEY_LEN 3
 
-LLTuple year23_day08(char *buf,
-                long buf_len);
+LLTuple year23_day08(char *buf, long buf_len);
 
 AocDayRes solve_year23_day08(const char *input_file);
 

@@ -29,7 +29,7 @@ typedef struct AocDayStatus {
   AocPartStatus part2_status;
 } AocDayStatus;
 
-typedef struct AocSubmissionStatus {
+typedef struct _AocSubmissionStatus {
   bool was_checked;
   bool correct;
   bool too_low;
@@ -66,5 +66,20 @@ typedef struct _AocDayRes {
 } AocDayRes;
 
 AocDayRes aoc_day_res_from_tuple(const LLTuple* tup);
+
+typedef struct AocBenchmarkDay {
+  AocDayTask task;
+  AocDayRes result;
+  double solve_duration;
+} AocBenchmarkDay;
+
+typedef AocDayRes (*aoc_solver)(const AocDayTask task);
+
+void print_aoc_day_status(const AocDayStatus *status);
+void print_aoc_submission_status(const AocSubmissionStatus *status);
+void print_aoc_day_task(const AocDayTask *task);
+void print_aoc_part_res(const AocPartRes *res);
+void print_aoc_day_result(const AocDayRes *result);
+void print_day_benchmark(const AocBenchmarkDay *res);
 
 #endif // AOCC_AOC_TYPES_H

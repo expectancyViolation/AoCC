@@ -1,7 +1,6 @@
 #ifndef AOCC_AOC_SOLUTION_MANAGER_H
 #define AOCC_AOC_SOLUTION_MANAGER_H
 
-#ifdef SQLITE_AVAILABLE
 #include "result_db.h"
 typedef void *aoc_manager_handle;
 
@@ -32,7 +31,6 @@ bool aoc_manager_validate_solution(aoc_manager_handle handle, int year, int day,
 
 bool aoc_manager_get_day_status(aoc_manager_handle handle, int year, int day,
                                 enum AOC_DAY_PART part,
-                                struct result_status **status);
+                                ResultStatus **status);
 
-#endif // SQLITE_AVAILABLE
 #endif // AOCC_AOC_SOLUTION_MANAGER_H

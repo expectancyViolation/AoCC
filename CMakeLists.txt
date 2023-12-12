@@ -2,7 +2,9 @@
 cmake_minimum_required(VERSION 3.16)
 project(aocc C)
 
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+if (NOT WIN32)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+endif ()
 set(CMAKE_C_STANDARD 11)
 
 
@@ -16,7 +18,12 @@ find_package(SQLite3)
 
 if (SQLite3_FOUND)
     add_compile_definitions(SQLITE_AVAILABLE)
+    #add_compile_definitions(DB_USE_SQLITE)
+else ()
+    #add_compile_definitions(DB_USE_IN_MEMORY)
 endif ()
+
+add_compile_definitions(DB_USE_IN_MEMORY)
 
 if (WIN32)
     add_compile_definitions(_AMD64_)
@@ -38,7 +45,7 @@ add_executable(aocc
         src/main.c
         src/util/helpers.c
         src/util/timer.c
-        src/util/result_db.c
+        src/util/result_db_sqlite.c
         src/util/aoc_solution_manager.c
         src/util/ll_tuple.c
         src/util/aoc_parse.c
@@ -62,6 +69,11 @@ add_executable(aocc
         src/2023/year23.c
         src/util/aoc_types.c
         src/2023/day12.c
+        src/util/aoc_solving.c
+        src/util/aoc_solving.h
+        src/util/result_status.c
+        src/util/result_status.h
+        src/util/result_db_in_memory.c
 )
 
 if (NOT WIN32)

@@ -43,7 +43,7 @@ void parse_nodes(char *buf, struct node *nodes, size_t **start_positions) {
       cvector_push_back(*start_positions, curr_node - nodes);
   }
 }
-LLTuple year23_day08(char *buf,  long buf_len) {
+LLTuple year23_day08(char *buf, long buf_len) {
   LLTuple day_res = {0};
 
   struct node nodes[26 * 26 * 26]; // 26**KEY_LEN   no constexpr in C :(

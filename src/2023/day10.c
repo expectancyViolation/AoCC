@@ -56,7 +56,7 @@ struct day10_map *day10_map_initialize(const char *buf, long buf_len) {
   return map;
 }
 
- void day10_print_map(const struct day10_map *map) {
+void day10_print_map(const struct day10_map *map) {
   printf("%s\n", map->buf);
   printf("%ld by %ld\n", map->x_extent, map->y_extent);
 }

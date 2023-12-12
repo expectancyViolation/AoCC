@@ -3,15 +3,17 @@
 LLTuple parallelize(LLTuple (*solve)(char *, long),
                     LLTuple (*reduce_partial_result)(LLTuple, LLTuple),
                     char *const input_buffer, long filesize, int overlap) {
-  struct _LLTuple result;
+  struct _LLTuple result={0,0};
   const char *file_end = input_buffer + filesize - 1;
   const int n_chunks = PARALLEL_LOOP_COUNT;
   const long chunk_size = filesize / n_chunks;
+  // #ifndef WIN32
+  // #endif
 #ifndef WIN32
 #pragma omp parallel for
 #endif
   for (int i = 0; i < n_chunks; ++i) {
-    LLTuple partial_res;
+    LLTuple partial_res = {0,0};
     const long begin_pos = chunk_size * i;
     const long end_pos = min(chunk_size * (i + 1), filesize - 1);
     char *begin_pointer = input_buffer + begin_pos;
@@ -22,6 +24,8 @@ LLTuple parallelize(LLTuple (*solve)(char *, long),
                                 &begin_pointer, &end_pointer);
     if (!is_first_segment)
       ++begin_pointer;
+    //assert(*begin_pointer=='n');
+    //assert(*end_pointer=='n');
 #ifdef PARALLELIZE_RUN_ON_COPY
     // operate on a copy to prevent "strsep" etc. to mess stuff up:
     // TODO: how does this affect performance

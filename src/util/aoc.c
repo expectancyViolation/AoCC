@@ -25,59 +25,11 @@
 
 #define SEP "\t" /* Tab separates the fields */
 
+
 char *get_input_file_path(int year, int day) {
   char *res;
   asprintf(&res, "%s/%d/day%02d_input.txt", INPUT_CACHE_DIR, year, day);
   return res;
-}
-void print_aoc_day_status(const AocDayStatus *status) {
-  printf("day status:\n"
-         "\tpart1:%20s (%d)\n"
-         "\tpart2:%20s (%d)\n",
-         status->part1_status.part_solution, status->part1_status.part_solved,
-         status->part2_status.part_solution, status->part1_status.part_solved);
-}
-
-void print_aoc_submission_status(const AocSubmissionStatus *status) {
-  printf("submission status:\n"
-         "\twas checked:%d\n"
-         "\tcorrect:%d\n"
-         "\ttoo_low:%d\n"
-         "\ttoo_high:%d\n",
-         status->was_checked, status->correct, status->too_low,
-         status->too_high);
-}
-
-void print_aoc_day_task(const AocDayTask *task) {
-  printf("task:\n\tyear:\t%30d\n\tday:\t%30d\n\tfile:\t%30s\n", task->year,
-         task->day, task->input_file);
-}
-
-void print_aoc_part_res(const AocPartRes *res) {
-  switch (res->type) {
-  case AOC_PART_RES_TYPE_llong:
-    printf("%30lld", res->res_ll);
-    return;
-  case AOC_PART_RES_TYPE_string:
-    printf("%30s", res->res_string);
-    return;
-  }
-}
-
-void print_aoc_day_result(const AocDayRes *result) {
-  printf("result:\n\tpart1:");
-  print_aoc_part_res(&(result->part1_res));
-  printf("\n\tpart2:");
-  print_aoc_part_res(&(result->part2_res));
-  printf("\n");
-}
-
-void print_day_benchmark(const AocBenchmarkDay *res) {
-  printf("--------------\n");
-  printf("benchmark:\n");
-  print_aoc_day_task(&res->task);
-  print_aoc_day_result(&res->result);
-  printf("took:%f\n\n", res->solve_duration);
 }
 
 AocBenchmarkDay benchmark_day(aoc_solver fun, AocDayTask task) {

@@ -76,7 +76,7 @@ void run_all_days(aoc_manager_handle manager, int year) {
 void test_submission(aoc_manager_handle manager_handle) {
   enum AOC_DAY_PART parts[] = {AOC_DAY_PART_part1, AOC_DAY_PART_part2};
   const int year = 2017;
-  struct result_status *status = NULL;
+  ResultStatus *status = NULL;
   for (int day = 1; day < 5; day++) {
     for (int i = 0; i < 2; i++) {
       aoc_manager_get_day_status(manager_handle, year, day, parts[i], &status);
@@ -109,10 +109,10 @@ void solve_current_day(aoc_manager_handle manager_handle) {
   fetch_day_input_cached(current_year, current_day, file);
   const AocDayRes res = solve_year23_day12(file);
   print_aoc_day_result(&res);
-  struct result_status stat = {0};
+  ResultStatus* stat=NULL;
   aoc_manager_get_day_status(manager_handle, current_year, current_day,
                              AOC_DAY_PART_part2, &stat);
-  print_result_status(&stat);
+  print_result_status(stat);
 
   // part 1
   submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
@@ -126,21 +126,22 @@ void solve_current_day(aoc_manager_handle manager_handle) {
 #endif // SQLITE_AVAILABLE
 
 int main() {
+  /*
   curl_global_init(CURL_GLOBAL_ALL);
   result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
-  aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
-  solve_current_day(manager_handle);
+  aoc_manager_handle manager_handle = aoc_manager_init_manager(db);*/
+  //solve_current_day(manager_handle);
 
   AocDayTask task = {
       .year = 2023, .day = 12, .input_file = "/tmp/aoc/2023/day12_input.txt"};
 
-  AocDayTask taskbb1 = {
-      .year = 2023, .day = 12, .input_file = "/tmp/aoc/day12_bigboy1.txt"};
+//  AocDayTask taskbb1 = {
+//      .year = 2023, .day = 12, .input_file = "/tmp/aoc/day12_bigboy1.txt"};
 
   AocDayTask taskbb2 = {
       .year = 2023, .day = 12, .input_file = "/tmp/aoc/day12_bigboy2.txt"};
-  AocDayTask tasks[]={task,taskbb1,taskbb2};
-  for(int i=0;i<3;i++){
+  AocDayTask tasks[]={task,taskbb2};
+  for(int i=0;i<2;i++){
     AocBenchmarkDay bench = benchmark_day(master_solver, (tasks[i]));
     print_day_benchmark(&bench);
   }
@@ -152,6 +153,9 @@ int main() {
   //    print_day_benchmark(&benchbb);
   //   run_all_days(manager_handle, 2023);
 
+  /*
   curl_global_cleanup();
   result_db_close(db);
+   */
+  return 0;
 }

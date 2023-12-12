@@ -85,7 +85,7 @@ bool parse_submission_status(char *raw_response, AocSubmissionStatus *out) {
 
  void test_aoc_parse() {
   char *buff;
-  struct AocSubmissionStatus status = {0};
+  AocSubmissionStatus status = {0};
   read_file_to_memory("/tmp/aoc/cache/submit/response_19744.txt", &buff, false);
 
   parse_submission_status(buff, &status);

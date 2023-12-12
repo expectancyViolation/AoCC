@@ -47,7 +47,7 @@ static int get_last(const char *buffer, bool part2) {
   return 0;
 }
 
-LLTuple year23_day01(char *buf,  long buf_len) {
+LLTuple year23_day01(char *buf, long buf_len) {
   LLTuple result = {0};
   char **buf_pos = &buf;
   while (*buf_pos != NULL) {
@@ -62,6 +62,7 @@ AocDayRes solve_year23_day01(const char *input_file) {
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
   LLTuple res =
       parallelize(year23_day01, ll_tuple_add, input_buffer, filesize, 0);
+
   AocDayRes day_res = aoc_day_res_from_tuple(&res);
   free(input_buffer);
   return day_res;

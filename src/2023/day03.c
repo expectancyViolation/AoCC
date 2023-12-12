@@ -30,19 +30,18 @@ static bool is_adjacent_to_symbol(char *segment_begin, const char *segment_end,
   return result;
 }
 
-typedef struct GearMatch {
+typedef struct _GearMatch {
   char *pos;
   long num;
 } GearMatch;
 
-static int compare_gear_match(struct GearMatch *m1, struct GearMatch *m2) {
+static int compare_gear_match(GearMatch *m1, GearMatch *m2) {
   return ((m1->pos) > (m2->pos)) - ((m1->pos) < (m2->pos));
 }
 
 static void day03_mark_gears(char *segment_begin, const char *segment_end,
-                             long line_length, long value,
-                             struct GearMatch **vec) {
-  struct GearMatch match;
+                             long line_length, long value, GearMatch **vec) {
+  GearMatch match;
   match.num = value;
   for (int i = -1; i < 2; i++) {
     const long offset = i * line_length;
@@ -68,7 +67,7 @@ LLTuple year23_day03(char *buf, long buf_len) {
   char *safe_segment_end = buf + buf_len - 1 * line_length;
 
   // vector of matches
-  struct GearMatch *v = NULL;
+  GearMatch *v = NULL;
 
   int curr_number;
   while (true) {
@@ -95,14 +94,14 @@ LLTuple year23_day03(char *buf, long buf_len) {
     curr_number_pos = curr_number_end;
   }
 
-  qsort(v, cvector_size(v), sizeof(struct GearMatch),
+  qsort(v, cvector_size(v), sizeof(GearMatch),
         (__compar_fn_t)compare_gear_match);
 
   char *prev_pos = NULL;
   int curr_count = 0;
   long curr_prod = 1;
   if (v) {
-    struct GearMatch *it;
+    GearMatch *it;
     for (it = cvector_begin(v); it != cvector_end(v); ++it) {
       char *const curr_pos = it->pos;
       if (curr_pos != prev_pos) {

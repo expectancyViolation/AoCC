@@ -119,7 +119,7 @@ void parse_hand(char *line, struct hand *out) {
   }
 }
 
-LLTuple year23_day07(char *buf,  long buf_len) {
+LLTuple year23_day07(char *buf, long buf_len) {
   LLTuple day_res = {0};
 
   struct hand curr_hand;
