@@ -154,7 +154,6 @@ void fetch_day_input(int year, int day, char const *outfile) {
 }
 
 void fetch_day_input_cached(int year, int day, char const *filepath) {
-  printf("%s\n", filepath);
   if (access(filepath, F_OK) != 0) {
     printf("%s not found. fetching...", filepath);
     fetch_day_input(year, day, filepath);

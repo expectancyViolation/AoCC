@@ -37,7 +37,6 @@ void generate_tasks(AocDayTask **tasks, int year) {
   }
 }
 
-
 bool validate_day_result(aoc_manager_handle manager, const AocDayRes *result,
                          const AocDayTask *task) {
   bool part1_correct = aoc_manager_validate_solution(
@@ -45,11 +44,11 @@ bool validate_day_result(aoc_manager_handle manager, const AocDayRes *result,
   bool part2_correct = aoc_manager_validate_solution(
       manager, task->year, task->day, AOC_DAY_PART_part2, result->part2_res);
   bool part1_no_guess = (result->part1_res.type == AOC_PART_RES_TYPE_none);
-  char *part1_symbol = part1_no_guess ? "no guess" : CHECKMARK(part1_correct);
+  char *part1_symbol = part1_no_guess ? "❓" : CHECKMARK(part1_correct);
   bool part2_no_guess = (result->part2_res.type == AOC_PART_RES_TYPE_none);
-  char *part2_symbol = part2_no_guess ? "no guess" : CHECKMARK(part1_correct);
+  char *part2_symbol = part2_no_guess ? "❓" : CHECKMARK(part1_correct);
   printf("P1:%5s\tP2:%5s\n", part1_symbol, part2_symbol);
-  return part1_correct + part2_correct;
+  return !(part1_no_guess && part2_no_guess);
 }
 
 void run_all_days(aoc_manager_handle manager, int year) {
@@ -69,8 +68,12 @@ void run_all_days(aoc_manager_handle manager, int year) {
     const AocBenchmarkDay result = results[i];
     const AocDayTask task = tasks[i];
     printf("-------\n");
-    print_day_benchmark(&results[i]);
-    bool both_correct = validate_day_result(manager, &(result.result), &task);
+    printf("DAY %2d:\n",task.day);
+    bool made_guess = validate_day_result(manager, &(result.result), &task);
+    if (made_guess) {
+      //print_day_benchmark(&results[i]);
+      printf("took:%f\n\n", results[i].solve_duration);
+    }
   }
   free(results);
 }
@@ -127,21 +130,24 @@ void solve_current_day(aoc_manager_handle manager_handle) {
   //                res.part2_res);
 }
 
-
 int main() {
   // benchmark(result_db_test);
-  //curl_global_init(CURL_GLOBAL_ALL);
-  //result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
-  //aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
+  curl_global_init(CURL_GLOBAL_ALL);
+  result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
+  aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
   //  solve_current_day(manager_handle);
 
-  AocDayTask task_bb = {
-      .year = 2023, .day = 12, .input_file = "/tmp/aoc/2023/day12_input.txt"};
-  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-  print_day_benchmark(&benchbb);
-  //  run_all_days(manager_handle, 2023);
+  // char * filepath="/tmp/aoc/2023/day13_input.txt";
 
-  //curl_global_cleanup();
-  //result_db_close(db);
+  //  char * filepath="/tmp/d13_ex1.txt";
+  //
+  //  AocDayTask task_bb = {
+  //      .year = 2023, .day = 13, .input_file = filepath};
+  //  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+  //  print_day_benchmark(&benchbb);
+  run_all_days(manager_handle, 2023);
+
+  curl_global_cleanup();
+  result_db_close(db);
   return 0;
 }

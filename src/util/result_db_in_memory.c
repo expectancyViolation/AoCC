@@ -118,6 +118,7 @@ bool result_status_store_entry(result_db_handle handle,
   return true;
 }
 
+// TODO: this is a db_test (not just a "in memory db test")
 void result_db_test() {
   result_db_handle handle = result_db_init_db("dummy");
   const int test_year = 2009;
