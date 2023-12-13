@@ -7,6 +7,9 @@
 
 #define AOC_SOL_MAX_LEN 100
 
+// TODO: DANGER: this has to be zero, so that we can reduce over it!
+#define AOC_LLONG_NO_ANSWER 0
+
 typedef enum AOC_DAY_PART {
   AOC_DAY_PART_undefined = 0,
   AOC_DAY_PART_part1 = 1,
@@ -14,10 +17,9 @@ typedef enum AOC_DAY_PART {
 } AOC_DAY_PART;
 
 // TODO: do we _really_ need this?
-//extern AOC_DAY_PART AOC_DAY_PART_BOTH_PARTS[2];
+// extern AOC_DAY_PART AOC_DAY_PART_BOTH_PARTS[2];
 //
-//#define NUM_AOC_DAY_PART_BOTH_PARTS (2)
-
+// #define NUM_AOC_DAY_PART_BOTH_PARTS (2)
 
 typedef struct AocPartStatus {
   bool part_solved;
@@ -43,9 +45,13 @@ typedef struct AocDayTask {
   char *input_file;
 } AocDayTask;
 
-enum AOC_PART_RES_TYPE { AOC_PART_RES_TYPE_llong, AOC_PART_RES_TYPE_string };
+enum AOC_PART_RES_TYPE {
+  AOC_PART_RES_TYPE_none,
+  AOC_PART_RES_TYPE_llong,
+  AOC_PART_RES_TYPE_string
+};
 
-#define NUM_AOC_PART_RES_TYPE (2);
+#define NUM_AOC_PART_RES_TYPE (3);
 
 typedef struct AocPartRes {
   enum AOC_PART_RES_TYPE type;
@@ -65,7 +71,7 @@ typedef struct _AocDayRes {
   AocPartRes part2_res;
 } AocDayRes;
 
-AocDayRes aoc_day_res_from_tuple(const LLTuple* tup);
+AocDayRes aoc_day_res_from_tuple(const LLTuple *tup);
 
 typedef struct AocBenchmarkDay {
   AocDayTask task;

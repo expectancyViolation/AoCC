@@ -8,12 +8,12 @@
 #include <assert.h>
 #include <sqlite3.h>
 
-typedef struct _DbHandleData {
+typedef struct _DbHandleDataInMemory {
   sqlite3 *db;
-} DbHandleData;
+} DbHandleDataInMemory;
 
-DbHandleData *db_handle_deref_handle(aoc_manager_handle handle) {
-  return (DbHandleData *)handle;
+DbHandleDataInMemory *db_handle_deref_handle(result_db_handle handle) {
+  return (DbHandleDataInMemory *)handle;
 }
 
 const char *kv_create_query =
@@ -21,7 +21,7 @@ const char *kv_create_query =
     "varchar(1023) PRIMARY KEY, value varchar(1023));";
 
 result_db_handle result_db_init_db(char *db_file) {
-  DbHandleData *handle_data = NULL;
+  DbHandleDataInMemory *handle_data = NULL;
   sqlite3 *db;
   int rc;
   rc = sqlite3_open(db_file, &db);
@@ -40,10 +40,11 @@ result_db_handle result_db_init_db(char *db_file) {
 }
 
 void result_db_close(result_db_handle handle) {
-  DbHandleData *handle_data = db_handle_deref_handle(handle);
+  DbHandleDataInMemory *handle_data = db_handle_deref_handle(handle);
   if (handle_data != NULL) {
     printf("close:%d\n", sqlite3_close(handle_data->db));
   }
+  free(handle_data);
 }
 
 // TODO: raw SQL 🤢
@@ -81,7 +82,7 @@ char *get_insert_query(const char *key, const char *value, bool overwrite) {
 bool result_status_load_entry(result_db_handle handle, int year, int day,
                               enum AOC_DAY_PART part, ResultStatus **out) {
   *out = NULL;
-  DbHandleData *handle_data = db_handle_deref_handle(handle);
+  DbHandleDataInMemory *handle_data = db_handle_deref_handle(handle);
   const char *key = result_status_combine_id(year, day, part);
   const char *query = get_select_query(key);
   char *errmsg = NULL;
@@ -99,7 +100,7 @@ bool result_status_load_entry(result_db_handle handle, int year, int day,
 
 bool result_status_store_entry(result_db_handle handle,
                                const ResultStatus *status, bool overwrite) {
-  DbHandleData *handle_data = db_handle_deref_handle(handle);
+  DbHandleDataInMemory *handle_data = db_handle_deref_handle(handle);
   char *key = result_status_get_id(status);
   char *value = encode_result_status(status);
   char *query = get_insert_query(key, value, overwrite);

@@ -25,7 +25,7 @@ void handle_pulled_part_status(result_db_handle db_handle, int year, int day,
                                enum AOC_DAY_PART day_part,
                                const AocPartStatus *part_status) {
   ResultStatus res_status;
-  result_db_initialize_result_status(&res_status);
+  result_status_init(&res_status);
   res_status.year = year;
   res_status.day = day;
   res_status.part = day_part;
@@ -107,6 +107,11 @@ aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
 bool aoc_manager_validate_solution(aoc_manager_handle handle, int year, int day,
                                    enum AOC_DAY_PART part,
                                    const AocPartRes guess) {
+  // do not fetch if guess is invalid
+  // TODO is this the right place for business logic?
+  if (guess.type == AOC_PART_RES_TYPE_none)
+    return false;
+
   // first try to validate via site
   ResultStatus *read_status = NULL;
   aoc_manager_get_day_status(handle, year, day, part, &read_status);

@@ -22,8 +22,10 @@ void format_aoc_part_res(const AocPartRes *res, char *out) {
   }
 }
 AocPartRes aoc_part_res_from_llong(long long int val) {
-  AocPartRes res = {.type = AOC_PART_RES_TYPE_llong, .res_ll = val};
-  return res;
+  if (val == AOC_LLONG_NO_ANSWER) {
+    return (AocPartRes){.type = AOC_PART_RES_TYPE_none};
+  }
+  return (AocPartRes){.type = AOC_PART_RES_TYPE_llong, .res_ll = val};
 }
 AocDayRes aoc_day_res_from_tuple(const LLTuple *tup) {
   const AocDayRes result = {.part1_res = aoc_part_res_from_llong(tup->left),
@@ -74,7 +76,6 @@ void print_aoc_day_result(const AocDayRes *result) {
 }
 
 void print_day_benchmark(const AocBenchmarkDay *res) {
-  printf("--------------\n");
   printf("benchmark:\n");
   print_aoc_day_task(&res->task);
   print_aoc_day_result(&res->result);

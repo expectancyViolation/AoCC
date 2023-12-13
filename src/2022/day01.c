@@ -1,6 +1,6 @@
 #include "day01.h"
 LLTuple year22_day01(char *buf, long buf_len) {
-  LLTuple result = {0};
+  LLTuple result = {AOC_LLONG_NO_ANSWER,AOC_LLONG_NO_ANSWER};
   char **buf_pos = &buf;
   long long curr = 0;
   long long res[4] = {0, 0, 0, 0};

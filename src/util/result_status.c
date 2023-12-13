@@ -25,7 +25,8 @@ void print_result_status(const ResultStatus *status) {
       printf("\tsolution:    %10s\n", status->string_solution);
       break;
     default:
-      assert(false);
+      printf("DANGER:undefined solution type!");
+      //assert(false);
     }
   } else {
     printf("\tno solution so far :(\n");
@@ -81,7 +82,7 @@ char *result_status_get_id(const ResultStatus *status) {
   return result_status_combine_id(status->year, status->day, status->part);
 };
 
-void result_db_initialize_result_status(ResultStatus *status) {
+void result_status_init(ResultStatus *status) {
   memset(status, 0, sizeof(*status));
   status->year = 2023;
   status->day = -1;

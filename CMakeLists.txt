@@ -42,6 +42,7 @@ add_executable(aocc
         res/b64.c/encode.c
         res/b64.c/decode.c
         res/asprintf.c/asprintf.c
+        res/hashmap.c/hashmap.c
         src/main.c
         src/util/helpers.c
         src/util/timer.c
@@ -54,7 +55,7 @@ add_executable(aocc
         src/util/fenwick.c
         src/2022/year22.c
         src/2022/day01.c
-        src/2022/day01.h
+        src/2022/day02.c
         src/2023/day01.c
         src/2023/day02.c
         src/2023/day03.c

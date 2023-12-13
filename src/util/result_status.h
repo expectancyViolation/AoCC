@@ -34,13 +34,11 @@ typedef struct _ResultStatus {
 } ResultStatus;
 
 void print_solution_type(enum SOLUTION_TYPE sol);
-
 void print_result_status(const ResultStatus *status);
-
 
 char *result_status_combine_id(int year, int day, enum AOC_DAY_PART part);
 char *result_status_get_id(const ResultStatus *status);
-void result_db_initialize_result_status(ResultStatus *status);
+void result_status_init(ResultStatus *status);
 
 ResultStatus *decode_result_status(char *b64_string);
 char *encode_result_status(const ResultStatus *status);

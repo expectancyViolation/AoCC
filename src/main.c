@@ -1,22 +1,20 @@
 #ifdef CURL_AVAILABLE
 #include <curl/curl.h>
 #endif
-// #include <unistd.h>
 
 #include "2022/day01.h"
 
+#include "2022/day02.h"
 #include "2022/year22.h"
-#include "2023/day11.h"
-#include "2023/day12.h"
 #include "2023/year23.h"
 #include "util/aoc.h"
 #include "util/aoc_solution_manager.h"
 #include "util/result_db.h"
 #include "util/timer.h"
 
-#define CURRENT_DAY 12
+#define CURRENT_DAY 25
 
-#define CHECKMARK(x) ((x) ? ("v") : ("x"))
+#define CHECKMARK(x) ((x) ? ("✅") : ("❌"))
 
 // TODO: use function pointers instead of massive switch?
 AocDayRes master_solver(const AocDayTask task) {
@@ -39,7 +37,6 @@ void generate_tasks(AocDayTask **tasks, int year) {
   }
 }
 
-#ifdef SQLITE_AVAILABLE
 
 bool validate_day_result(aoc_manager_handle manager, const AocDayRes *result,
                          const AocDayTask *task) {
@@ -47,7 +44,11 @@ bool validate_day_result(aoc_manager_handle manager, const AocDayRes *result,
       manager, task->year, task->day, AOC_DAY_PART_part1, result->part1_res);
   bool part2_correct = aoc_manager_validate_solution(
       manager, task->year, task->day, AOC_DAY_PART_part2, result->part2_res);
-  printf("P1:%s\t P2:%s\n", CHECKMARK(part1_correct), CHECKMARK(part2_correct));
+  bool part1_no_guess = (result->part1_res.type == AOC_PART_RES_TYPE_none);
+  char *part1_symbol = part1_no_guess ? "no guess" : CHECKMARK(part1_correct);
+  bool part2_no_guess = (result->part2_res.type == AOC_PART_RES_TYPE_none);
+  char *part2_symbol = part2_no_guess ? "no guess" : CHECKMARK(part1_correct);
+  printf("P1:%5s\tP2:%5s\n", part1_symbol, part2_symbol);
   return part1_correct + part2_correct;
 }
 
@@ -56,7 +57,9 @@ void run_all_days(aoc_manager_handle manager, int year) {
   generate_tasks(&tasks, year);
   size_t num_of_tasks = cvector_size(tasks);
   AocBenchmarkDay *results = malloc(num_of_tasks * sizeof(*results));
+#ifndef WIN32
 #pragma omp parallel for
+#endif
   for (size_t i = 0; i < num_of_tasks; i++) {
     const AocDayTask task = tasks[i];
     fetch_day_input_cached(task.year, task.day, task.input_file);
@@ -65,10 +68,9 @@ void run_all_days(aoc_manager_handle manager, int year) {
   for (size_t i = 0; i < num_of_tasks; i++) {
     const AocBenchmarkDay result = results[i];
     const AocDayTask task = tasks[i];
-    bool both_correct = validate_day_result(manager, &(result.result), &task);
-    //    print_aoc_day_result(&result.result);
-    //    if (both_correct)
+    printf("-------\n");
     print_day_benchmark(&results[i]);
+    bool both_correct = validate_day_result(manager, &(result.result), &task);
   }
   free(results);
 }
@@ -103,59 +105,43 @@ void submit_helper(aoc_manager_handle manager_handle, int year, int day,
 }
 
 void solve_current_day(aoc_manager_handle manager_handle) {
-  const int current_day = 12;
-  const int current_year = 2023;
-  char const *file = "/tmp/day12___.txt";
+  const int current_day = 2;
+  const int current_year = 2022;
+  char const *file = "/tmp/22day02.txt";
   fetch_day_input_cached(current_year, current_day, file);
-  const AocDayRes res = solve_year23_day12(file);
+  const AocDayRes res = solve_year22_day02(file);
   print_aoc_day_result(&res);
-  ResultStatus* stat=NULL;
+  ResultStatus *stat = NULL;
   aoc_manager_get_day_status(manager_handle, current_year, current_day,
                              AOC_DAY_PART_part2, &stat);
   print_result_status(stat);
 
-  // part 1
-  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
-                res.part1_res);
-
-  // part 2
-  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
-                res.part2_res);
+  //  // part 1
+  //  submit_helper(manager_handle, current_year, current_day,
+  //  AOC_DAY_PART_part1,
+  //                res.part1_res);
+  //
+  //  // part 2
+  //  submit_helper(manager_handle, current_year, current_day,
+  //  AOC_DAY_PART_part2,
+  //                res.part2_res);
 }
 
-#endif // SQLITE_AVAILABLE
 
 int main() {
-  /*
-  curl_global_init(CURL_GLOBAL_ALL);
-  result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
-  aoc_manager_handle manager_handle = aoc_manager_init_manager(db);*/
-  //solve_current_day(manager_handle);
+  // benchmark(result_db_test);
+  //curl_global_init(CURL_GLOBAL_ALL);
+  //result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
+  //aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
+  //  solve_current_day(manager_handle);
 
-  AocDayTask task = {
+  AocDayTask task_bb = {
       .year = 2023, .day = 12, .input_file = "/tmp/aoc/2023/day12_input.txt"};
+  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+  print_day_benchmark(&benchbb);
+  //  run_all_days(manager_handle, 2023);
 
-//  AocDayTask taskbb1 = {
-//      .year = 2023, .day = 12, .input_file = "/tmp/aoc/day12_bigboy1.txt"};
-
-  AocDayTask taskbb2 = {
-      .year = 2023, .day = 12, .input_file = "/tmp/aoc/day12_bigboy2.txt"};
-  AocDayTask tasks[]={task,taskbb2};
-  for(int i=0;i<2;i++){
-    AocBenchmarkDay bench = benchmark_day(master_solver, (tasks[i]));
-    print_day_benchmark(&bench);
-  }
-
-  //    AocDayTask task_bb = {
-  //        .year = 2023, .day = 12, .input_file =
-  //        "/tmp/aoc/2023/day12_input.txt"};
-  //    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-  //    print_day_benchmark(&benchbb);
-  //   run_all_days(manager_handle, 2023);
-
-  /*
-  curl_global_cleanup();
-  result_db_close(db);
-   */
+  //curl_global_cleanup();
+  //result_db_close(db);
   return 0;
 }

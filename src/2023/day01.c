@@ -48,7 +48,7 @@ static int get_last(const char *buffer, bool part2) {
 }
 
 LLTuple year23_day01(char *buf, long buf_len) {
-  LLTuple result = {0};
+  LLTuple result = {AOC_LLONG_NO_ANSWER,AOC_LLONG_NO_ANSWER};
   char **buf_pos = &buf;
   while (*buf_pos != NULL) {
     char *line = strsep(buf_pos, "\n");
