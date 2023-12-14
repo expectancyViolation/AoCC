@@ -141,8 +141,6 @@ int main() {
 
    char * filepath="/tmp/aoc/2023/day14_input.txt";
 
-//    char * filepath="/tmp/d13_bb.txt";
-
     AocDayTask task_bb = {
         .year = 2023, .day = 14, .input_file = filepath};
     AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);

@@ -2,14 +2,29 @@
 #include "../../res/hashmap.c/hashmap.h"
 #include "../util/parallelize.h"
 
-void simulate(char **col_vec, size_t row_len) {
+long long calc_load(char *col_vec, size_t len) {
+  long long res = 0;
+  for (size_t i = 0; i < len; i++) {
+    char *vec = col_vec + (len * i);
+    for (size_t j = 0; j < len; j++) {
+      if (vec[j] == 'O') {
+        res += len - j;
+      }
+    }
+  }
+  return res;
+}
 
+void simulate(char *col_vec, size_t row_len) {
+  static int call_count = 0;
+  call_count += 1;
+  printf("call:%d\n", call_count);
   for (size_t i = 0; i < row_len; i++) {
-    char *vec = col_vec[i];
+    char *vec = col_vec + (i * row_len);
 
     int *free_pos = NULL;
     size_t lowest_free_pos = 0;
-    for (size_t j = 0; j < cvector_size(vec); j++) {
+    for (size_t j = 0; j < row_len; j++) {
       switch (vec[j]) {
       case '#':
         cvector_clear(free_pos);
@@ -43,34 +58,27 @@ void simulate(char **col_vec, size_t row_len) {
   }
 }
 
-long long calc_load(char **col_vec, size_t row_len) {
-  long long res = 0;
-  for (size_t i = 0; i < row_len; i++) {
-    char *vec = col_vec[i];
-    for (size_t j = 0; j < cvector_size(vec); j++) {
-      if (vec[j] == 'O') {
-        res += cvector_size(vec) - j;
-      }
+void transpose_square(char *m, size_t len) {
+  for (size_t i = 0; i < len; i++) {
+    for (size_t j = i + 1; j < len; j++) {
+      const char tmp = m[i * len + j];
+      m[i * len + j] = m[j * len + i];
+      m[j * len + i] = tmp;
     }
   }
-  return res;
 }
 
-void transpose_square(char **m, size_t len) {
+void flip_square(char *m, size_t len) {
   for (size_t i = 0; i < len; i++) {
-    for (size_t j = i + 1; j < len; j++)
-      m[i * len + j] = m[j * len + i];
-  }
-}
-
-void flip_square(char **m, size_t len) {
-  for (size_t i = 0; i < len; i++) {
-    for (size_t j = 0; j < len / 2; j++)
+    for (size_t j = 0; j < len / 2; j++) {
+      const char tmp = m[i * len + j];
       m[i * len + j] = m[(i + 1) * len - j - 1];
+      m[(i + 1) * len - j - 1] = tmp;
+    }
   }
 }
 
-void rot90_square(char **m, size_t len) {
+void rot90_square(char *m, size_t len) {
   transpose_square(m, len);
   flip_square(m, len);
 }
@@ -93,15 +101,16 @@ char **rot90(char **col_vec, size_t row_len) {
   return rot_col_vec;
 }
 
-// void print_col_vec(char **col_vec, size_t row_len) {
-//   for (int i = row_len - 1; i >= 0; i--) {
-//     char *vec = col_vec[i];
-//     for (int j = cvector_size(vec) - 1; j >= 0; j--) {
-//       putchar(vec[j]);
-//     }
-//     printf("\n");
-//   }
-// }
+void print_col_vec(char *col_vec, size_t row_len) {
+  printf("---\n");
+  for (size_t i = 0; i < row_len; i++) {
+    char *vec = col_vec + i * row_len;
+    for (size_t j = 0; j < row_len; j++) {
+      putchar(vec[j]);
+    }
+    printf("\n");
+  }
+}
 
 typedef struct {
   u_int64_t hash;
@@ -118,14 +127,22 @@ u_int64_t cycle_res_hash(const void *item, u_int64_t seed0, u_int64_t seed1) {
   return res->hash;
 }
 
-char **step_cycle(char **col_vec, int row_len) {
+char *step_cycle(char *col_vec, int row_len) {
 
+  // printf("START STEP\n");
   for (int i = 0; i < 4; i++) {
-    simulate(col_vec, row_len);
-//    col_vec = rot90(col_vec, row_len);
-    rot90_square(col_vec,row_len);
+    //    col_vec = rot90(col_vec, row_len);
+    // we pull left (not up) so rot first then simulate
 
+    simulate(col_vec, row_len);
+    rot90_square(col_vec, row_len);
+    // rot90_square(col_vec, row_len);
+    // rot90_square(col_vec, row_len);
+    // print_col_vec(col_vec, row_len);
+    // printf("%lld\n", calc_load(col_vec,row_len));
   }
+
+  // printf("DONE STEP!!!!!!!!!!!!!!!!");
   return col_vec;
 }
 
@@ -133,28 +150,35 @@ LLTuple year23_day14(char *buf, long buf_len) {
   LLTuple res = {0, 0};
   size_t row_len = strchr(buf, '\n') - buf;
   // inefficient: use 2D array (fixed size) instead
-  char **col_vec = malloc(row_len * sizeof(*col_vec));
-  memset(col_vec, 0, row_len * sizeof(*col_vec));
+  char *col_vec = malloc(sizeof(char) * row_len * row_len);
+  int j = 0;
   while (buf != NULL) {
     char *line = strsep(&buf, "\n");
     for (size_t i = 0; i < row_len; i++) {
-      cvector_push_back(col_vec[row_len - i - 1], line[i]);
+      col_vec[j * row_len + i] = line[i];
     }
+    j++;
   }
+  rot90_square(col_vec, row_len);
+  rot90_square(col_vec, row_len);
+  rot90_square(col_vec, row_len);
+  // printf("%lld\n", calc_load(col_vec,row_len));
   struct hashmap *map = hashmap_new(sizeof(CycleRes), 0, 0, 0, cycle_res_hash,
                                     cycle_res_compare, NULL, NULL);
   int cycles_to_go = 1000000000;
   int cc = 0;
-  while (cycles_to_go) {
+  while (cycles_to_go > 0) {
+    // assert(cc < 3);
     col_vec = step_cycle(col_vec, row_len);
     cc++;
-    long long load = calc_load(col_vec, row_len);
-    uint64_t bad_hash = load;
-    CycleRes cycle_res = {.cycle_count = cc, .hash = bad_hash};
+    uint64_t hash_val =
+        hashmap_sip(col_vec, (sizeof(char)) * row_len * row_len, 123, 345667);
+    CycleRes cycle_res = {.cycle_count = cc, .hash = hash_val};
 
-    const CycleRes *old = hashmap_get(map, &(CycleRes){.hash = bad_hash});
+    const CycleRes *old = hashmap_get(map, &(CycleRes){.hash = hash_val});
     if (old != NULL) {
       cycles_to_go = cycles_to_go % (cc - old->cycle_count);
+      printf("\t\t\ttogo %d %d\n", cycles_to_go, (cc - old->cycle_count));
     }
     hashmap_set(map, &cycle_res);
     cycles_to_go--;
