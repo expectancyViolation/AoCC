@@ -69,12 +69,11 @@ add_executable(aocc
         src/2023/day11.c
         src/2023/day12.c
         src/2023/day13.c
+        src/2023/day14.c
         src/2023/year23.c
         src/util/aoc_types.c
         src/util/aoc_solving.c
-        src/util/aoc_solving.h
         src/util/result_status.c
-        src/util/result_status.h
         src/util/result_db_in_memory.c
 )
 
