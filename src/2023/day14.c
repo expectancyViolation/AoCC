@@ -2,6 +2,8 @@
 #include "../../res/hashmap.c/hashmap.h"
 #include "../util/parallelize.h"
 
+// parallelization is only worth it for large inputs
+
 long long calc_load(const char *mat, size_t len) {
   long long res = 0;
 
@@ -18,7 +20,7 @@ long long calc_load(const char *mat, size_t len) {
 
 void simulate(char *mat, size_t len) {
 
-//#pragma omp parallel for
+  // #pragma omp parallel for
   for (size_t i = 0; i < len; i++) {
     char *const vec = mat + (i * len);
 
@@ -30,11 +32,13 @@ void simulate(char *mat, size_t len) {
           vec[j + k + 1] = 'O';
         }
         to_distribute = 0;
-      } break;
+        break;
+      }
       case 'O': {
         to_distribute++;
         vec[j] = '.';
-      } break;
+        break;
+      }
       }
     }
     for (size_t k = 0; k < to_distribute; k++) {
@@ -44,7 +48,7 @@ void simulate(char *mat, size_t len) {
 }
 
 void transpose_square(char *m, size_t len) {
-//#pragma omp parallel for
+  // #pragma omp parallel for
   for (size_t i = 0; i < len; i++) {
     for (size_t j = i + 1; j < len; j++) {
       const char tmp = m[i * len + j];
@@ -55,7 +59,7 @@ void transpose_square(char *m, size_t len) {
 }
 
 void flip_square(char *m, size_t len) {
-//#pragma omp parallel for
+  // #pragma omp parallel for
   for (size_t i = 0; i < len; i++) {
     for (size_t j = 0; j < len / 2; j++) {
       const char tmp = m[i * len + j];

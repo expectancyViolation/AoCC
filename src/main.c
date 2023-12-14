@@ -134,19 +134,15 @@ int main() {
   // benchmark(result_db_test);
   // curl_global_init(CURL_GLOBAL_ALL);
 
-  result_db_handle db = result_db_init_db("/tmp/other_aoc/ress_vnnn.db");
+  result_db_handle db = result_db_init_db("/tmp/other_aoc/res_vnnn.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
 
   // solve_current_day(manager_handle);
 
-  //   char * filepath="/tmp/aoc/2023/day14_input.txt";
-
-  //  char const *filepath = "/tmp/23ex1.txt";
-
-//  char const *filepath = "/tmp/aoc/bb14.txt";
-//  AocDayTask task_bb = {.year = 2023, .day = 14, .input_file = filepath};
-//  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-//  print_day_benchmark(&benchbb);
+  //  char const *filepath = "/tmp/aoc/bb14.txt";
+  //  AocDayTask task_bb = {.year = 2023, .day = 14, .input_file = filepath};
+  //  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+  //  print_day_benchmark(&benchbb);
   run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
