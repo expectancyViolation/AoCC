@@ -2,10 +2,11 @@
 #include "../../res/hashmap.c/hashmap.h"
 #include "../util/parallelize.h"
 
-long long calc_load(char *mat, size_t len) {
+long long calc_load(const char *mat, size_t len) {
   long long res = 0;
+
   for (size_t i = 0; i < len; i++) {
-    char *vec = mat + (len * i);
+    const char *vec = mat + (len * i);
     for (size_t j = 0; j < len; j++) {
       if (vec[j] == 'O') {
         res += len - j;
@@ -16,38 +17,34 @@ long long calc_load(char *mat, size_t len) {
 }
 
 void simulate(char *mat, size_t len) {
-  size_t *free_pos= malloc(sizeof (size_t)*len);
-  for (size_t i = 0; i < len; i++) {
-    char *vec = mat + (i * len);
 
-    size_t lowest_free_pos = 0;
-    size_t free_pos_len=0;
-    for (size_t j = 0; j < len; j++) {
+//#pragma omp parallel for
+  for (size_t i = 0; i < len; i++) {
+    char *const vec = mat + (i * len);
+
+    size_t to_distribute = 0;
+    for (int j = len - 1; j >= 0; j--) {
       switch (vec[j]) {
-      case '#':
-        lowest_free_pos = free_pos_len;
-        break;
-      case 'O': {
-        if (free_pos_len > lowest_free_pos) {
-          const int tar_pos = free_pos[lowest_free_pos];
-          lowest_free_pos += 1;
-          vec[tar_pos] = vec[j];
-          vec[j] = '.';
-          free_pos[free_pos_len]=j;
-          free_pos_len++;
+      case '#': {
+        for (size_t k = 0; k < to_distribute; k++) {
+          vec[j + k + 1] = 'O';
         }
+        to_distribute = 0;
       } break;
-      case '.':
-        free_pos[free_pos_len]=j;
-        free_pos_len++;
-        break;
+      case 'O': {
+        to_distribute++;
+        vec[j] = '.';
+      } break;
       }
     }
+    for (size_t k = 0; k < to_distribute; k++) {
+      vec[k] = 'O';
+    }
   }
-  free(free_pos);
 }
 
 void transpose_square(char *m, size_t len) {
+//#pragma omp parallel for
   for (size_t i = 0; i < len; i++) {
     for (size_t j = i + 1; j < len; j++) {
       const char tmp = m[i * len + j];
@@ -58,6 +55,7 @@ void transpose_square(char *m, size_t len) {
 }
 
 void flip_square(char *m, size_t len) {
+//#pragma omp parallel for
   for (size_t i = 0; i < len; i++) {
     for (size_t j = 0; j < len / 2; j++) {
       const char tmp = m[i * len + j];
@@ -111,9 +109,10 @@ LLTuple year23_day14(char *buf, long buf_len) {
   rot90_square(mat, len);
   rot90_square(mat, len);
   rot90_square(mat, len);
+
   // "quarter" step for part1 (simulate is idempotent)
   simulate(mat, len);
-  res.left= calc_load(mat, len);
+  res.left = calc_load(mat, len);
 
   struct hashmap *map = hashmap_new(sizeof(CycleRes), 0, 0, 0, cycle_res_hash,
                                     cycle_res_compare, NULL, NULL);
@@ -122,8 +121,8 @@ LLTuple year23_day14(char *buf, long buf_len) {
   while (cycles_to_go > 0) {
     mat = step_cycle(mat, len);
     cc++;
-    uint64_t hash_val =
-        hashmap_sip(mat, (sizeof(char)) * len * len, 0, 0);
+    uint64_t hash_val = hashmap_sip(mat, (sizeof(char)) * len * len, 0, 0);
+
     CycleRes cycle_res = {.cycle_count = cc, .hash = hash_val};
 
     const CycleRes *old = hashmap_get(map, &(CycleRes){.hash = hash_val});
@@ -141,10 +140,6 @@ LLTuple year23_day14(char *buf, long buf_len) {
 AocDayRes solve_year23_day14(const char *input_file) {
   char *input_buffer;
   const long filesize = read_file_to_memory(input_file, &input_buffer, true);
-
-
-  //  LLTuple res =
-  //      parallelize(year23_day12, ll_tuple_add, input_buffer, filesize, 0);
 
   LLTuple res = year23_day14(input_buffer, filesize);
   AocDayRes day_res = aoc_day_res_from_tuple(&res);
