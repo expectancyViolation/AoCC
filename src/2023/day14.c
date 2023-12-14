@@ -87,7 +87,7 @@ u_int64_t cycle_res_hash(const void *item, u_int64_t seed0, u_int64_t seed1) {
   return res->hash;
 }
 
-char *step_cycle(char *mat, int len) {
+char *step_cycle(char *mat, size_t len) {
   for (int i = 0; i < 4; i++) {
     simulate(mat, len);
     rot90_square(mat, len);
@@ -97,29 +97,33 @@ char *step_cycle(char *mat, int len) {
 
 LLTuple year23_day14(char *buf, long buf_len) {
   LLTuple res = {0, 0};
-  size_t row_len = strchr(buf, '\n') - buf;
-  char *col_vec = malloc(sizeof(char) * row_len * row_len);
+  size_t len = strchr(buf, '\n') - buf;
+  char *mat = malloc(sizeof(char) * len * len);
   int j = 0;
   while (buf != NULL) {
     char *line = strsep(&buf, "\n");
-    for (size_t i = 0; i < row_len; i++) {
-      col_vec[j * row_len + i] = line[i];
+    for (size_t i = 0; i < len; i++) {
+      mat[j * len + i] = line[i];
     }
     j++;
   }
   // rotate into place (simulate simulates falling to the "left")
-  rot90_square(col_vec, row_len);
-  rot90_square(col_vec, row_len);
-  rot90_square(col_vec, row_len);
+  rot90_square(mat, len);
+  rot90_square(mat, len);
+  rot90_square(mat, len);
+  // "quarter" step for part1 (simulate is idempotent)
+  simulate(mat, len);
+  res.left= calc_load(mat, len);
+
   struct hashmap *map = hashmap_new(sizeof(CycleRes), 0, 0, 0, cycle_res_hash,
                                     cycle_res_compare, NULL, NULL);
   int cycles_to_go = 1000000000;
   int cc = 0;
   while (cycles_to_go > 0) {
-    col_vec = step_cycle(col_vec, row_len);
+    mat = step_cycle(mat, len);
     cc++;
     uint64_t hash_val =
-        hashmap_sip(col_vec, (sizeof(char)) * row_len * row_len, 0, 0);
+        hashmap_sip(mat, (sizeof(char)) * len * len, 0, 0);
     CycleRes cycle_res = {.cycle_count = cc, .hash = hash_val};
 
     const CycleRes *old = hashmap_get(map, &(CycleRes){.hash = hash_val});
@@ -129,8 +133,8 @@ LLTuple year23_day14(char *buf, long buf_len) {
     hashmap_set(map, &cycle_res);
     cycles_to_go--;
   }
-  res.right = calc_load(col_vec, row_len);
-  free(col_vec);
+  res.right = calc_load(mat, len);
+  free(mat);
   return res;
 }
 
