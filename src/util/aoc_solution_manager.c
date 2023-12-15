@@ -96,7 +96,14 @@ aoc_manager_sane_submit(aoc_manager_handle handle, int year, int day,
   }
   submit_answer(year, day, part, &guess, out_status);
   bool refetch = update_result_status(read_status, &guess, out_status);
-  result_status_store_entry(handle_data->db_handle, read_status, true);
+  assert(read_status!=NULL);
+  print_result_status(read_status);
+  printf("read\n");
+  // TODO: read status is not seafe for reinsetion into hashmap? => take copy when reading?
+  ResultStatus* write_status= malloc(sizeof(*write_status));
+  memcpy(write_status,read_status,sizeof(*write_status));
+  result_status_store_entry(handle_data->db_handle, write_status, true);
+  free(write_status);
   if (refetch) {
     printf("detected inconsistencies. refetching...");
     aoc_manager_pull_day_status(handle, year, day);

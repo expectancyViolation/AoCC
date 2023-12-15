@@ -29,6 +29,7 @@ uint64_t result_status_hash(const void *item, uint64_t seed0, uint64_t seed1) {
 typedef struct _DbHandleDataInMemory {
   struct hashmap *map;
   bool modified;
+  char* db_file;
 } DbHandleDataInMemory;
 
 DbHandleDataInMemory *db_handle_deref_handle(result_db_handle handle) {
@@ -89,13 +90,14 @@ result_db_handle result_db_init_db(char *db_file) {
   handle_data->map =
       hashmap_new(sizeof(ResultStatus), 0, 0, 0, result_status_hash,
                   result_status_compare, NULL, NULL);
-  load_dump(DUMPFILE, handle_data);
+  handle_data->db_file=db_file;
+  load_dump(db_file, handle_data);
   return (result_db_handle)handle_data;
 }
 
 void result_db_close(result_db_handle handle) {
   DbHandleDataInMemory *handle_data = db_handle_deref_handle(handle);
-  dump(DUMPFILE, handle_data);
+  dump(handle_data->db_file, handle_data);
   hashmap_free(handle_data->map);
   free(handle_data);
 }

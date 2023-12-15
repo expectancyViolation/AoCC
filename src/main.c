@@ -7,6 +7,7 @@
 #include "2022/day02.h"
 #include "2022/year22.h"
 #include "2023/day14.h"
+#include "2023/day15.h"
 #include "2023/year23.h"
 #include "util/aoc.h"
 #include "util/aoc_solution_manager.h"
@@ -109,12 +110,12 @@ void submit_helper(aoc_manager_handle manager_handle, int year, int day,
 }
 
 void solve_current_day(aoc_manager_handle manager_handle) {
-  const int current_day = 14;
+  const int current_day = 15;
   const int current_year = 2023;
-  // char const *file = "/tmp/23day14.txt";
-  char const *file = "/tmp/23ex1.txt";
+  char const *file = "/tmp/23day15.txt";
+  //char const *file = "/tmp/d15_ex.txt";
   fetch_day_input_cached(current_year, current_day, file);
-  const AocDayRes res = solve_year23_day14(file);
+  const AocDayRes res = solve_year23_day15(file);
   print_aoc_day_result(&res);
   ResultStatus *stat = NULL;
   aoc_manager_get_day_status(manager_handle, current_year, current_day,
@@ -122,12 +123,12 @@ void solve_current_day(aoc_manager_handle manager_handle) {
   print_result_status(stat);
 
   //  // part 1
-  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
-                res.part1_res);
+//  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
+//                res.part1_res);
 
   // part 2
-  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
-                res.part2_res);
+//  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
+//                res.part2_res);
 }
 
 int main() {
@@ -136,8 +137,9 @@ int main() {
 
   result_db_handle db = result_db_init_db("/tmp/other_aoc/res_vnnn.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
+  //result_db_test();
 
-  // solve_current_day(manager_handle);
+//  solve_current_day(manager_handle);
 
   //  char const *filepath = "/tmp/aoc/bb14.txt";
   //  AocDayTask task_bb = {.year = 2023, .day = 14, .input_file = filepath};
