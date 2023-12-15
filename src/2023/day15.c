@@ -2,7 +2,7 @@
 #include "../../res/hashmap.c/hashmap.h"
 #include "../util/parallelize.h"
 
-#define MAX_ITEM_SIZE 100
+#define MAX_ITEM_SIZE 40
 
 unsigned char hash(char *input) {
   unsigned char res = 0;
@@ -15,7 +15,9 @@ unsigned char hash(char *input) {
 
 typedef struct {
   unsigned char hash;
-  char content[MAX_ITEM_SIZE];
+  //  char content[MAX_ITEM_SIZE];
+  char *content;
+  uint64_t content_hash;
   long value;
   long insertion_step;
 } Item;
@@ -23,70 +25,80 @@ typedef struct {
 int item_compare(const void *a, const void *b, void *udata) {
   const Item *ia = a;
   const Item *ib = b;
-  return strcmp(ia->content, ib->content);
+  return CMP(ia->content_hash, ib->content_hash);
 }
 u_int64_t item_hash(const void *item, u_int64_t seed0, u_int64_t seed1) {
   const Item *res = item;
-  return res->hash;
+  return res->content_hash;
 }
 
 int item_insertion_step_compare(const void *a, const void *b, void *udata) {
   const Item *ia = a;
   const Item *ib = b;
+  const int hash_compare = CMP(ia->hash, ib->hash);
+  if (hash_compare != 0)
+    return hash_compare;
   return CMP(ia->insertion_step, ib->insertion_step);
 }
 
 void print_item(const Item *item) {
-  printf("item:\n\tcontent: %s\n\tvalue: %lld\t\n hash:%hhu\n\t(first "
+  printf("item:\n\tcontent: %s\n\tvalue: %ld\t\n hash:%hhu\n\t(first "
          "inserted: %ld)\n",
-         item->content, item->value, item->hash, item->insertion_step);
+         (item->content), item->value, item->hash, item->insertion_step);
 }
 
-
-long long score_box(Item *curr_box) {
-  long long res = 0;
-  qsort(curr_box, cvector_size(curr_box), sizeof(Item),
-        (__compar_fn_t)item_insertion_step_compare);
-  for (int i = 0; i < cvector_size(curr_box); i++) {
-    res += (i + 1) * curr_box[i].value;
-  }
-  return res;
-}
-
-// hashmap does not maintain insertion order => sort by "first inserted"
-long long score_lenses(struct hashmap *map) {
-  long long res = 0;
-
+static void print_all_entries(struct hashmap *map) {
   size_t iter = 0;
   void *item;
-  unsigned char prev_hash = 0;
-  Item *curr_box = NULL;
+  printf("ENTRIES:\n");
+  while (hashmap_iter(map, &iter, &item)) {
+    const Item *item1 = item;
+    print_item(item1);
+  }
+}
+
+long long score_lenses_vec(Item *all_lenses) {
+  long long res = 0;
+  qsort(all_lenses, cvector_size(all_lenses), sizeof(Item),
+        (__compar_fn_t)item_insertion_step_compare);
+  int prev_hash = -1;
+  int hash_run = 0;
+  for (int i = 0; i < cvector_size(all_lenses); i++) {
+    Item curr_lens = all_lenses[i];
+    // print_item(&curr_lens);
+    if (curr_lens.hash != prev_hash) {
+      hash_run = 0;
+      prev_hash = curr_lens.hash;
+    } else {
+      hash_run += 1;
+    }
+    long long score =
+        (((int)(curr_lens.hash)) + 1) * (hash_run + 1) * curr_lens.value;
+    res += score;
+  }
+  return res;
+}
+
+long long score_lenses(struct hashmap *map) {
+  size_t iter = 0;
+  void *item;
+  Item *all_lenses = NULL;
   while (hashmap_iter(map, &iter, &item)) {
     Item *item1 = item;
-    if (prev_hash == item1->hash) {
-      cvector_push_back(curr_box, *item1);
-    } else {
-      int box_score = ((int)(prev_hash)) + 1;
-      res += box_score * score_box(curr_box);
-      cvector_clear(curr_box);
-      cvector_push_back(curr_box, *item1);
-      prev_hash = item1->hash;
-    }
+    cvector_push_back(all_lenses, *item1);
   }
-  int box_score = ((int)(prev_hash)) + 1;
-  res += box_score * score_box(curr_box);
-  return res;
+  return score_lenses_vec(all_lenses);
 }
 
 LLTuple year23_day15(char *buf, long buf_len) {
   LLTuple res = {0};
 
+  // this is insanely slow :/
   struct hashmap *map =
       hashmap_new(sizeof(Item), 0, 0, 0, item_hash, item_compare, NULL, NULL);
   int cnt = 0;
   while (buf != NULL) {
     cnt += 1;
-    // assert(cnt <100);
     char *line = strsep(&buf, ",");
     const unsigned char line_hash = hash(line);
     res.left = res.left + line_hash;
@@ -94,21 +106,26 @@ LLTuple year23_day15(char *buf, long buf_len) {
     if (remove_pos != NULL) {
       // handle remove
       line[remove_pos - line] = 0;
-      Item item = {.hash = hash(line)};
-      strcpy(item.content, line);
+      const size_t line_len = remove_pos - line;
+      uint64_t hash_val = hashmap_sip(line, (sizeof(char)) * line_len, 0, 0);
+      Item item = {.hash = hash(line), .content_hash = hash_val};
       hashmap_delete(map, &item);
     } else {
       char *label = strsep(&line, "=");
 
+      const size_t label_len = line - label - 1;
+
+      uint64_t hash_val = hashmap_sip(label, (sizeof(char)) * label_len, 0, 0);
       long value = strtol(line, NULL, 10);
-      Item item = {.hash = hash(label), .value = value, .insertion_step = cnt};
-      strcpy(item.content, label);
-      const Item *replaced = hashmap_set(map, &item);
-      if (replaced != NULL) {
-        // weird hack reinsert with _old_ "first inserted
-        item.insertion_step = replaced->insertion_step;
-        hashmap_set(map, &item);
-      }
+      Item item = {.hash = hash(label),
+                   .value = value,
+                   .insertion_step = cnt,
+                   .content = label,
+                   .content_hash = hash_val};
+      const Item *to_replace = hashmap_get(map, &item);
+      if (to_replace != NULL)
+        item.insertion_step = to_replace->insertion_step;
+      hashmap_set(map, &item);
     }
   }
   long long score = score_lenses(map);

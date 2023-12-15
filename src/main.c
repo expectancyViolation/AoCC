@@ -73,7 +73,7 @@ void run_all_days(aoc_manager_handle manager, int year) {
     printf("DAY %2d:\n", task.day);
     bool made_guess = validate_day_result(manager, &(result.result), &task);
     if (made_guess) {
-      print_day_benchmark(&results[i]);
+      //print_day_benchmark(&results[i]);
       printf("took:%f\n\n", results[i].solve_duration);
     }
   }
@@ -112,8 +112,8 @@ void submit_helper(aoc_manager_handle manager_handle, int year, int day,
 void solve_current_day(aoc_manager_handle manager_handle) {
   const int current_day = 15;
   const int current_year = 2023;
-  char const *file = "/tmp/23day15.txt";
-  //char const *file = "/tmp/d15_ex.txt";
+  //char const *file = "/tmp/23day15.txt";
+  char const *file = "/tmp/d15_ex.txt";
   fetch_day_input_cached(current_year, current_day, file);
   const AocDayRes res = solve_year23_day15(file);
   print_aoc_day_result(&res);
@@ -141,11 +141,11 @@ int main() {
 
 //  solve_current_day(manager_handle);
 
-  //  char const *filepath = "/tmp/aoc/bb14.txt";
-  //  AocDayTask task_bb = {.year = 2023, .day = 14, .input_file = filepath};
-  //  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-  //  print_day_benchmark(&benchbb);
-  run_all_days(manager_handle, 2023);
+    char const *filepath = "/tmp/d15_bb.txt";
+    AocDayTask task_bb = {.year = 2023, .day = 15, .input_file = filepath};
+    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+    print_day_benchmark(&benchbb);
+//    run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
   aoc_manager_close(manager_handle);
