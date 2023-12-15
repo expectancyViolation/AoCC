@@ -141,11 +141,11 @@ int main() {
 
 //  solve_current_day(manager_handle);
 
-    char const *filepath = "/tmp/d15_bb.txt";
-    AocDayTask task_bb = {.year = 2023, .day = 15, .input_file = filepath};
-    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-    print_day_benchmark(&benchbb);
-//    run_all_days(manager_handle, 2023);
+//    char const *filepath = "/tmp/d15_bbb.txt";
+//    AocDayTask task_bb = {.year = 2023, .day = 15, .input_file = filepath};
+//    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+//    print_day_benchmark(&benchbb);
+    run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
   aoc_manager_close(manager_handle);

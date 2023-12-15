@@ -2,7 +2,10 @@
 #include "../../res/hashmap.c/hashmap.h"
 #include "../util/parallelize.h"
 
+
+
 // parallelization is only worth it for large inputs
+#define D14_PARALLEL
 
 long long calc_load(const char *mat, size_t len) {
   long long res = 0;
@@ -19,8 +22,9 @@ long long calc_load(const char *mat, size_t len) {
 }
 
 void simulate(char *mat, size_t len) {
-
-  // #pragma omp parallel for
+#ifdef D14_PARALLEL
+#pragma omp parallel for
+#endif
   for (size_t i = 0; i < len; i++) {
     char *const vec = mat + (i * len);
 
@@ -48,7 +52,9 @@ void simulate(char *mat, size_t len) {
 }
 
 void transpose_square(char *m, size_t len) {
-  // #pragma omp parallel for
+#ifdef D14_PARALLEL
+#pragma omp parallel for
+#endif
   for (size_t i = 0; i < len; i++) {
     for (size_t j = i + 1; j < len; j++) {
       const char tmp = m[i * len + j];
@@ -59,7 +65,9 @@ void transpose_square(char *m, size_t len) {
 }
 
 void flip_square(char *m, size_t len) {
-  // #pragma omp parallel for
+#ifdef D14_PARALLEL
+   #pragma omp parallel for
+#endif
   for (size_t i = 0; i < len; i++) {
     for (size_t j = 0; j < len / 2; j++) {
       const char tmp = m[i * len + j];
@@ -123,6 +131,8 @@ LLTuple year23_day14(char *buf, long buf_len) {
   int cycles_to_go = 1000000000;
   int cc = 0;
   while (cycles_to_go > 0) {
+//    if(cc%100==0)
+//      printf("cycle count: %d\n",cc);
     mat = step_cycle(mat, len);
     cc++;
     uint64_t hash_val = hashmap_sip(mat, (sizeof(char)) * len * len, 0, 0);

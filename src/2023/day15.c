@@ -93,7 +93,6 @@ long long score_lenses(struct hashmap *map) {
 LLTuple year23_day15(char *buf, long buf_len) {
   LLTuple res = {0};
 
-  // this is insanely slow :/
   struct hashmap *map =
       hashmap_new(sizeof(Item), 0, 0, 0, item_hash, item_compare, NULL, NULL);
   int cnt = 0;
