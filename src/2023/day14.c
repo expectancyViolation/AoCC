@@ -5,7 +5,7 @@
 
 
 // parallelization is only worth it for large inputs
-#define D14_PARALLEL
+//#define D14_PARALLEL
 
 long long calc_load(const char *mat, size_t len) {
   long long res = 0;

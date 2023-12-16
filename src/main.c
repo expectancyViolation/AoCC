@@ -8,6 +8,7 @@
 #include "2022/year22.h"
 #include "2023/day14.h"
 #include "2023/day15.h"
+#include "2023/day16.h"
 #include "2023/year23.h"
 #include "util/aoc.h"
 #include "util/aoc_solution_manager.h"
@@ -110,12 +111,14 @@ void submit_helper(aoc_manager_handle manager_handle, int year, int day,
 }
 
 void solve_current_day(aoc_manager_handle manager_handle) {
-  const int current_day = 15;
+  const int current_day = 16;
   const int current_year = 2023;
-  //char const *file = "/tmp/23day15.txt";
-  char const *file = "/tmp/d15_ex.txt";
+  //char const *file = "/tmp/23day16.txt";
+  char const *file = "/tmp/d16_input.txt";
+
+// char const *file = "/tmp/d16_ex11.txt";
   fetch_day_input_cached(current_year, current_day, file);
-  const AocDayRes res = solve_year23_day15(file);
+  const AocDayRes res = solve_year23_day16(file);
   print_aoc_day_result(&res);
   ResultStatus *stat = NULL;
   aoc_manager_get_day_status(manager_handle, current_year, current_day,
@@ -139,13 +142,13 @@ int main() {
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
   //result_db_test();
 
-//  solve_current_day(manager_handle);
+  solve_current_day(manager_handle);
 
 //    char const *filepath = "/tmp/d15_bbb.txt";
 //    AocDayTask task_bb = {.year = 2023, .day = 15, .input_file = filepath};
 //    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
 //    print_day_benchmark(&benchbb);
-    run_all_days(manager_handle, 2023);
+//    run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
   aoc_manager_close(manager_handle);
