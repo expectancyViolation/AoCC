@@ -11,7 +11,7 @@ enum FACING {
 
 #define NUM_FACING 4
 
-int facing_index(enum FACING facing) {
+static int facing_index(enum FACING facing) {
   switch (facing) {
   case FACING_north:
     return 0;
@@ -24,7 +24,7 @@ int facing_index(enum FACING facing) {
   }
 }
 
-LLTuple facing_to_delta(enum FACING facing) {
+static LLTuple facing_to_delta(enum FACING facing) {
   LLTuple res = {0};
   switch (facing) {
   case FACING_north:
@@ -146,7 +146,7 @@ int interact_facing(enum FACING facing, enum D16TILE tile) {
   return tile_facing_lookup[tile][facing_index(facing)];
 }
 
-void interact(D16State state, const D16Map *map, struct hashmap *out_states) {
+static void interact(D16State state, const D16Map *map, struct hashmap *out_states) {
   const enum D16TILE curr_tile = d16map_lookup(map, state.x, state.y);
   int new_facing_flags = interact_facing(state.facing, curr_tile);
   for (int facing_index = 0; facing_index < NUM_FACING; facing_index++) {
@@ -159,7 +159,7 @@ void interact(D16State state, const D16Map *map, struct hashmap *out_states) {
 }
 
 // moves state 1 step
-D16State step(D16State state) {
+static D16State step(D16State state) {
   LLTuple delta = facing_to_delta(state.facing);
   state.x += delta.left;
   state.y += delta.right;
