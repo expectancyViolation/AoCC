@@ -10,6 +10,7 @@
 #include "2023/day15.h"
 #include "2023/day16.h"
 #include "2023/day17.h"
+#include "2023/day18.h"
 #include "2023/year23.h"
 #include "util/aoc.h"
 #include "util/aoc_solution_manager.h"
@@ -112,14 +113,18 @@ void submit_helper(aoc_manager_handle manager_handle, int year, int day,
 }
 
 void solve_current_day(aoc_manager_handle manager_handle) {
-  const int current_day = 17;
+  const int current_day = 18;
   const int current_year = 2023;
   //char const *file = "/tmp/23day16.txt";
   //char const *file = "/tmp/d16_input.txt";
 
-  char const *file = "/tmp/d17_input.txt";
+  //char const *file = "/tmp/aoc/bb17.txt";
+
+  char const *file = "/tmp/d18_inp.txt";
+
+//  char const *file = "/tmp/ex.txt";
   fetch_day_input_cached(current_year, current_day, file);
-  const AocDayRes res = solve_year23_day17(file);
+  const AocDayRes res = solve_year23_day18(file);
   print_aoc_day_result(&res);
   ResultStatus *stat = NULL;
   aoc_manager_get_day_status(manager_handle, current_year, current_day,
@@ -134,8 +139,8 @@ void solve_current_day(aoc_manager_handle manager_handle) {
 //                res.part1_res);
 
   // part 2
-//  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
-//                res.part2_res);
+  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
+                res.part2_res);
 }
 
 int main() {
