@@ -1,6 +1,7 @@
 #include "day17.h"
 #include "../../res/gheap.h"
 #include "../../res/hashmap.c/hashmap.h"
+#include <omp.h>
 
 #define MAX_SIZE 10000
 #define HEAP_LIMIT 1000000
@@ -149,14 +150,14 @@ static bool is_final(const D17Map *map, D17State state) {
   return (state.x == map->x_size - 1) && (state.y == map->y_size - 1);
 }
 
-static void get_neighbors_naive(const D17Map *map,const D17State state,
+static void get_neighbors_naive(const D17Map *map, const D17State state,
                                 D17State **outvec) {
   for (int i = 0; i < 4; i++) {
     LLTuple delta = facing_to_delta(i);
     D17State moved_state = state;
     moved_state.facing = 0;
-    moved_state.x += delta.left;
-    moved_state.y += delta.right;
+    moved_state.x += (int)delta.left;
+    moved_state.y += (int)delta.right;
     moved_state.distance += d17map_lookup(map, state.x, state.y);
     if (0 <= (moved_state.x) && (moved_state.x < (map->x_size)) &&
         (0 <= moved_state.y) && (moved_state.y < (map->y_size))) {
@@ -174,7 +175,7 @@ static bool is_final_ultra(const D17Map *map, D17State state) {
          (state.straight_moves >= 4);
 }
 
-static void get_neighbors_ultra(const D17Map *map,const D17State state,
+static void get_neighbors_ultra(const D17Map *map, const D17State state,
                                 D17State **outvec) {
   if (state.straight_moves < 10) {
     D17State straight_state = step(state, map);
@@ -236,11 +237,6 @@ int heuristic_use_naive_dist(D17State state, const void *heuristic_data) {
   return 0;
 }
 
-void check_distances_are_consistent(const HeuristicDistances* distances){
-
-}
-
-
 typedef void (*get_nbs_ptr)(const D17Map *map, D17State state,
                             D17State **outvec);
 
@@ -276,9 +272,9 @@ static long long solve(const D17Map *map, D17State *initial_state_vec,
     gheap_push_heap(&heap_ctx, priority_heap, curr_heap_size);
   }
 
-  int steps = 0;
+  //int steps = 0;
   while (curr_heap_size > 0) {
-    steps++;
+    //steps++;
     // assert(steps < 50000);
     gheap_pop_heap(&heap_ctx, priority_heap, curr_heap_size);
     const D17State curr_state = priority_heap[curr_heap_size - 1];
@@ -300,12 +296,13 @@ static long long solve(const D17Map *map, D17State *initial_state_vec,
       if (heuristic != NULL) {
         heuristic_dist = heuristic(*nb, heuristic_data);
         const int distance_to_nb = d17map_lookup(map, nb->x, nb->y);
-        nb->heuristic = curr_state.distance + distance_to_nb+heuristic_dist;
-        //printf("setting heurdist to %d+%d+%d=%d\n",curr_state.distance,distance_to_nb,heuristic_dist,nb->heuristic);
+        nb->heuristic = curr_state.distance + distance_to_nb + heuristic_dist;
+        // printf("setting heurdist to
+        // %d+%d+%d=%d\n",curr_state.distance,distance_to_nb,heuristic_dist,nb->heuristic);
       }
-      D17State *old_nb_data=hashmap_get(visited,nb);
-      if(old_nb_data!=NULL){
-        assert(old_nb_data->heuristic<=nb->heuristic);
+      D17State *old_nb_data = hashmap_get(visited, nb);
+      if (old_nb_data != NULL) {
+        assert(old_nb_data->heuristic <= nb->heuristic);
       }
       priority_heap[curr_heap_size++] = *nb;
       gheap_push_heap(&heap_ctx, priority_heap, curr_heap_size);
@@ -328,6 +325,20 @@ static void fill_map(D17Map *map, char *buf, long buf_len) {
     }
     curr_x++;
   }
+}
+
+static long long solve_p1(const D17Map *map, const D17State *initial_states,
+                          const HeuristicDistances *heuristic_distances) {
+  SolveResult result = {NULL};
+  return solve(map, initial_states, get_neighbors, is_final,
+               heuristic_use_naive_dist, heuristic_distances, &result);
+}
+
+static long long solve_p2(const D17Map *map, const D17State *initial_states,
+                          const HeuristicDistances *heuristic_distances) {
+  SolveResult result = {NULL};
+  return solve(map, initial_states, get_neighbors_ultra, is_final_ultra,
+               heuristic_use_naive_dist, heuristic_distances, &result);
 }
 
 LLTuple year23_day17(char *buf, long buf_len) {
@@ -377,11 +388,14 @@ LLTuple year23_day17(char *buf, long buf_len) {
   }
   // return res;
   SolveResult result = {NULL};
-  res.left = solve(&map, initial_states, get_neighbors, is_final,
-                   heuristic_use_naive_dist, &heuristic_distances, &result);
 
-  res.right = solve(&map, initial_states, get_neighbors_ultra, is_final_ultra,
-                    heuristic_use_naive_dist, &heuristic_distances, &result);
+#pragma omp parallel for
+  for (int i = 0; i < 2; i++) {
+    if (i == 0)
+      res.left = solve_p1(&map, initial_states, &heuristic_distances);
+    if (i == 1)
+      res.right = solve_p2(&map, initial_states, &heuristic_distances);
+  }
 
   //  res.left = solve(&map, initial_states, get_neighbors, is_final,NULL,NULL,
   //  &result);

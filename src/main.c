@@ -17,7 +17,7 @@
 #include "util/result_db.h"
 #include "util/timer.h"
 
-#define CURRENT_DAY 15
+#define CURRENT_DAY 18
 
 #define CHECKMARK(x) ((x) ? ("✅") : ("❌"))
 
@@ -76,7 +76,7 @@ void run_all_days(aoc_manager_handle manager, int year) {
     printf("DAY %2d:\n", task.day);
     bool made_guess = validate_day_result(manager, &(result.result), &task);
     if (made_guess) {
-      //print_day_benchmark(&results[i]);
+      print_day_benchmark(&results[i]);
       printf("took:%f\n\n", results[i].solve_duration);
     }
   }
@@ -147,17 +147,17 @@ int main() {
   // benchmark(result_db_test);
   // curl_global_init(CURL_GLOBAL_ALL);
 
-  result_db_handle db = result_db_init_db("/tmp/other_aoc/res_vnnn.db");
+  result_db_handle db = result_db_init_db("/tmp/other_aoc/res_vnnn_.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
   //result_db_test();
 
-  solve_current_day(manager_handle);
+  //solve_current_day(manager_handle);
 
 //    char const *filepath = "/tmp/d15_bbb.txt";
 //    AocDayTask task_bb = {.year = 2023, .day = 15, .input_file = filepath};
 //    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
 //    print_day_benchmark(&benchbb);
-//    run_all_days(manager_handle, 2023);
+   run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
   aoc_manager_close(manager_handle);

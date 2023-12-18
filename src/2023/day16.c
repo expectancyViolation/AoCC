@@ -146,7 +146,8 @@ int interact_facing(enum FACING facing, enum D16TILE tile) {
   return tile_facing_lookup[tile][facing_index(facing)];
 }
 
-static void interact(D16State state, const D16Map *map, struct hashmap *out_states) {
+static void interact(D16State state, const D16Map *map,
+                     struct hashmap *out_states) {
   const enum D16TILE curr_tile = d16map_lookup(map, state.x, state.y);
   int new_facing_flags = interact_facing(state.facing, curr_tile);
   for (int facing_index = 0; facing_index < NUM_FACING; facing_index++) {
@@ -220,7 +221,7 @@ static void fill_map(D16Map *map, char *buf, long buf_len) {
   int curr_x = 0;
   while (buf != NULL) {
     char *line = strsep(&buf, "\n");
-    printf("%s\n", line);
+    // printf("%s\n", line);
     for (int i = 0; i < map->y_size; i++) {
       d16map_set(map, curr_x, i, parse_d16_tile(line[i]));
     }
@@ -250,10 +251,12 @@ LLTuple year23_day16(char *buf, long buf_len) {
     offset_y += (offset_y != 0) ? (-1) : 0;
 
     const int endstop = (step_x != 0) ? map.x_size : map.y_size;
+#pragma omp parallel for
     for (int i = 0; i < endstop; i++) {
       D16State modified_initial_state = {offset_x + i * step_x - dx,
                                          offset_y + i * step_y - dy, facing};
       const long long curr_res = solve(&map, modified_initial_state);
+#pragma omp critical
       curr_best = max(curr_best, curr_res);
     }
   }
