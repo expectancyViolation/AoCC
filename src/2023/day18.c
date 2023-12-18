@@ -1,62 +1,53 @@
 #include "day18.h"
 
-typedef struct {
-  int x;
-  int y;
-} D18State;
-
-static long long signed_area(const D18State *t1, const D18State *t2,
-                             const D18State *t3) {
-  const long long v1x = (t2->x) - (t1->x);
-  const long long v1y = (t2->y) - (t1->y);
-  const long long v2x = (t3->x) - (t1->x);
-  const long long v2y = (t3->y) - (t1->y);
+static long long signed_area(const LLTuple *t1, const LLTuple *t2,
+                             const LLTuple *t3) {
+  const long long v1x = (t2->left) - (t1->left);
+  const long long v1y = (t2->right) - (t1->right);
+  const long long v2x = (t3->left) - (t1->left);
+  const long long v2y = (t3->right) - (t1->right);
   return v1x * v2y - v2x * v1y;
 }
 
+LLTuple lltuple_add(const LLTuple t1, const LLTuple t2) {
+  return (LLTuple){t1.left + t2.left, t1.right + t2.right};
+}
+
+LLTuple lltuple_scale(const LLTuple t, long long factor) {
+  return (LLTuple){factor * t.left, factor * t.right};
+}
+
 static LLTuple parse_direction_p1(char d) {
-  LLTuple delta = {0, 0};
   switch (d) {
   case 'U':
-    delta.left = -1;
-    break;
+    return (LLTuple){-1, 0};
   case 'R':
-    delta.right = 1;
-    break;
+    return (LLTuple){0, 1};
   case 'D':
-    delta.left = 1;
-    break;
+    return (LLTuple){1, 0};
   case 'L':
-    delta.right = -1;
-    break;
+    return (LLTuple){0, -1};
   }
-  return delta;
 }
 
 static LLTuple parse_direction_p2(char d) {
-  LLTuple delta = {0, 0};
   switch (d) {
   case '3':
-    delta.left = -1;
-    break;
+    return (LLTuple){-1, 0};
   case '0':
-    delta.right = 1;
-    break;
+    return (LLTuple){0, 1};
   case '1':
-    delta.left = 1;
-    break;
+    return (LLTuple){1, 0};
   case '2':
-    delta.right = -1;
-    break;
+    return (LLTuple){0, -1};
   }
-  return delta;
 }
 
 LLTuple year23_day18(char *buf, long buf_len) {
   LLTuple res = {0};
 
-  D18State curr_state_p1 = {0, 0};
-  D18State curr_state_p2 = {0, 0};
+  LLTuple curr_state_p1 = {0, 0};
+  LLTuple curr_state_p2 = {0, 0};
 
   long long twice_interior_size_p1 = 0;
   long long boundary_size_p1 = 0;
@@ -65,34 +56,34 @@ LLTuple year23_day18(char *buf, long buf_len) {
   long long boundary_size_p2 = 0;
 
   while (buf != NULL) {
+
+    // parse p1
     char *line = strsep(&buf, "\n");
     const LLTuple delta_p1 = parse_direction_p1(line[0]);
     const long step_count_p1 = strtol(line + 1, NULL, 10);
 
-    const D18State new_state_p1 = {
-        curr_state_p1.x + step_count_p1 * delta_p1.left,
-        curr_state_p1.y + step_count_p1 * delta_p1.right};
+    // solve p1
+    const LLTuple new_state_p1 =
+        lltuple_add(curr_state_p1, lltuple_scale(delta_p1, step_count_p1));
     boundary_size_p1 += step_count_p1;
 
     twice_interior_size_p1 +=
-        signed_area(&(D18State){0, 0}, &curr_state_p1, &new_state_p1);
+        signed_area(&(LLTuple){0, 0}, &curr_state_p1, &new_state_p1);
     curr_state_p1 = new_state_p1;
 
+    // parse p2
     strsep(&line, "(");
-    printf("%s\n", line);
-
     const LLTuple delta_p2 = parse_direction_p2(line[6]);
-
     line[6] = 0;
-
     const long step_count_p2 = strtol(line + 1, NULL, 16);
-    const D18State new_state_p2 = {
-        curr_state_p2.x + step_count_p2 * delta_p2.left,
-        curr_state_p2.y + step_count_p2 * delta_p2.right};
+
+    // solve p2
+    const LLTuple new_state_p2 =
+        lltuple_add(curr_state_p2, lltuple_scale(delta_p2, step_count_p2));
     boundary_size_p2 += step_count_p2;
 
     twice_interior_size_p2 +=
-        signed_area(&(D18State){0, 0}, &curr_state_p2, &new_state_p2);
+        signed_area(&(LLTuple){0, 0}, &curr_state_p2, &new_state_p2);
     curr_state_p2 = new_state_p2;
   }
   res.left = (llabs(twice_interior_size_p1) + boundary_size_p1) / 2 + 1;
