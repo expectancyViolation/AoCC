@@ -1,12 +1,15 @@
 #include "day17.h"
 #include "../../res/gheap.h"
 #include "../../res/hashmap.c/hashmap.h"
+#include "../util/timer.h"
+#include <leptonica/allheaders.h>
+#include <limits.h>
 #include <omp.h>
 
 #define MAX_SIZE 10000
 #define HEAP_LIMIT 1000000
 
-#define D17_PART2
+#define D17_PAINT
 
 #define DISTANCE_UNREACHABLE -1
 
@@ -57,17 +60,18 @@ static LLTuple facing_to_delta(enum FACING facing) {
   return res;
 }
 
-typedef struct {
+typedef struct _D17State {
   int x;
   int y;
   enum FACING facing;
   int straight_moves;
   int distance;
   int heuristic;
+  int predecessor_index;
 } D17State;
 
 static const D17State INVALID_STATE = {
-    .x = -2, .y = -2, FACING_west, -1, 1000000, 1000000};
+    .x = -2, .y = -2, FACING_west, -1, 1000000, 1000000, -1};
 
 void print_d17state(const D17State *state) {
   printf("state:(%d,%d,%d,%d (cost:%d,latest heuristic: %d))\n", state->x,
@@ -220,6 +224,8 @@ static const struct gheap_ctx heap_ctx = {
 
 typedef struct {
   struct hashmap *visited;
+  D17State *final_state;
+  D17State *predecessors_vec;
 } SolveResult;
 
 typedef struct {
@@ -248,6 +254,7 @@ static long long solve(const D17Map *map, D17State *initial_state_vec,
                        get_nbs_ptr get_nbs, is_final_ptr is_final_,
                        heuristic_ptr heuristic, void *heuristic_data,
                        SolveResult *out_solve) {
+
   struct hashmap *states = hashmap_new(sizeof(D17State), 0, 0, 0, d17state_hash,
                                        d17state_compare, NULL, NULL);
 
@@ -272,10 +279,10 @@ static long long solve(const D17Map *map, D17State *initial_state_vec,
     gheap_push_heap(&heap_ctx, priority_heap, curr_heap_size);
   }
 
-  //int steps = 0;
+  // int steps = 0;
   while (curr_heap_size > 0) {
-    //steps++;
-    // assert(steps < 50000);
+    // steps++;
+    //  assert(steps < 50000);
     gheap_pop_heap(&heap_ctx, priority_heap, curr_heap_size);
     const D17State curr_state = priority_heap[curr_heap_size - 1];
     curr_heap_size--;
@@ -283,8 +290,15 @@ static long long solve(const D17Map *map, D17State *initial_state_vec,
     if (already_visited) {
       continue;
     }
+    //    printf("visiting:%d\n");
+    //    print_d17state(&curr_state);
+    const int pred_index = cvector_size(out_solve->predecessors_vec);
+    cvector_push_back(out_solve->predecessors_vec, curr_state);
+
     bool is_final = is_final_(map, curr_state);
     if (is_final) {
+      out_solve->final_state = malloc(sizeof(D17State));
+      *(out_solve->final_state) = curr_state;
       return curr_state.distance;
     }
     hashmap_set(visited, &curr_state);
@@ -297,15 +311,18 @@ static long long solve(const D17Map *map, D17State *initial_state_vec,
         heuristic_dist = heuristic(*nb, heuristic_data);
         const int distance_to_nb = d17map_lookup(map, nb->x, nb->y);
         nb->heuristic = curr_state.distance + distance_to_nb + heuristic_dist;
-        // printf("setting heurdist to
-        // %d+%d+%d=%d\n",curr_state.distance,distance_to_nb,heuristic_dist,nb->heuristic);
+        // printf("%d\n",nb->heuristic);
+        //  printf("setting heurdist to
+        //  %d+%d+%d=%d\n",curr_state.distance,distance_to_nb,heuristic_dist,nb->heuristic);
       }
       D17State *old_nb_data = hashmap_get(visited, nb);
       if (old_nb_data != NULL) {
-        assert(old_nb_data->heuristic <= nb->heuristic);
+        //        assert(old_nb_data->heuristic <= nb->heuristic);
+      } else {
+        nb->predecessor_index = pred_index;
+        priority_heap[curr_heap_size++] = *nb;
+        gheap_push_heap(&heap_ctx, priority_heap, curr_heap_size);
       }
-      priority_heap[curr_heap_size++] = *nb;
-      gheap_push_heap(&heap_ctx, priority_heap, curr_heap_size);
     }
   }
   return 0;
@@ -327,18 +344,74 @@ static void fill_map(D17Map *map, char *buf, long buf_len) {
   }
 }
 
+static void paint_result(const D17Map *map, const SolveResult *res,
+                         char *outfile) {
+#ifdef D17_PAINT
+  for (int layer = 0; layer <= 10; layer++) {
+    PIX *pic = pixCreate(map->y_size, map->x_size, 32);
+    size_t iter = 0;
+    void *item;
+    const int mapsize = map->x_size * map->y_size;
+    int *color_map = malloc(sizeof(int) * mapsize);
+    for (int i = 0; i < mapsize; i++)
+      color_map[i] = INT_MAX;
+    while (hashmap_iter(res->visited, &iter, &item)) {
+      D17State *state = item;
+      const int offset = state->x * map->y_size + state->y;
+      if (state->straight_moves == layer)
+        color_map[offset] = min(color_map[offset], state->distance);
+    }
+    for (int x = 0; x < map->x_size; x++) {
+      for (int y = 0; y < map->y_size; y++) {
+        const size_t offset = x * map->y_size + y;
+        const int col_val = color_map[offset];
+        if ((col_val != INT_MAX))
+          pixSetRGBPixel(pic, y, x, (col_val) % 255, 0, 100);
+      }
+    }
+    D17State *curr_state = res->final_state;
+    while (curr_state->predecessor_index >= 0) {
+      if (curr_state->straight_moves == layer)
+        pixSetRGBPixel(pic, curr_state->y, curr_state->x, 255, 255, 255);
+      curr_state = &(res->predecessors_vec[curr_state->predecessor_index]);
+      // printf("currstate:\n");
+      // print_d17state(curr_state);
+    }
+
+    pixSetRGBPixel(pic, 0, 0, 255, 255, 255);
+
+    assert(pic != NULL);
+    char full_outfile[200] = "";
+    sprintf(full_outfile, "%s_layer_%d.bmp", outfile, layer);
+    pixWrite(full_outfile, pic, IFF_BMP);
+    free(color_map);
+  }
+#endif
+}
+
 static long long solve_p1(const D17Map *map, const D17State *initial_states,
                           const HeuristicDistances *heuristic_distances) {
-  SolveResult result = {NULL};
-  return solve(map, initial_states, get_neighbors, is_final,
+  SolveResult result = {NULL, NULL, NULL};
+  const long long res= solve(map, initial_states, get_neighbors, is_final,
                heuristic_use_naive_dist, heuristic_distances, &result);
+
+  const char *filename = (heuristic_distances == NULL) ? "/tmp/d17_p1_no_heur"
+                                                       : "/tmp/d17_p1_heur";
+  paint_result(map, &result, filename);
+  return res;
 }
 
 static long long solve_p2(const D17Map *map, const D17State *initial_states,
                           const HeuristicDistances *heuristic_distances) {
-  SolveResult result = {NULL};
-  return solve(map, initial_states, get_neighbors_ultra, is_final_ultra,
-               heuristic_use_naive_dist, heuristic_distances, &result);
+  SolveResult result = {NULL, NULL, NULL};
+  heuristic_ptr heur =
+      (heuristic_distances != NULL) ? heuristic_use_naive_dist : NULL;
+  const long long res = solve(map, initial_states, get_neighbors_ultra,
+                        is_final_ultra, heur, heuristic_distances, &result);
+  const char *filename = (heuristic_distances == NULL) ? "/tmp/d17_p2_no_heur"
+                                                       : "/tmp/d17_p2_heur";
+  paint_result(map, &result, filename);
+  return res;
 }
 
 LLTuple year23_day17(char *buf, long buf_len) {
@@ -354,7 +427,8 @@ LLTuple year23_day17(char *buf, long buf_len) {
                               .facing = initial_facing,
                               .straight_moves = 0,
                               .distance = 0,
-                              .heuristic = 0};
+                              .heuristic = 0,
+                              .predecessor_index = -1};
     cvector_push_back(initial_states, initial_state);
   }
 
@@ -364,13 +438,19 @@ LLTuple year23_day17(char *buf, long buf_len) {
                                       .facing = 0,
                                       .straight_moves = 0,
                                       .distance = 0,
-                                      .heuristic = 0};
+                                      .heuristic = 0,
+                                      .predecessor_index = -1};
   cvector_push_back(heuristic_initial_states, heuristic_initial_state);
 
-  SolveResult heuristic_result = {NULL};
+  SolveResult heuristic_result = {NULL, NULL, NULL};
+
+  struct my_perf_timer *timer_heur = start_perf_measurement();
 
   solve(&map, heuristic_initial_states, get_neighbors_naive, is_final_heuristic,
         NULL, NULL, &heuristic_result);
+
+  double took_heur = stop_perf_measurement(timer_heur);
+  printf("heur took %f\n", took_heur);
 
   HeuristicDistances heuristic_distances = {.x_size = map.x_size,
                                             .y_size = map.y_size};
@@ -387,21 +467,28 @@ LLTuple year23_day17(char *buf, long buf_len) {
                              state->y] = state->distance;
   }
   // return res;
-  SolveResult result = {NULL};
+  SolveResult result = {NULL, NULL, NULL};
 
 #pragma omp parallel for
   for (int i = 0; i < 2; i++) {
+    struct my_perf_timer *timer = start_perf_measurement();
     if (i == 0)
       res.left = solve_p1(&map, initial_states, &heuristic_distances);
     if (i == 1)
       res.right = solve_p2(&map, initial_states, &heuristic_distances);
+
+    double took = stop_perf_measurement(timer);
+    printf("part %d took %f\n", i + 1, took);
   }
 
   //  res.left = solve(&map, initial_states, get_neighbors, is_final,NULL,NULL,
   //  &result);
   //
-  //  res.right = solve(&map, initial_states, get_neighbors_ultra,
-  //  is_final_ultra,NULL,NULL,&result);
+
+  //  struct my_perf_timer *timer_no_heur = start_perf_measurement();
+  res.right = solve_p2(&map, initial_states, NULL);
+  //  double took = stop_perf_measurement(timer_no_heur);
+  //  printf("part 2 no heur took %f\n",took);
 
   free((map.map));
   return res;

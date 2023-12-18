@@ -126,10 +126,10 @@ void solve_current_day(aoc_manager_handle manager_handle) {
   fetch_day_input_cached(current_year, current_day, file);
   const AocDayRes res = solve_year23_day18(file);
   print_aoc_day_result(&res);
-  ResultStatus *stat = NULL;
-  aoc_manager_get_day_status(manager_handle, current_year, current_day,
-                             AOC_DAY_PART_part2, &stat);
-  print_result_status(stat);
+//  ResultStatus *stat = NULL;
+//  aoc_manager_get_day_status(manager_handle, current_year, current_day,
+//                             AOC_DAY_PART_part2, &stat);
+//  print_result_status(stat);
 
 
   // 1030 too high
@@ -139,8 +139,8 @@ void solve_current_day(aoc_manager_handle manager_handle) {
 //                res.part1_res);
 
   // part 2
-  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
-                res.part2_res);
+//  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
+//                res.part2_res);
 }
 
 int main() {
@@ -151,13 +151,13 @@ int main() {
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
   //result_db_test();
 
-  //solve_current_day(manager_handle);
+//  solve_current_day(manager_handle);
 
-//    char const *filepath = "/tmp/d15_bbb.txt";
-//    AocDayTask task_bb = {.year = 2023, .day = 15, .input_file = filepath};
-//    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-//    print_day_benchmark(&benchbb);
-   run_all_days(manager_handle, 2023);
+    char const *filepath = "/tmp/d17_ex1.txt";
+    AocDayTask task_bb = {.year = 2023, .day = 17, .input_file = filepath};
+    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+    print_day_benchmark(&benchbb);
+//   run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
   aoc_manager_close(manager_handle);

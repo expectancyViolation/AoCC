@@ -37,6 +37,7 @@ if (OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif ()
 
+
 add_executable(aocc
         res/b64.c/buffer.c
         res/b64.c/encode.c
@@ -90,3 +91,5 @@ endif ()
 if (SQLite3_FOUND)
     target_link_libraries(aocc SQLite::SQLite3)
 endif ()
+
+target_link_libraries(aocc leptonica)
