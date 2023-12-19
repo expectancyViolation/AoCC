@@ -123,7 +123,7 @@ void solve_current_day(aoc_manager_handle manager_handle) {
 
   char const *file = "/tmp/d19_inp.txt";
 
-//  char const *file = "/tmp/d19_ex1.txt";
+ // char const *file = "/tmp/d19_ex1.txt";
 
 //  char const *file = "/tmp/ex.txt";
   fetch_day_input_cached(current_year, current_day, file);
