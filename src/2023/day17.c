@@ -4,14 +4,13 @@
 #include "../util/timer.h"
 #include <leptonica/allheaders.h>
 #include <limits.h>
-#include <omp.h>
 
 #define MAX_SIZE 10000
 #define HEAP_LIMIT 1000000
 
 #define D17_PAINT
 
-#define DISTANCE_UNREACHABLE -1
+#define DISTANCE_UNREACHABLE (-1)
 
 enum FACING {
   FACING_north = 0,
@@ -21,19 +20,6 @@ enum FACING {
 };
 
 #define NUM_FACING 4
-
-static int facing_index(enum FACING facing) {
-  switch (facing) {
-  case FACING_north:
-    return 0;
-  case FACING_east:
-    return 1;
-  case FACING_south:
-    return 2;
-  case FACING_west:
-    return 3;
-  }
-}
 
 static enum FACING turn_facing(enum FACING in, bool left) {
   const int offset = (left) ? (-1) : 1;
@@ -60,7 +46,7 @@ static LLTuple facing_to_delta(enum FACING facing) {
   return res;
 }
 
-typedef struct _D17State {
+typedef struct {
   int x;
   int y;
   enum FACING facing;
@@ -73,11 +59,11 @@ typedef struct _D17State {
 static const D17State INVALID_STATE = {
     .x = -2, .y = -2, FACING_west, -1, 1000000, 1000000, -1};
 
-void print_d17state(const D17State *state) {
-  printf("state:(%d,%d,%d,%d (cost:%d,latest heuristic: %d))\n", state->x,
-         state->y, state->facing, state->straight_moves, state->distance,
-         state->heuristic);
-}
+//void print_d17state(const D17State *state) {
+//  printf("state:(%d,%d,%d,%d (cost:%d,latest heuristic: %d))\n", state->x,
+//         state->y, state->facing, state->straight_moves, state->distance,
+//         state->heuristic);
+//}
 
 static int d17state_compare(const void *a, const void *b, void *udata) {
   const D17State *sa = a;
@@ -272,7 +258,7 @@ static long long solve(const D17Map *map, D17State *initial_state_vec,
 
   gheap_make_heap(&heap_ctx, priority_heap, curr_heap_size);
 
-  for (int i = 0; i < cvector_size(initial_state_vec); i++) {
+  for (size_t i = 0; i < cvector_size(initial_state_vec); i++) {
     const D17State initial_state = initial_state_vec[i];
     hashmap_set(states, &initial_state);
     priority_heap[curr_heap_size++] = initial_state;
@@ -304,7 +290,7 @@ static long long solve(const D17Map *map, D17State *initial_state_vec,
     hashmap_set(visited, &curr_state);
     cvector_clear(nb_vec);
     get_nbs(map, curr_state, &nb_vec);
-    for (int i = 0; i < cvector_size(nb_vec); i++) {
+    for (size_t i = 0; i < cvector_size(nb_vec); i++) {
       D17State *nb = &(nb_vec[i]);
       int heuristic_dist = 0;
       if (heuristic != NULL) {
@@ -392,8 +378,9 @@ static void paint_result(const D17Map *map, const SolveResult *res,
 static long long solve_p1(const D17Map *map, const D17State *initial_states,
                           const HeuristicDistances *heuristic_distances) {
   SolveResult result = {NULL, NULL, NULL};
-  const long long res= solve(map, initial_states, get_neighbors, is_final,
-               heuristic_use_naive_dist, heuristic_distances, &result);
+  const long long res =
+      solve(map, initial_states, get_neighbors, is_final,
+            heuristic_use_naive_dist, heuristic_distances, &result);
 
   const char *filename = (heuristic_distances == NULL) ? "/tmp/d17_p1_no_heur"
                                                        : "/tmp/d17_p1_heur";
@@ -406,8 +393,9 @@ static long long solve_p2(const D17Map *map, const D17State *initial_states,
   SolveResult result = {NULL, NULL, NULL};
   heuristic_ptr heur =
       (heuristic_distances != NULL) ? heuristic_use_naive_dist : NULL;
-  const long long res = solve(map, initial_states, get_neighbors_ultra,
-                        is_final_ultra, heur, heuristic_distances, &result);
+  const long long res =
+      solve(map, initial_states, get_neighbors_ultra, is_final_ultra, heur,
+            heuristic_distances, &result);
   const char *filename = (heuristic_distances == NULL) ? "/tmp/d17_p2_no_heur"
                                                        : "/tmp/d17_p2_heur";
   paint_result(map, &result, filename);
