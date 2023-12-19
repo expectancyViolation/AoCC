@@ -123,6 +123,8 @@ void solve_current_day(aoc_manager_handle manager_handle) {
 
   char const *file = "/tmp/d19_inp.txt";
 
+//  char const *file = "/tmp/d19_ex1.txt";
+
 //  char const *file = "/tmp/ex.txt";
   fetch_day_input_cached(current_year, current_day, file);
   const AocDayRes res = solve_year23_day19(file);
@@ -133,11 +135,10 @@ void solve_current_day(aoc_manager_handle manager_handle) {
 //  print_result_status(stat);
 
 
-  // 1030 too high
 
   //  // part 1
-//  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
-//                res.part1_res);
+  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
+                res.part1_res);
 
   // part 2
 //  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part2,
