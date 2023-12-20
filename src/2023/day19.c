@@ -139,7 +139,8 @@ D19Target const *match_rule_target(D19Rule const *curr_rule, long const *xmas) {
   return &(curr_rule->default_target);
 }
 
-bool judge_xmas(D19Rule const *rules_vec, int in_rule_offset, long const *xmas) {
+bool judge_xmas(D19Rule const *rules_vec, int in_rule_offset,
+                long const *xmas) {
   D19Target const initial_target = {.target_type = D19_TARGET_TYPE_rule,
                                     .target_rule_offset = in_rule_offset};
   D19Target const *curr_target = &initial_target;
@@ -245,8 +246,6 @@ LLTuple year23_day19(char *buf, long buf_len) {
       const long split_val = split_rule->split_val;
       const long other_side_val =
           (split_rule->is_greater) ? (split_val + 1) : (split_val);
-      //      cvector_push_back(crit_vals[split_rule->split_char_offset],
-      //      split_val);
       cvector_push_back(crit_vals[split_rule->split_char_offset],
                         other_side_val);
     }
@@ -266,15 +265,12 @@ LLTuple year23_day19(char *buf, long buf_len) {
   int comb_lims[] = {0, 0, 0, 0};
   for (int i = 0; i < 4; i++) {
     comb_lims[i] = cvector_size(crit_vals[i]) - 1;
-    printf("%d,",comb_lims[i]);
+    printf("%d,", comb_lims[i]);
   }
   printf("\n");
-  int k = 0;
   bool reached_last_interval = false;
-  long long total_size = 0;
   long long total_accepted = 0;
   while (!reached_last_interval) {
-    assert(k < 10000);
     long long interval_size = 1;
     long curr_xmas[4] = {0};
     for (int i = 0; i < 4; i++) {
@@ -282,23 +278,14 @@ LLTuple year23_day19(char *buf, long buf_len) {
       const int iv_end = curr_offset[i] + 1;
       interval_size *= crit_vals[i][iv_end] - crit_vals[i][iv_begin];
       curr_xmas[i] = crit_vals[i][iv_begin];
-//      printf("%lld-%lld\t", crit_vals[i][iv_begin], crit_vals[i][iv_end]);
     }
 
     bool accept = judge_xmas(rules_vec, in_rule_offset, curr_xmas);
-//    printf("\ncurr xmas:%ld,%ld,%ld,%ld =>%d\n", curr_xmas[0], curr_xmas[1], curr_xmas[2],
-//           curr_xmas[3],accept);
     if (accept) {
       total_accepted += interval_size;
     }
-
-//    printf("\n");
-//    printf("%lld\n", interval_size);
-    total_size += interval_size;
-
     reached_last_interval = advance_comb(curr_offset, comb_lims);
   }
-//  printf("TOTAL:%lld\n", total_size);
   res.right = total_accepted;
 
   return res;
