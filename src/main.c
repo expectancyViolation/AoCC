@@ -123,15 +123,17 @@ void solve_current_day(aoc_manager_handle manager_handle) {
 
   // char const *file = "/tmp/aoc/bb17.txt";
 
-//  char const *file = "/tmp/d21_inp.txt";
+  //  char const *file = "/tmp/d21_inp.txt";
 
-  char const *file = "/tmp/d21_inp.txt";
 
   //  char const *file = "/tmp/d20_ex2.txt";
 
   // char const *file = "/tmp/d19_ex1.txt";
 
   //  char const *file = "/tmp/ex.txt";
+
+//   char const *file = "/tmp/d21_inp.txt";
+  char const *file = "/tmp/d21_ex4.txt";
   fetch_day_input_cached(current_year, current_day, file);
   const AocDayRes res = solve_year23_day21(file);
   print_aoc_day_result(&res);

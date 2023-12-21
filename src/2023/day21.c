@@ -6,6 +6,8 @@
 
 #define DISTANCE_UNREACHABLE (-1)
 
+#define MOD_(a, M) (((a) % (M)) + (M)) % (M)
+
 typedef struct {
   char *map;
   int x_size;
@@ -37,10 +39,13 @@ static void d21map_set(const D21Map *map, int x, int y, int val) {
   map->map[map->y_size * x + y] = val;
 }
 
-static char d21map_lookup(const D21Map *map, int x, int y) {
-  if ((0 <= x) && (x < map->x_size) && (0 <= y) && (y < map->y_size))
-    return map->map[(map->y_size) * x + y];
-  return '#';
+static char d21_map_periodic_lookup(const D21Map *map, int x, int y) {
+  const int x_offset = x + (map->start_x);
+  const int y_offset = y + (map->start_y);
+  const int x_rem = MOD_(x_offset, map->x_size);
+  const int y_rem = MOD_(y_offset, map->y_size);
+
+  return map->map[(map->y_size) * x_rem + y_rem];
 }
 
 static u_int64_t d21state_hash(const void *item, u_int64_t seed0,
@@ -51,36 +56,27 @@ static u_int64_t d21state_hash(const void *item, u_int64_t seed0,
   return hash_val;
 }
 
-typedef struct {
-  struct hashmap *visited;
-} SolveResult;
-
 static void fill_map(D21Map *map, char *buf, long buf_len) {
   const int y_size = strchr(buf, '\n') - buf;
   const int x_size = buf_len / (y_size + 1);
-  map->x_size = 3 * x_size;
-  map->y_size = 3 * y_size;
-  map->map = malloc(9 * sizeof(*map->map) * x_size * y_size);
+  map->x_size = x_size;
+  map->y_size = y_size;
+  map->map = malloc(sizeof(*map->map) * x_size * y_size);
   int curr_x = 0;
   while (buf != NULL) {
     char *line = strsep(&buf, "\n");
     for (int i = 0; i < y_size; i++) {
-      for (int j = 0; j < 3; j++) {
-        for (int k = 0; k < 3; k++) {
-          char symbol = ((j == 1) || (k == 1)) ? line[i] : '#';
-          d21map_set(map, curr_x, i, line[i]);
-          if ((k == 1) && (j == 1) && (line[i] == 'S')) {
-            map->start_x = x_size + curr_x;
-            map->start_y = y_size + i;
-          }
-        }
+      d21map_set(map, curr_x, i, line[i]);
+      if (line[i] == 'S') {
+        map->start_x = curr_x;
+        map->start_y = i;
       }
     }
     curr_x++;
   }
 }
 
-static long long solve(const D21Map *map) {
+static LLTuple solve(const D21Map *map) {
 
   struct hashmap *visited = hashmap_new(
       sizeof(D21State), 0, 0, 0, d21state_hash, d21state_compare, NULL, NULL);
@@ -88,32 +84,24 @@ static long long solve(const D21Map *map) {
   struct hashmap *frontier = hashmap_new(
       sizeof(D21State), 0, 0, 0, d21state_hash, d21state_compare, NULL, NULL);
 
-  hashmap_set(frontier,
-              &(D21State){.x = map->start_x, .y = map->start_y, .distance = 0});
+  hashmap_set(frontier, &(D21State){.x = 0, .y = 0, .distance = 0});
 
   struct hashmap *new_frontier = hashmap_new(
       sizeof(D21State), 0, 0, 0, d21state_hash, d21state_compare, NULL, NULL);
 
-  // int steps = 0;
-  for (int n_step = 0; n_step < 800; n_step++) {
+  for (int n_step = 0; n_step < 4 * map->x_size; n_step++) {
+    // limit should be safe to reach all reachable positions in 3x3 blocks
 
     size_t iter = 0;
     void *item;
     while (hashmap_iter(frontier, &iter, &item)) {
       D21State curr_state = *(D21State *)item;
-      // printf("checking: %d %d\n", curr_state.x, curr_state.y);
-      //     bool already_visited = hashmap_get(visited, &curr_state) != NULL;
-      //     if (already_visited) {
-      //       assert(false);
-      //       continue;
-      //     }
-      // printf("visiting:%d %d at %d\n", curr_state.x,
-      // curr_state.y,curr_state.distance);
+
       hashmap_set(visited, &curr_state);
       for (int i = 0; i < NUM_DELTAS; i++) {
         const int nx = curr_state.x + DELTAS[i].left;
         const int ny = curr_state.y + DELTAS[i].right;
-        if (d21map_lookup(map, nx, ny) != '#') {
+        if (d21_map_periodic_lookup(map, nx, ny) != '#') {
           if (hashmap_get(visited, &(D21State){.x = nx, .y = ny}) != NULL)
             continue;
           const D21State new_state = {
@@ -127,53 +115,63 @@ static long long solve(const D21Map *map) {
     frontier = new_frontier;
     new_frontier = tmp;
     hashmap_clear(new_frontier, 0);
-    printf("frontier: %ld\n", hashmap_count(frontier));
-    printf("visited: %ld\n", hashmap_count(visited));
   }
+
+  const long long step_count = 26501365;
 
   size_t iter = 0;
   void *item;
-  long long count_at_even_dist = 0;
-  long long count_p1 = 0;
-  long long block_size = map->x_size / 3;
-  printf("block size is %lld\n", block_size);
-  int count_at_even_dist_p2 = 0;
+  long long count_at_odd_dist = 0;
+  long long count_even_below_64 = 0;
+  long long block_size = map->x_size;
   while (hashmap_iter(visited, &iter, &item)) {
     D21State curr_state = *(D21State *)item;
-    bool is_even_dist = (curr_state.distance % 2) == 0;
-    if (!is_even_dist)
-      continue;
-    //    if (curr_state.distance == 0)
-    //      curr_state.distance = 2;
 
-    // handle regular distances (p1)
-    if ((abs(curr_state.x - (map->start_x)) <= 65) &&
-        abs(curr_state.y - (map->start_y)) <= 65) {
-      count_p1 += is_even_dist;
+    int pos_inside_block_x = MOD_(curr_state.x + map->start_x, map->x_size);
+    int pos_inside_block_y = MOD_(curr_state.y + map->start_y, map->y_size);
+    int block_x =
+        (curr_state.x + map->start_x - pos_inside_block_x) / (map->x_size);
+    int block_y =
+        (curr_state.y + map->start_y - pos_inside_block_y) / (map->y_size);
+
+    if ((abs(block_x) > 1) || (abs(block_y) > 1))
       continue;
+
+    long long remaining_dist = step_count - curr_state.distance;
+    long long remaining_block_steps = remaining_dist / block_size;
+
+    bool is_odd_distance = (curr_state.distance % 2) == 1;
+
+    if (curr_state.distance <= 64) {
+      count_even_below_64 += (!is_odd_distance);
     }
 
-    int remaining_dist = 26501365 - curr_state.distance;
-    // printf("%d\n", map->x_size);
-    long long remaining_block_steps = remaining_dist / block_size;
-    //  1199438254480527 too high
-    //  1200175023393127
-    //  1404644746729180
-    //    85740177832380
-    //   771646337293980 wrong
-    //  1369576921329408
-    count_at_even_dist +=
-        ((remaining_block_steps + 1) * (remaining_block_steps + 1)) / 2;
+    if ((block_x == 0) && (block_y == 0)) {
+      // initial block
+      count_at_odd_dist += is_odd_distance;
+    } else if (abs(block_x) + abs(block_y) == 1) {
+      // straight line alternating odd even
+      count_at_odd_dist += (remaining_block_steps + 1 + is_odd_distance) / 2;
+    } else {
+      // striped alternating triangles in quadrant
+      if (is_odd_distance) {
+        long long n_ = (remaining_block_steps + 2) / 2;
+        count_at_odd_dist += n_ * n_;
+      } else {
+        long long n_ = (remaining_block_steps + 1) / 2;
+        count_at_odd_dist += n_ * (n_ + 1);
+      }
+    }
   }
-  printf("%lld\n", count_p1);
-  return count_at_even_dist;
+
+  return (LLTuple){count_even_below_64, count_at_odd_dist};
 }
 
 LLTuple year23_day21(char *buf, long buf_len) {
   LLTuple res = {0};
   D21Map map = {0};
   fill_map(&map, buf, buf_len);
-  res.left = solve(&map);
+  res = solve(&map);
   return res;
 }
 AocDayRes solve_year23_day21(const char *input_file) {
