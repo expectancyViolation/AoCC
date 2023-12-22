@@ -78,6 +78,7 @@ add_executable(aocc
         src/2023/day19.c
         src/2023/day20.c
         src/2023/day21.c
+        src/2023/day22.c
         src/2023/year23.c
         src/util/aoc_types.c
         src/util/aoc_solving.c

@@ -20,7 +20,7 @@ int clock_gettime(int _, struct timespec *spec)      //C-file part
 void start_my_perf_timer(struct my_perf_timer *timer) {
   assert(!timer->running);
   timer->running = true;
-  clock_gettime(CLOCK_MONOTONIC, timer->begin);
+  clock_gettime(CLOCK_MONOTONIC_RAW, timer->begin);
 }
 
 void destroy_my_perf_timer(struct my_perf_timer *timer) {
@@ -39,7 +39,7 @@ struct my_perf_timer *start_perf_measurement() {
 
 double stop_perf_measurement(struct my_perf_timer *timer) {
   struct timespec end;
-  clock_gettime(CLOCK_MONOTONIC, &end);
+  clock_gettime(CLOCK_MONOTONIC_RAW, &end);
   const double result =
       (double)(end.tv_nsec - timer->begin->tv_nsec) / 1000000000.0 +
       (double)(end.tv_sec - timer->begin->tv_sec);

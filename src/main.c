@@ -14,6 +14,7 @@
 #include "2023/day19.h"
 #include "2023/day20.h"
 #include "2023/day21.h"
+#include "2023/day22.h"
 #include "2023/year23.h"
 #include "util/aoc.h"
 #include "util/aoc_solution_manager.h"
@@ -116,26 +117,13 @@ void submit_helper(aoc_manager_handle manager_handle, int year, int day,
 }
 
 void solve_current_day(aoc_manager_handle manager_handle) {
-  const int current_day = 21;
+  const int current_day = 22;
   const int current_year = 2023;
-  // char const *file = "/tmp/23day16.txt";
-  // char const *file = "/tmp/d16_input.txt";
+  char const *file = "/tmp/d22_input_.txt";
 
-  // char const *file = "/tmp/aoc/bb17.txt";
-
-  //  char const *file = "/tmp/d21_inp.txt";
-
-
-  //  char const *file = "/tmp/d20_ex2.txt";
-
-  // char const *file = "/tmp/d19_ex1.txt";
-
-  //  char const *file = "/tmp/ex.txt";
-
-//   char const *file = "/tmp/d21_inp.txt";
-  char const *file = "/tmp/d21_ex4.txt";
+  //  char const *file = "/tmp/d22_ex1.txt";
   fetch_day_input_cached(current_year, current_day, file);
-  const AocDayRes res = solve_year23_day21(file);
+  const AocDayRes res = solve_year23_day22(file);
   print_aoc_day_result(&res);
   //  ResultStatus *stat = NULL;
   //  aoc_manager_get_day_status(manager_handle, current_year, current_day,
@@ -143,8 +131,9 @@ void solve_current_day(aoc_manager_handle manager_handle) {
   //  print_result_status(stat);
 
   //  // part 1
-  submit_helper(manager_handle, current_year, current_day, AOC_DAY_PART_part1,
-                res.part1_res);
+  //  submit_helper(manager_handle, current_year, current_day,
+  //  AOC_DAY_PART_part1,
+  //                res.part1_res);
 
   // part 2
   //  submit_helper(manager_handle, current_year, current_day,
@@ -156,20 +145,20 @@ int main() {
   // benchmark(result_db_test);
   // curl_global_init(CURL_GLOBAL_ALL);
 
-  result_db_handle db = result_db_init_db("/tmp/other_aoc/res_vnnn_.db");
-  aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
-  // result_db_test();
+  // result_db_handle db = result_db_init_db("/tmp/other_aoc/res_vnnn_.db");
+  // aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
+  //  result_db_test();
 
-  solve_current_day(manager_handle);
+  //  solve_current_day(manager_handle);
 
-  //    char const *filepath = "/tmp/d17_ex1.txt";
-  //    AocDayTask task_bb = {.year = 2023, .day = 17, .input_file = filepath};
-  //    AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-  //    print_day_benchmark(&benchbb);
-  //     run_all_days(manager_handle, 2023);
+  char const *filepath = "/tmp/d22_input.txt";
+  AocDayTask task_bb = {.year = 2023, .day = 22, .input_file = filepath};
+  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+  print_day_benchmark(&benchbb);
+  //       run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
-  aoc_manager_close(manager_handle);
-  result_db_close(db);
+  // aoc_manager_close(manager_handle);
+  // result_db_close(db);
   return 0;
 }
