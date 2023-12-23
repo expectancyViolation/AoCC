@@ -120,9 +120,9 @@ void submit_helper(aoc_manager_handle manager_handle, int year, int day,
 void solve_current_day(aoc_manager_handle manager_handle) {
   const int current_day = 23;
   const int current_year = 2023;
-  char const *file = "/tmp/d23_input.txt";
+char const *file = "/tmp/d23_input.txt";
 
-//   char const *file = "/tmp/d23_ex1.txt";
+  // char const *file = "/tmp/d23_ex1.txt";
   fetch_day_input_cached(current_year, current_day, file);
   const AocDayRes res = solve_year23_day23(file);
   print_aoc_day_result(&res);
