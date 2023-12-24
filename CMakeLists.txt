@@ -38,6 +38,7 @@ if (OPENMP_FOUND)
 endif ()
 
 
+
 add_executable(aocc
         res/b64.c/buffer.c
         res/b64.c/encode.c
@@ -80,6 +81,7 @@ add_executable(aocc
         src/2023/day21.c
         src/2023/day22.c
         src/2023/day23.c
+        src/2023/day24.c
         src/2023/year23.c
         src/util/aoc_types.c
         src/util/aoc_solving.c
@@ -98,3 +100,5 @@ if (SQLite3_FOUND)
 endif ()
 
 target_link_libraries(aocc leptonica)
+
+target_link_libraries(aocc gmp)
