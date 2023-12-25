@@ -21,6 +21,8 @@ enum D19_CHAR_OFFSET {
   D19_CHAR_OFFSET_s = 3
 };
 
+#define NUM_D19_CHAR_OFFSET 4
+
 typedef struct {
   enum D19_TARGET_TYPE target_type;
   union {
@@ -59,17 +61,21 @@ void print_d19split_rule(const D19SplitRule *rule) {
 typedef struct {
   char rule_key[MAX_RULE_KEY_LEN + 1];
   D19SplitRule split_rules[MAX_RULE_COUNT];
+  int num_split_rules;
   D19Target default_target;
 } D19Rule;
 
 void print_d19rule(const D19Rule *rule) {
   printf("RULE:\nkey:%s\n", rule->rule_key);
+  int c = 0;
   for (int i = 0; i < MAX_RULE_COUNT; i++) {
+    c = i;
     const D19SplitRule *split_rule = &(rule->split_rules[i]);
     if (split_rule->target.target_type == D19_TARGET_TYPE_none)
       break;
     print_d19split_rule(split_rule);
   }
+  assert(c == rule->num_split_rules);
   printf("DEFAULT:\n");
   print_d19target(&(rule->default_target));
   printf("\n");
@@ -98,7 +104,7 @@ int get_or_create_target_rule(struct hashmap *rule_lookup, D19Rule **rules_vec,
 
   D19RuleOffset *curr_rule_offset = hashmap_get(rule_lookup, search_rule);
   if (curr_rule_offset == NULL) {
-    D19Rule new_rule = {0};
+    D19Rule new_rule = {.num_split_rules = 0};
     strcpy(new_rule.rule_key, search_rule->rule_key);
     search_rule->rule_offset = cvector_size(*rules_vec);
     cvector_push_back(*rules_vec, new_rule);
@@ -162,6 +168,82 @@ bool advance_comb(int *combs, int const *lims) {
   return true;
 }
 
+enum D19_STATUS {
+  D19_STATUS_undefined = 0,
+  D19_STATUS_matching = 1,
+  D19_STATUS_accepted = 2,
+  D19_STATUS_rejected = 3
+};
+
+typedef struct {
+  long long upper_bounds[NUM_D19_CHAR_OFFSET];
+  long long lower_bounds[NUM_D19_CHAR_OFFSET];
+  int rule_num;
+  int split_rule_offset;
+  enum D19_STATUS status;
+} D19State;
+
+void print_d19_state(D19State const *state) {
+  printf("state:\n\trule:%d\n\toffset:%d\n\tstatus:%d\n", state->rule_num,
+         state->split_rule_offset, state->status);
+  for (int i = 0; i < 4; i++) {
+    printf("%d to %d\n", state->lower_bounds[i], state->upper_bounds[i]);
+  }
+}
+
+bool apply_split_rule(D19Rule const *rules_vec, D19State *state, bool invert) {
+  D19Rule const *curr_rule = &(rules_vec[state->rule_num]);
+  assert(state->status == D19_STATUS_matching);
+  assert(state->split_rule_offset < MAX_RULE_COUNT);
+  if (state->split_rule_offset > curr_rule->num_split_rules)
+    return false;
+  const bool at_default_rule =
+      (state->split_rule_offset) == curr_rule->num_split_rules;
+  D19Target const *target = NULL;
+  if (at_default_rule) {
+    if (invert)
+      return false;
+    target = &(curr_rule->default_target);
+  } else {
+    D19SplitRule const *curr_split_rule =
+        &(curr_rule->split_rules[state->split_rule_offset]);
+    target = &(curr_split_rule->target);
+    if (curr_split_rule->is_greater) {
+      if (invert) {
+        state->upper_bounds[curr_split_rule->split_char_offset] =
+            min(state->upper_bounds[curr_split_rule->split_char_offset],
+                (curr_split_rule->split_val) + 1);
+      } else {
+        state->lower_bounds[curr_split_rule->split_char_offset] =
+            max(state->lower_bounds[curr_split_rule->split_char_offset],
+                (curr_split_rule->split_val) + 1);
+      }
+    } else {
+      if (invert) {
+        state->lower_bounds[curr_split_rule->split_char_offset] =
+            max(state->lower_bounds[curr_split_rule->split_char_offset],
+                (curr_split_rule->split_val));
+      } else {
+        state->upper_bounds[curr_split_rule->split_char_offset] =
+            min(state->upper_bounds[curr_split_rule->split_char_offset],
+                curr_split_rule->split_val);
+      }
+    }
+  }
+  if (invert)
+    return true;
+
+  if (target->target_type == D19_TARGET_TYPE_terminator) {
+    state->status =
+        (target->accept) ? D19_STATUS_accepted : D19_STATUS_rejected;
+  } else {
+    assert(target->target_type == D19_TARGET_TYPE_rule);
+    state->rule_num = target->target_rule_offset;
+    state->split_rule_offset = 0;
+  }
+  return true;
+}
+
 LLTuple year23_day19(char *buf, long buf_len) {
   LLTuple res = {0};
 
@@ -184,13 +266,12 @@ LLTuple year23_day19(char *buf, long buf_len) {
       in_rule_offset = offset;
     }
     D19Rule curr_rule = (rules_vec[offset]);
-    int i = 0;
 
     char *rules = strsep(&line, "}");
     while (rules != NULL) {
       char *split_rule_string = strsep(&rules, ",");
-      D19SplitRule *curr_split_rule = &(curr_rule.split_rules[i]);
-      i++;
+      D19SplitRule *curr_split_rule =
+          &(curr_rule.split_rules[curr_rule.num_split_rules]);
       bool is_default_target =
           (split_rule_string[1] != '<') && (split_rule_string[1] != '>');
       if (is_default_target) {
@@ -202,6 +283,8 @@ LLTuple year23_day19(char *buf, long buf_len) {
               get_or_create_target_rule(rule_lookup, &rules_vec, &search_rule);
         }
         break;
+      } else {
+        curr_rule.num_split_rules++;
       }
       const char *xmas = "xmas";
       curr_split_rule->split_char_offset =
@@ -236,57 +319,39 @@ LLTuple year23_day19(char *buf, long buf_len) {
     }
   }
 
-  long long *crit_vals[4] = {NULL, NULL, NULL, NULL};
-  for (int i = 0; i < cvector_size(rules_vec); i++) {
-    const D19Rule *rule = &(rules_vec[i]);
-    for (int j = 0; j < MAX_RULE_COUNT; j++) {
-      const D19SplitRule *split_rule = &(rule->split_rules[j]);
-      if (split_rule->target.target_type == D19_TARGET_TYPE_none)
-        break;
-      const long split_val = split_rule->split_val;
-      const long other_side_val =
-          (split_rule->is_greater) ? (split_val + 1) : (split_val);
-      cvector_push_back(crit_vals[split_rule->split_char_offset],
-                        other_side_val);
+  D19State *state_stack = NULL;
+  D19State initial_state = {.upper_bounds = {4001, 4001, 4001, 4001},
+                            .lower_bounds = {1, 1, 1, 1},
+                            .split_rule_offset = 0,
+                            .status = D19_STATUS_matching,
+                            .rule_num = in_rule_offset};
+  cvector_push_back(state_stack, initial_state);
+  long long total_vol = 0;
+  while (cvector_size(state_stack) > 0) {
+    D19State curr_state = state_stack[cvector_size(state_stack) - 1];
+    if (curr_state.status != D19_STATUS_matching) {
+      if(curr_state.status==D19_STATUS_accepted) {
+        long long curr_vol = 1;
+        for (int i = 0; i < NUM_D19_CHAR_OFFSET; i++) {
+          curr_vol *= (curr_state.upper_bounds[i] - curr_state.lower_bounds[i]);
+        }
+        total_vol += curr_vol;
+      }
+      cvector_pop_back(state_stack);
+      continue;
     }
-  }
-  for (int i = 0; i < 4; i++) {
-    cvector_push_back(crit_vals[i], 1);
-    cvector_push_back(crit_vals[i], 4001);
-    qsort(crit_vals[i], cvector_size(crit_vals[i]), sizeof(long long),
-          (__compar_fn_t)compare_long);
-    for (int j = 0; j < cvector_size(crit_vals[i]); j++) {
-      printf("%lld,", crit_vals[i][j]);
+    bool could_step = apply_split_rule(rules_vec, &curr_state, false);
+    apply_split_rule(rules_vec, &state_stack[cvector_size(state_stack) - 1],
+                     true);
+    state_stack[cvector_size(state_stack) - 1].split_rule_offset++;
+    if (!could_step) {
+      cvector_pop_back(state_stack);
+      continue;
     }
-    printf("\n");
+    cvector_push_back(state_stack, curr_state);
   }
 
-  int curr_offset[] = {0, 0, 0, 0};
-  int comb_lims[] = {0, 0, 0, 0};
-  for (int i = 0; i < 4; i++) {
-    comb_lims[i] = cvector_size(crit_vals[i]) - 1;
-    printf("%d,", comb_lims[i]);
-  }
-  printf("\n");
-  bool reached_last_interval = false;
-  long long total_accepted = 0;
-  while (!reached_last_interval) {
-    long long interval_size = 1;
-    long curr_xmas[4] = {0};
-    for (int i = 0; i < 4; i++) {
-      const int iv_begin = curr_offset[i];
-      const int iv_end = curr_offset[i] + 1;
-      interval_size *= crit_vals[i][iv_end] - crit_vals[i][iv_begin];
-      curr_xmas[i] = crit_vals[i][iv_begin];
-    }
-
-    bool accept = judge_xmas(rules_vec, in_rule_offset, curr_xmas);
-    if (accept) {
-      total_accepted += interval_size;
-    }
-    reached_last_interval = advance_comb(curr_offset, comb_lims);
-  }
-  res.right = total_accepted;
+  res.right =total_vol;
 
   return res;
 }
