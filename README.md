@@ -1,3 +1,6 @@
+# AoC 2023 in C
+
+
 # TODO
 - Logging (https://github.com/rxi/log.c?)
 - Unit Tests!
