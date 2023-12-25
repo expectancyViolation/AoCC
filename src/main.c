@@ -76,6 +76,7 @@ void run_all_days(aoc_manager_handle manager, int year) {
     fetch_day_input_cached(task.year, task.day, task.input_file);
     results[i] = benchmark_day(master_solver, task);
   }
+  double overall=0;
   for (size_t i = 0; i < num_of_tasks; i++) {
     const AocBenchmarkDay result = results[i];
     const AocDayTask task = tasks[i];
@@ -83,10 +84,12 @@ void run_all_days(aoc_manager_handle manager, int year) {
     printf("DAY %2d:\n", task.day);
     bool made_guess = validate_day_result(manager, &(result.result), &task);
     if (made_guess) {
-      print_day_benchmark(&results[i]);
+//      print_day_benchmark(&results[i]);
       printf("took:%f\n\n", results[i].solve_duration);
+      overall+=results[i].solve_duration;
     }
   }
+  printf("---------------------------\noverall duration:%f\n\n",overall);
   free(results);
 }
 
