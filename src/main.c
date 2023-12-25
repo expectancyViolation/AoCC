@@ -124,16 +124,9 @@ void solve_current_day(aoc_manager_handle manager_handle) {
   const int current_year = 2023;
   char const *file = "/tmp/d25_inp.txt";
 
-  //  char const *file = "/tmp/d25_ex1.txt";
-
-  //   char const *file = "/tmp/d24_ex1.txt";
   fetch_day_input_cached(current_year, current_day, file);
   const AocDayRes res = solve_year23_day25(file);
   print_aoc_day_result(&res);
-  //  ResultStatus *stat = NULL;
-  //  aoc_manager_get_day_status(manager_handle, current_year, current_day,
-  //                             AOC_DAY_PART_part2, &stat);
-  //  print_result_status(stat);
 
   //  // part 1
   //  submit_helper(manager_handle, current_year, current_day,
@@ -156,11 +149,11 @@ int main() {
 
   //  solve_current_day(manager_handle);
 
-//  char const *filepath = "/tmp/d19_inp.txt";
-//  AocDayTask task_bb = {.year = 2023, .day = 19, .input_file = filepath};
-//  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-//  print_day_benchmark(&benchbb);
-         run_all_days(manager_handle, 2023);
+  //  char const *filepath = "/tmp/d23_input.txt";
+  //  AocDayTask task_bb = {.year = 2023, .day = 23, .input_file = filepath};
+  //  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+  //  print_day_benchmark(&benchbb);
+  run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
   aoc_manager_close(manager_handle);

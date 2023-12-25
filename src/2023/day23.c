@@ -140,11 +140,13 @@ typedef struct {
 typedef struct {
   D23LongTripPosition position;
   int distance;
+  int edge_offset;
 } D23LongTripState;
 
 void print_d23_long_trip_state(D23LongTripState const *state) {
-  printf("LTS: %lu %d dist:%d\n", state->position.visited_crossing_bitset,
-         state->position.curr_crossing, state->distance);
+  printf("LTS: %lu %d dist:%d edge:%d\n",
+         state->position.visited_crossing_bitset, state->position.curr_crossing,
+         state->distance, state->edge_offset);
 }
 
 static int d23long_trip_state_compare(const void *a, const void *b,
@@ -193,8 +195,6 @@ static LLTuple solve(D23Map *map) {
       sizeof(D23State), 0, 0, 0, d23state_hash, d23state_compare, NULL, NULL);
 
   while (hashmap_count(frontier) > 0) {
-    // limit should be safe to reach all reachable positions in 3x3 blocks
-
     size_t iter = 0;
     void *item;
     while (hashmap_iter(frontier, &iter, &item)) {
@@ -224,9 +224,6 @@ static LLTuple solve(D23Map *map) {
       }
       if (already_visited)
         continue;
-      //      printf("visiting: ");
-      //      print_d23state(&curr_state);
-      //      printf("is crossing:%d\n", curr_is_crossing);
       char curr_tile = d23_map_lookup(map, curr_state.x, curr_state.y);
       for (int i = 0; i < NUM_DELTAS; i++) {
         //        printf("checking: %d\n", i);
@@ -259,14 +256,6 @@ static LLTuple solve(D23Map *map) {
     hashmap_clear(new_frontier, 0);
   }
 
-  size_t iter = 0;
-  void *item;
-  long long block_size = map->x_size;
-  while (hashmap_iter(visited_crossings, &iter, &item)) {
-    //printf("crossing:\n");
-    D23State *curr_state = (D23State *)item;
-    //print_d23state(curr_state);
-  }
   LLTuple **neighbors =
       malloc(cvector_size(map->crossings_vec) * sizeof(LLTuple *));
   for (int i = 0; i < cvector_size(map->crossings_vec); i++)
@@ -276,8 +265,6 @@ static LLTuple solve(D23Map *map) {
     const LLTuple edge = map->crossing_connections_vec[i];
     if (edge.left == -1)
       continue;
-    //    printf("%lld,%lld,Undirected,%d,%d,1\n", edge.left, edge.right, i,
-    //           map->crossing_connection_weights_vec[i]);
     LLTuple left_entry = (LLTuple){
         .left = edge.right, .right = map->crossing_connection_weights_vec[i]};
     cvector_push_back(neighbors[edge.left], left_entry);
@@ -287,111 +274,56 @@ static LLTuple solve(D23Map *map) {
     cvector_push_back(neighbors[edge.right], right_entry);
   }
 
-//  for (int i = 0; i < cvector_size(map->crossings_vec); i++) {
-//    //print_d23state(&map->crossings_vec[i]);
-//    for (int j = 0; j < cvector_size(neighbors[i]); j++) {
-//      print_tuple(neighbors[i][j]);
-//      printf("\n");
-//    }
-//  }
+  const int end_crossing = (cvector_size(map->crossings_vec) - 1);
 
-  struct hashmap *long_trip_visited =
-      hashmap_new(sizeof(D23LongTripState), 0, 0, 0, d23long_trip_state_hash,
-                  d23long_trip_state_compare, NULL, NULL);
+  D23LongTripState *trip_stack = NULL;
+  D23LongTripState initial_trip_state = {
+      .position = {.curr_crossing = 0, .visited_crossing_bitset = 1},
+      .distance = 0,
+      .edge_offset = 0};
+  cvector_push_back(trip_stack, initial_trip_state);
 
-  struct hashmap *long_trip_frontier =
-      hashmap_new(sizeof(D23LongTripState), 0, 0, 0, d23long_trip_state_hash,
-                  d23long_trip_state_compare, NULL, NULL);
-
-  struct hashmap *long_trip_new_frontier =
-      hashmap_new(sizeof(D23LongTripState), 0, 0, 0, d23long_trip_state_hash,
-                  d23long_trip_state_compare, NULL, NULL);
-
-  hashmap_set(long_trip_frontier,
-              &(D23LongTripState){.position = {.curr_crossing = 0,
-                                               .visited_crossing_bitset = 1},
-                                  .distance = 0});
-
-  while (hashmap_count(long_trip_frontier) > 0) {
-    // limit should be safe to reach all reachable positions in 3x3 blocks
-
-    size_t iter = 0;
-    void *item;
-    while (hashmap_iter(long_trip_frontier, &iter, &item)) {
-      D23LongTripState curr_state = *(D23LongTripState *)item;
-
-      //      if (curr_state.position.curr_crossing == 2) {
-      // print_d23_long_trip_state(&curr_state);
-      //      }
-
-      D23LongTripState *prev_visit =
-          hashmap_get(long_trip_visited, &curr_state);
-
-      bool distance_updated = true;
-      bool already_visited = prev_visit != NULL;
-      if (already_visited) {
-        distance_updated = curr_state.distance != prev_visit->distance;
-        curr_state.distance = max(curr_state.distance, prev_visit->distance);
-      }
-      hashmap_set(long_trip_visited, &curr_state);
-      hashmap_set(new_frontier, &curr_state);
-      if (!distance_updated)
-        continue;
-      int const curr_crossing = curr_state.position.curr_crossing;
-      uint64_t const visited_bitset =
-          curr_state.position.visited_crossing_bitset;
-      LLTuple *nbs = neighbors[curr_crossing];
-      for (int i = 0; i < cvector_size(nbs); i++) {
-        uint64_t nb = nbs[i].left;
-        // printf("%lu\n", nb);
-        const uint64_t one = 1;
-        uint64_t nb_bit = one << (nb); // DANGER!! literals are 32 bit
-        assert(kbi_popcount64(visited_bitset | nb_bit) < 37);
-        int nb_dist = nbs[i].right;
-        bool nb_already_visited = visited_bitset & nb_bit;
-        if (nb_already_visited)
-          continue;
-
-        D23LongTripState new_state = {
-            .position = {.visited_crossing_bitset = visited_bitset | nb_bit,
-                         .curr_crossing = nb},
-            .distance = curr_state.distance + nb_dist};
-
-        D23LongTripState *already_in_frontier =
-            hashmap_get(long_trip_new_frontier, &new_state);
-        if (already_in_frontier != NULL) {
-          new_state.distance =
-              max(new_state.distance, already_in_frontier->distance);
-        }
-        hashmap_set(long_trip_new_frontier, &new_state);
-      }
+  int longest_trip = 0;
+  while (cvector_size(trip_stack) > 0) {
+    D23LongTripState curr_trip_state = trip_stack[cvector_size(trip_stack) - 1];
+    // check final
+    if (curr_trip_state.position.curr_crossing == end_crossing) {
+      longest_trip = max(longest_trip, curr_trip_state.distance);
+      cvector_pop_back(trip_stack);
+      continue;
     }
-    struct hashmap *tmp = long_trip_frontier;
-    long_trip_frontier = long_trip_new_frontier;
-    long_trip_new_frontier = tmp;
-    hashmap_clear(long_trip_new_frontier, 0);
-    //printf("frontier size:%ld\n", hashmap_count(long_trip_frontier));
-  }
-
-  {
-    size_t iter = 0;
-    void *item;
-    const int end_crossing =
-        (cvector_size(map->crossings_vec) - 1); // TODO why?
-    int longest_trip = 0;
-    while (hashmap_iter(long_trip_visited, &iter, &item)) {
-      D23LongTripState curr_state = *(D23LongTripState *)item;
-      const uint64_t one = 1;
-      if (curr_state.position.curr_crossing == end_crossing)
-        longest_trip = max(longest_trip, curr_state.distance);
+    int const curr_crossing = curr_trip_state.position.curr_crossing;
+    LLTuple *nbs = neighbors[curr_crossing];
+    // check no neighbors left
+    if (cvector_size(nbs) <= curr_trip_state.edge_offset) {
+      cvector_pop_back(trip_stack);
+      continue;
     }
-    return (LLTuple){0,longest_trip};
-  }
+    // advance neighbor
+    trip_stack[cvector_size(trip_stack) - 1].edge_offset++;
+    // check current neighbor
+    uint64_t const visited_bitset =
+        curr_trip_state.position.visited_crossing_bitset;
+    uint64_t nb = nbs[curr_trip_state.edge_offset].left;
+    const uint64_t one = 1;
+    uint64_t nb_bit = one << (nb); // DANGER!! literals are 32 bit
+    int nb_dist = nbs[curr_trip_state.edge_offset].right;
+    const bool nb_already_visited = visited_bitset & nb_bit;
+    if (nb_already_visited)
+      continue;
 
+    D23LongTripState new_state = {
+        .position = {.visited_crossing_bitset = visited_bitset | nb_bit,
+                     .curr_crossing = nb},
+        .distance = curr_trip_state.distance + nb_dist,
+        .edge_offset = 0};
+
+    cvector_push_back(trip_stack, new_state);
+  }
+  return (LLTuple){0, longest_trip};
 }
 
 LLTuple year23_day23(char *buf, long buf_len) {
-  LLTuple res = {0};
   D23Map map = {0, .crossings_vec = NULL,
                 .crossing_connection_weights_vec = NULL};
   fill_map(&map, buf, buf_len);
