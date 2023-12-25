@@ -12,6 +12,10 @@
 
 #define DISTANCE_UNREACHABLE (-1)
 
+
+// BFS makes this slow
+//  all the heuristics cannot offset the hashmap/ bad memory access pattern :/
+
 enum FACING {
   FACING_north = 0,
   FACING_east = 1,

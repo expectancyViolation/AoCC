@@ -57,10 +57,15 @@ bool validate_day_result(aoc_manager_handle manager, const AocDayRes *result,
       manager, task->year, task->day, AOC_DAY_PART_part2, result->part2_res);
   bool part1_no_guess = (result->part1_res.type == AOC_PART_RES_TYPE_none);
   char *part1_symbol = part1_no_guess ? "❓" : CHECKMARK(part1_correct);
-  bool part2_no_guess = (result->part2_res.type == AOC_PART_RES_TYPE_none);
-  char *part2_symbol = part2_no_guess ? "❓" : CHECKMARK(part2_correct);
-  printf("P1:%5s\tP2:%5s\n", part1_symbol, part2_symbol);
-  return !(part1_no_guess && part2_no_guess);
+  if (task->day == 25) {
+    printf("P1:%5s\n", part1_symbol);
+    return !(part1_no_guess);
+  } else {
+    bool part2_no_guess = (result->part2_res.type == AOC_PART_RES_TYPE_none);
+    char *part2_symbol = part2_no_guess ? "❓" : CHECKMARK(part2_correct);
+    printf("P1:%5s\tP2:%5s\n", part1_symbol, part2_symbol);
+    return !(part1_no_guess && part2_no_guess);
+  }
 }
 
 void run_all_days(aoc_manager_handle manager, int year) {
@@ -76,7 +81,7 @@ void run_all_days(aoc_manager_handle manager, int year) {
     fetch_day_input_cached(task.year, task.day, task.input_file);
     results[i] = benchmark_day(master_solver, task);
   }
-  double overall=0;
+  double overall = 0;
   for (size_t i = 0; i < num_of_tasks; i++) {
     const AocBenchmarkDay result = results[i];
     const AocDayTask task = tasks[i];
@@ -84,12 +89,12 @@ void run_all_days(aoc_manager_handle manager, int year) {
     printf("DAY %2d:\n", task.day);
     bool made_guess = validate_day_result(manager, &(result.result), &task);
     if (made_guess) {
-//      print_day_benchmark(&results[i]);
+      //      print_day_benchmark(&results[i]);
       printf("took:%f\n\n", results[i].solve_duration);
-      overall+=results[i].solve_duration;
+      overall += results[i].solve_duration;
     }
   }
-  printf("---------------------------\noverall duration:%f\n\n",overall);
+  printf("---------------------------\noverall duration:%f\n\n", overall);
   free(results);
 }
 

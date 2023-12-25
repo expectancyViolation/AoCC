@@ -6,6 +6,7 @@
 #include <string.h>
 
 #define HAND_SIZE 5
+#define DAY07_PART2
 
 struct hand {
   int largest_match;
