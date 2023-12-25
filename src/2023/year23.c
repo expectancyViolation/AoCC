@@ -64,8 +64,8 @@ AocDayRes year23_solver(const AocDayTask task) {
     return solve_year23_day17(file);
   case 18:
     return solve_year23_day18(file);
-  case 19:
-    return solve_year23_day19(file);
+//  case 19:
+//    return solve_year23_day19(file);
   case 20:
     return solve_year23_day20(file);
   case 21:

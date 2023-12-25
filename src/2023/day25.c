@@ -213,13 +213,13 @@ LLTuple year23_day25(char *buf, long buf_len) {
   bool done = false;
 
   // parallel not worth, since we hit on second attempt
-  // #pragma omp parallel for
+//#pragma omp parallel for
   for (int sink = 1; sink < cvector_size(edge_lookup.offset_vec) - 1; sink++) {
-    if (done)
-      continue;
+        if (done)
+          continue;
     DFSFlowResult flow_res = dfs_flow(&edge_lookup, 0, sink);
     if (flow_res.max_flow == 3) {
-      // #pragma omp critical
+//#pragma omp critical
       done = true;
       res.left = (num_verts - flow_res.still_connected_count) *
                  flow_res.still_connected_count;

@@ -261,13 +261,11 @@ static LLTuple solve(D23Map *map) {
 
   size_t iter = 0;
   void *item;
-  long long count_at_odd_dist = 0;
-  long long count_even_below_64 = 0;
   long long block_size = map->x_size;
   while (hashmap_iter(visited_crossings, &iter, &item)) {
-    printf("crossing:\n");
+    //printf("crossing:\n");
     D23State *curr_state = (D23State *)item;
-    print_d23state(curr_state);
+    //print_d23state(curr_state);
   }
   LLTuple **neighbors =
       malloc(cvector_size(map->crossings_vec) * sizeof(LLTuple *));
@@ -289,13 +287,13 @@ static LLTuple solve(D23Map *map) {
     cvector_push_back(neighbors[edge.right], right_entry);
   }
 
-  for (int i = 0; i < cvector_size(map->crossings_vec); i++) {
-    print_d23state(&map->crossings_vec[i]);
-    for (int j = 0; j < cvector_size(neighbors[i]); j++) {
-      print_tuple(neighbors[i][j]);
-      printf("\n");
-    }
-  }
+//  for (int i = 0; i < cvector_size(map->crossings_vec); i++) {
+//    //print_d23state(&map->crossings_vec[i]);
+//    for (int j = 0; j < cvector_size(neighbors[i]); j++) {
+//      print_tuple(neighbors[i][j]);
+//      printf("\n");
+//    }
+//  }
 
   struct hashmap *long_trip_visited =
       hashmap_new(sizeof(D23LongTripState), 0, 0, 0, d23long_trip_state_hash,
@@ -372,7 +370,7 @@ static LLTuple solve(D23Map *map) {
     long_trip_frontier = long_trip_new_frontier;
     long_trip_new_frontier = tmp;
     hashmap_clear(long_trip_new_frontier, 0);
-    printf("frontier size:%ld\n", hashmap_count(long_trip_frontier));
+    //printf("frontier size:%ld\n", hashmap_count(long_trip_frontier));
   }
 
   {
@@ -380,19 +378,16 @@ static LLTuple solve(D23Map *map) {
     void *item;
     const int end_crossing =
         (cvector_size(map->crossings_vec) - 1); // TODO why?
-    printf("END%d\n", end_crossing);
     int longest_trip = 0;
     while (hashmap_iter(long_trip_visited, &iter, &item)) {
       D23LongTripState curr_state = *(D23LongTripState *)item;
       const uint64_t one = 1;
-      uint64_t nb_bit = one << end_crossing;
       if (curr_state.position.curr_crossing == end_crossing)
         longest_trip = max(longest_trip, curr_state.distance);
     }
-    printf("longest: %d\n", longest_trip);
+    return (LLTuple){0,longest_trip};
   }
 
-  return (LLTuple){count_even_below_64, count_at_odd_dist};
 }
 
 LLTuple year23_day23(char *buf, long buf_len) {
@@ -400,8 +395,7 @@ LLTuple year23_day23(char *buf, long buf_len) {
   D23Map map = {0, .crossings_vec = NULL,
                 .crossing_connection_weights_vec = NULL};
   fill_map(&map, buf, buf_len);
-  solve(&map);
-  return res;
+  return solve(&map);
 }
 AocDayRes solve_year23_day23(const char *input_file) {
   char *input_buffer;

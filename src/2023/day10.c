@@ -110,7 +110,7 @@ const struct day10_piece *get_tile_piece(char tile) {
   case '.':
     return &GROUND;
   default:
-    printf("%x is ground\n", tile);
+//    printf("%x is ground\n", tile);
     // we are surrounded by ground
     return &GROUND;
   }

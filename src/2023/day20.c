@@ -232,7 +232,7 @@ LLTuple year23_day20(char *buf, long buf_len) {
           if (rx_pre_input_periods[i] != 0)
             continue;
           if (pulse.target_offset == rx_pre->input_indices[i]) {
-            printf("found period:%d at time push %d\n", i, n_push);
+//            printf("found period:%d at time push %d\n", i, n_push);
             rx_pre_input_periods[i] = n_push;
           }
         }

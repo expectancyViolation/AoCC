@@ -59,11 +59,11 @@ typedef struct {
 static const D17State INVALID_STATE = {
     .x = -2, .y = -2, FACING_west, -1, 1000000, 1000000, -1};
 
-//void print_d17state(const D17State *state) {
-//  printf("state:(%d,%d,%d,%d (cost:%d,latest heuristic: %d))\n", state->x,
-//         state->y, state->facing, state->straight_moves, state->distance,
-//         state->heuristic);
-//}
+// void print_d17state(const D17State *state) {
+//   printf("state:(%d,%d,%d,%d (cost:%d,latest heuristic: %d))\n", state->x,
+//          state->y, state->facing, state->straight_moves, state->distance,
+//          state->heuristic);
+// }
 
 static int d17state_compare(const void *a, const void *b, void *udata) {
   const D17State *sa = a;
@@ -438,7 +438,7 @@ LLTuple year23_day17(char *buf, long buf_len) {
         NULL, NULL, &heuristic_result);
 
   double took_heur = stop_perf_measurement(timer_heur);
-  printf("heur took %f\n", took_heur);
+  //  printf("heur took %f\n", took_heur);
 
   HeuristicDistances heuristic_distances = {.x_size = map.x_size,
                                             .y_size = map.y_size};
@@ -466,7 +466,7 @@ LLTuple year23_day17(char *buf, long buf_len) {
       res.right = solve_p2(&map, initial_states, &heuristic_distances);
 
     double took = stop_perf_measurement(timer);
-    printf("part %d took %f\n", i + 1, took);
+    //    printf("part %d took %f\n", i + 1, took);
   }
 
   //  res.left = solve(&map, initial_states, get_neighbors, is_final,NULL,NULL,

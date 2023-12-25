@@ -24,7 +24,7 @@
 #include "util/result_db.h"
 #include "util/timer.h"
 
-#define CURRENT_DAY 20
+#define CURRENT_DAY 25
 
 #define CHECKMARK(x) ((x) ? ("✅") : ("❌"))
 
@@ -150,17 +150,17 @@ int main() {
   // benchmark(result_db_test);
   // curl_global_init(CURL_GLOBAL_ALL);
 
-  result_db_handle db = result_db_init_db("/tmp/other_aoc/res_vnnn_.db");
+  result_db_handle db = result_db_init_db("/tmp/other_aoc/res_vnnn__.db");
   aoc_manager_handle manager_handle = aoc_manager_init_manager(db);
   //  result_db_test();
 
   //  solve_current_day(manager_handle);
 
-  char const *filepath = "/tmp/d25_inp.txt";
-  AocDayTask task_bb = {.year = 2023, .day = 25, .input_file = filepath};
-  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
-  print_day_benchmark(&benchbb);
-  //       run_all_days(manager_handle, 2023);
+//  char const *filepath = "/tmp/d25_inp.txt";
+//  AocDayTask task_bb = {.year = 2023, .day = 25, .input_file = filepath};
+//  AocBenchmarkDay benchbb = benchmark_day(master_solver, task_bb);
+//  print_day_benchmark(&benchbb);
+         run_all_days(manager_handle, 2023);
 
   // curl_global_cleanup();
   aoc_manager_close(manager_handle);
